@@ -103,15 +103,15 @@ jobs:
       matrix:
         include:
           - target: backend
-            context: ./backend
+            context: .
             type: runtime
             dockerfile: Dockerfile.backend
           - target: backend-migrator
-            context: ./backend
+            context: .
             type: migrator
             dockerfile: Dockerfile.migrator
           - target: frontend
-            context: ./frontend
+            context: .
             type: runner
             dockerfile: Dockerfile.frontend
 

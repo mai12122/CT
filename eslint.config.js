@@ -13,6 +13,6 @@ module.exports = defineConfig([
     },
   },
   {
-    ignores: ["dist/*", "server/**", "prisma/**", ".expo/**"],
+    ignores: ["dist/*", "prisma/**", ".expo/**"],
   },
 ]);
