@@ -223,20 +223,3 @@ jobs:
             ./scripts/deploy.sh
           EOF
           echo "✅ Environment deployment completed."
-
-  # =========================================================================
-  # 6. GITHUB PAGES DEPLOYMENT (OPTIONAL)
-  # =========================================================================
-  deploy-github-pages:
-    name: Deploy to GitHub Pages
-    needs: frontend-lint-build
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-    continue-on-error: true
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: 🌐 Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
