@@ -73,4 +73,80 @@ export class AuthController {
       next(error);
     }
   }
+
+  static async oauth(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { provider, email, name, avatar, providerId } = req.body;
+      const result = await AuthService.oauthLogin({ provider, email, name, avatar, providerId });
+      res.status(200).json({
+        success: true,
+        message: `${provider} authentication successful`,
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async sendPhoneOtp(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { phone } = req.body;
+      const result = await AuthService.sendPhoneOtp(phone);
+      res.status(200).json({
+        ...result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async verifyPhoneOtp(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { phone, code, name } = req.body;
+      const result = await AuthService.verifyPhoneOtp({ phone, code, name });
+      res.status(200).json({
+        success: true,
+        message: 'Phone verification successful',
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getFacebookUrl(req: Request, res: Response, next: NextFunction) {
+    try {
+      const redirectUri = req.query.redirectUri as string | undefined;
+      const url = AuthService.getFacebookAuthUrl(redirectUri);
+
+      if (req.query.redirect === 'true') {
+        return res.redirect(url);
+      }
+
+      res.status(200).json({
+        success: true,
+        data: { url },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async facebookCallback(req: Request, res: Response, next: NextFunction) {
+    try {
+      const code = (req.query.code || req.body.code) as string;
+      if (!code) {
+        throw new AppError('Authorization code is required', 400);
+      }
+      const redirectUri = (req.query.redirectUri || req.body.redirectUri) as string | undefined;
+      const result = await AuthService.handleFacebookCallback(code, redirectUri);
+      res.status(200).json({
+        success: true,
+        message: 'Facebook authentication successful',
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }

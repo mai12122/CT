@@ -1,9 +1,9 @@
-import jwt, { SignOptions } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { config } from '../config';
 
 export interface TokenPayload {
   userId: string;
-  email: string;
+  email?: string | null;
   role: string;
 }
 

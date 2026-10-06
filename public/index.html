@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>CT Live Concerts — Mobile Pass</title>
+  <link rel="icon" type="image/png" href="logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -449,6 +450,140 @@
     }
     .btn-secondary:hover { background: rgba(139, 92, 246, 0.15); border-color: var(--primary); }
 
+    /* Clean Social Auth Section */
+    .social-auth-box {
+      margin: 18px 0 16px 0;
+      text-align: center;
+    }
+    .social-auth-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 10px;
+    }
+    .social-icons-row {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      justify-content: center;
+    }
+    .btn-social-icon {
+      flex: 1;
+      max-width: 160px;
+      height: 48px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .btn-social-icon:hover {
+      transform: translateY(-2px);
+    }
+    .btn-social-icon.btn-google-icon:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(66, 133, 244, 0.5);
+      box-shadow: 0 4px 14px rgba(66, 133, 244, 0.2);
+    }
+    .btn-social-icon.btn-facebook-icon:hover {
+      background: rgba(24, 119, 242, 0.1);
+      border-color: rgba(24, 119, 242, 0.5);
+      box-shadow: 0 4px 14px rgba(24, 119, 242, 0.2);
+    }
+    .btn-phone-toggle {
+      width: 100%;
+      padding: 11px;
+      background: rgba(139, 92, 246, 0.12);
+      border: 1px dashed rgba(139, 92, 246, 0.4);
+      color: #c084fc;
+      border-radius: 14px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: 0.2s;
+      margin-top: 10px;
+    }
+    .btn-phone-toggle:hover {
+      background: rgba(139, 92, 246, 0.2);
+    }
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      margin: 16px 0;
+      color: var(--text-muted);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .auth-divider::before,
+    .auth-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+    .auth-divider span {
+      padding: 0 10px;
+    }
+    .oauth-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 16px;
+    }
+    .oauth-modal.active {
+      display: flex;
+    }
+    @media (min-width: 640px) {
+      .oauth-modal {
+        align-items: center;
+      }
+    }
+    .oauth-modal-content {
+      background: #0f172a;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      width: 100%;
+      max-width: 420px;
+      padding: 24px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+      animation: modalSlideUp 0.25s ease;
+      text-align: left;
+    }
+    .oauth-account-pill {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      background: rgba(2, 6, 23, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .oauth-account-pill:hover {
+      border-color: #8b5cf6;
+      background: rgba(139, 92, 246, 0.1);
+      transform: translateX(2px);
+    }
+
     /* Poster & Seat Map */
     .hall-poster {
       background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);
@@ -762,12 +897,7 @@
     <!-- ============================================================ -->
     <header class="top-app-bar">
       <div class="top-bar-left">
-        <div class="top-bar-icon" id="topBarIcon">
-          <!-- Sparkles Icon -->
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
-          </svg>
-        </div>
+        <img src="logo.png" alt="CT Concert Ticketing" style="height: 38px; width: auto; object-fit: contain; margin-right: 8px;">
         <div>
           <div class="top-bar-tag" id="topBarTag">CT LIVE CONCERTS</div>
           <div class="top-bar-title" id="topBarTitle">Event Pass</div>
@@ -938,17 +1068,19 @@
       <!-- 1. AUTHENTICATION FIRST GATE (IF NOT LOGGED IN) -->
       <!-- ======================================================= -->
       <div id="hallAuthGate" class="auth-gate-card">
-        <div class="lock-icon-box">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-          </svg>
-        </div>
+        <img src="logo.png" alt="CT Concert Ticketing" style="width: 220px; max-width: 85%; height: auto; object-fit: contain; margin-bottom: 16px; filter: drop-shadow(0 6px 20px rgba(139,92,246,0.35));">
         <h2 class="auth-title">Authentication Required</h2>
         <p class="auth-desc">
           Please sign in to access CT Live Music Hall seat reservations and flash sale tickets.
         </p>
 
+        <!-- Method Switcher Pills (Email vs Phone) at the TOP -->
+        <div style="display: flex; background: rgba(0,0,0,0.4); border: 1px solid var(--card-border); border-radius: 12px; padding: 4px; margin-bottom: 14px;">
+          <button type="button" id="tabSwitchEmail" onclick="setHallAuthMode('email')" style="flex: 1; padding: 8px; border-radius: 8px; border: none; background: var(--primary); color: #fff; font-size: 12px; font-weight: 700; cursor: pointer;">Email Address</button>
+          <button type="button" id="tabSwitchPhone" onclick="setHallAuthMode('phone')" style="flex: 1; padding: 8px; border-radius: 8px; border: none; background: transparent; color: var(--text-muted); font-size: 12px; font-weight: 700; cursor: pointer;">Phone Number (SMS OTP)</button>
+        </div>
+
+        <!-- 1. Email Form -->
         <form id="hallLoginForm" onsubmit="handleHallLogin(event)">
           <div class="form-group">
             <label class="form-label">Email Address</label>
@@ -962,7 +1094,63 @@
           <button type="submit" class="btn-primary" id="hallLoginBtn">Sign In to Continue</button>
           <button type="button" class="btn-secondary" onclick="quickFillAndLogin()">⚡ Demo Account Quick Sign In (Alex Rivera)</button>
         </form>
+
+        <!-- 2. Phone Form -->
+        <div id="hallPhoneForm" style="display: none; text-align: left;">
+          <div id="phoneStep1">
+            <div class="form-group">
+              <label class="form-label">Cambodian Phone Number</label>
+              <div style="display: flex; gap: 8px;">
+                <span style="background: rgba(255,255,255,0.06); border: 1px solid var(--card-border); border-radius: 12px; padding: 12px 14px; color: #fff; font-weight: 800; font-size: 13px; display: flex; align-items: center; gap: 6px;">
+                  <span style="font-size: 16px;">🇰🇭</span> +855
+                </span>
+                <input type="tel" class="form-input" id="hallPhoneInput" placeholder="012 345 678" value="012 345 678" style="flex: 1; font-weight: 600;">
+              </div>
+            </div>
+            <button type="button" class="btn-primary" onclick="sendHallPhoneOtp()" id="sendOtpBtn">Send Cambodian Verification SMS</button>
+            <div style="font-size: 11px; color: #a78bfa; margin-top: 8px; cursor: pointer; text-align: center;" onclick="document.getElementById('hallPhoneInput').value='012 345 678'">
+              ⚡ Quick fill Cambodian demo phone (🇰🇭 012 345 678)
+            </div>
+          </div>
+
+          <div id="phoneStep2" style="display: none; margin-top: 10px;">
+            <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px; padding: 10px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 12px; color: #34d399; font-weight: 600;">SMS Code Ready</span>
+              <span id="otpHintBox" style="font-size: 11px; color: #fff; background: rgba(16,185,129,0.3); padding: 3px 8px; border-radius: 6px; cursor: pointer; font-weight: 700;" onclick="document.getElementById('hallOtpInput').value='123456'">Auto-fill: 123456</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">6-Digit Verification Code</label>
+              <input type="text" class="form-input" id="hallOtpInput" placeholder="123456" maxlength="6" style="font-size: 18px; font-weight: 800; letter-spacing: 4px; text-align: center;">
+            </div>
+            <button type="button" class="btn-primary" onclick="verifyHallPhoneOtp()" id="verifyOtpBtn" style="background: #059669;">Verify & Unlock Hall</button>
+            <div style="text-align: center; margin-top: 8px;">
+              <span style="font-size: 11px; color: var(--text-muted); cursor: pointer;" onclick="document.getElementById('phoneStep2').style.display='none'; document.getElementById('phoneStep1').style.display='block';">← Change Phone Number</span>
+            </div>
+          </div>
+        </div>
+
         <div id="hallAuthErr" style="display: none; color: #f87171; font-size: 12px; margin-top: 12px;"></div>
+
+        <!-- Clean Social Login: Continue with then Google and Facebook icons UNDER Email & Phone -->
+        <div class="social-auth-box" style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 16px;">
+          <div class="social-auth-label">Continue with</div>
+          <div class="social-icons-row">
+            <button type="button" class="btn-social-icon btn-google-icon" onclick="openOAuthModal('GOOGLE')" title="Continue with Google" aria-label="Google">
+              <svg width="22" height="22" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+                <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.24v3.15C3.26 21.36 7.33 24 12 24z"/>
+                <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.24C.45 8.16 0 9.97 0 12s.45 3.84 1.24 5.42l4.04-3.15z"/>
+                <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.24 6.58l4.04 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+              </svg>
+            </button>
+
+            <a href="https://www.facebook.com/login.php" target="_blank" rel="noopener noreferrer" class="btn-social-icon btn-facebook-icon" title="Sign in with Facebook" aria-label="Facebook">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="#1877F2">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+            </a>
+          </div>
+        </div>
       </div>
 
       <!-- ======================================================= -->
@@ -1226,6 +1414,40 @@
             <span style="color: var(--text-muted);">Venue:</span>
             <span style="color: #cbd5e1; font-weight: 600;" id="modalVenue">SoFi Stadium • Los Angeles, CA</span>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- INTERACTIVE OAUTH MODAL (GOOGLE & FACEBOOK) -->
+    <!-- ============================================================ -->
+    <div id="oauthModal" class="oauth-modal" onclick="closeOAuthModal(event)">
+      <div class="oauth-modal-content" onclick="event.stopPropagation()">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.08);">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div id="oauthModalIconBox" style="width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: #fff;">
+              <!-- Dynamic Icon (Google or Facebook) -->
+            </div>
+            <div>
+              <div id="oauthModalTitle" style="font-size: 16px; font-weight: 900; color: #fff;">Sign in with Google</div>
+              <div style="font-size: 11px; color: var(--text-muted);">to continue to CT Live Music Hall</div>
+            </div>
+          </div>
+          <button type="button" onclick="closeOAuthModal()" style="background: rgba(255,255,255,0.08); border: none; border-radius: 50%; width: 28px; height: 28px; color: #fff; cursor: pointer; font-size: 14px;">✕</button>
+        </div>
+
+        <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Choose an account for 1-tap sign in:</div>
+
+        <div id="oauthAccountsList">
+          <!-- Dynamically populated account pills -->
+        </div>
+
+        <!-- Custom Account Entry Section -->
+        <div style="margin-top: 12px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 12px;">
+          <div style="font-size: 11px; font-weight: 700; color: #94a3b8; margin-bottom: 6px;">Or use another account:</div>
+          <input type="text" class="form-input" id="oauthCustomName" placeholder="Full Name (e.g. Sokha Meng)" style="margin-bottom: 8px;">
+          <input type="email" class="form-input" id="oauthCustomEmail" placeholder="Email address" style="margin-bottom: 10px;">
+          <button type="button" class="btn-primary" id="oauthCustomSubmitBtn" onclick="submitCustomOAuth()">Continue</button>
         </div>
       </div>
     </div>
@@ -1511,6 +1733,245 @@
       syncAuthState();
       switchTab('explore');
     }
+
+    // ============================================================
+    // GOOGLE & FACEBOOK OAUTH HANDLERS
+    // ============================================================
+    let currentOAuthProvider = 'GOOGLE';
+
+    const googleAccounts = [
+      { name: 'Alex Rivera', email: 'alex.rivera@gmail.com', avatar: 'AR' },
+      { name: 'Sarah Connor', email: 'sarah.music@gmail.com', avatar: 'SC' }
+    ];
+
+    const facebookAccounts = [
+      { name: 'Alex Rivera', email: 'alex.rivera@facebook.com', avatar: 'AR' },
+      { name: 'Jessica Pearson', email: 'jessica.pearson@facebook.com', avatar: 'JP' }
+    ];
+
+    function setHallAuthMode(mode) {
+      const emailForm = document.getElementById('hallLoginForm');
+      const phoneForm = document.getElementById('hallPhoneForm');
+      const tabEmail = document.getElementById('tabSwitchEmail');
+      const tabPhone = document.getElementById('tabSwitchPhone');
+
+      if (mode === 'email') {
+        emailForm.style.display = 'block';
+        phoneForm.style.display = 'none';
+        tabEmail.style.background = 'var(--primary)';
+        tabEmail.style.color = '#fff';
+        tabPhone.style.background = 'transparent';
+        tabPhone.style.color = 'var(--text-muted)';
+      } else {
+        emailForm.style.display = 'none';
+        phoneForm.style.display = 'block';
+        tabPhone.style.background = 'var(--primary)';
+        tabPhone.style.color = '#fff';
+        tabEmail.style.background = 'transparent';
+        tabEmail.style.color = 'var(--text-muted)';
+      }
+    }
+
+    function openOAuthModal(provider) {
+      currentOAuthProvider = provider;
+      const modal = document.getElementById('oauthModal');
+      const iconBox = document.getElementById('oauthModalIconBox');
+      const title = document.getElementById('oauthModalTitle');
+      const list = document.getElementById('oauthAccountsList');
+
+      if (provider === 'GOOGLE') {
+        iconBox.style.background = '#ffffff';
+        iconBox.innerHTML = `
+          <svg width="22" height="22" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+            <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.24v3.15C3.26 21.36 7.33 24 12 24z"/>
+            <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.24C.45 8.16 0 9.97 0 12s.45 3.84 1.24 5.42l4.04-3.15z"/>
+            <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.24 6.58l4.04 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+          </svg>
+        `;
+        title.innerText = 'Sign in with Google';
+        
+        list.innerHTML = googleAccounts.map(acc => `
+          <div class="oauth-account-pill" onclick="handleOAuthLogin('GOOGLE', '${acc.name}', '${acc.email}')">
+            <div style="width: 34px; height: 34px; border-radius: 50%; background: rgba(139,92,246,0.3); border: 1px solid rgba(139,92,246,0.6); display: flex; align-items: center; justify-content: center; font-weight: 800; color: #c084fc; font-size: 12px;">${acc.avatar}</div>
+            <div style="flex: 1;">
+              <div style="font-size: 13px; font-weight: 800; color: #fff;">${acc.name}</div>
+              <div style="font-size: 11px; color: var(--text-muted);">${acc.email}</div>
+            </div>
+            <span style="font-size: 11px; color: #34d399; font-weight: 700;">1-Tap</span>
+          </div>
+        `).join('');
+      } else {
+        iconBox.style.background = '#1877F2';
+        iconBox.innerHTML = `
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="#ffffff">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+          </svg>
+        `;
+        title.innerText = 'Sign in with Facebook';
+
+        list.innerHTML = facebookAccounts.map(acc => `
+          <div class="oauth-account-pill" onclick="handleOAuthLogin('FACEBOOK', '${acc.name}', '${acc.email}')">
+            <div style="width: 34px; height: 34px; border-radius: 50%; background: rgba(24,119,242,0.3); border: 1px solid rgba(24,119,242,0.6); display: flex; align-items: center; justify-content: center; font-weight: 800; color: #60a5fa; font-size: 12px;">${acc.avatar}</div>
+            <div style="flex: 1;">
+              <div style="font-size: 13px; font-weight: 800; color: #fff;">${acc.name}</div>
+              <div style="font-size: 11px; color: var(--text-muted);">${acc.email}</div>
+            </div>
+            <span style="font-size: 11px; color: #34d399; font-weight: 700;">1-Tap</span>
+          </div>
+        `).join('');
+      }
+
+      modal.classList.add('active');
+    }
+
+    function closeOAuthModal(e) {
+      if (e && e.target !== document.getElementById('oauthModal')) return;
+      document.getElementById('oauthModal').classList.remove('active');
+    }
+
+    async function handleOAuthLogin(provider, name, email) {
+      const modal = document.getElementById('oauthModal');
+      try {
+        const res = await fetch('http://localhost:5000/api/v1/auth/oauth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            provider,
+            name,
+            email,
+            providerId: `${provider.toLowerCase()}_${Date.now()}`
+          })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          currentUser = data.data.user;
+          sessionStorage.setItem('ct_user', JSON.stringify(currentUser));
+          if (modal) modal.classList.remove('active');
+          syncAuthState();
+          return;
+        }
+      } catch (e) {
+        // Fallback for static demo
+      }
+
+      currentUser = {
+        name: name,
+        email: email || `${name.toLowerCase().replace(/\s+/g, '')}@${provider.toLowerCase()}.com`,
+        phone: '+855 12 345 678',
+        authProvider: provider
+      };
+      sessionStorage.setItem('ct_user', JSON.stringify(currentUser));
+      if (modal) modal.classList.remove('active');
+      syncAuthState();
+    }
+
+    function submitCustomOAuth() {
+      const name = document.getElementById('oauthCustomName').value.trim() || 'Verified User';
+      const email = document.getElementById('oauthCustomEmail').value.trim() || `${name.toLowerCase().replace(/\s+/g, '')}@${currentOAuthProvider.toLowerCase()}.com`;
+      handleOAuthLogin(currentOAuthProvider, name, email);
+    }
+
+    function getNormalizedCambodianPhone(raw) {
+      let cleaned = (raw || '').trim().replace(/[\s\-\.\(\)]/g, '');
+      if (cleaned.startsWith('00855')) return '+855' + cleaned.slice(5);
+      if (cleaned.startsWith('855')) return '+855' + cleaned.slice(3);
+      if (cleaned.startsWith('+8550')) return '+855' + cleaned.slice(5);
+      if (cleaned.startsWith('+855')) return cleaned;
+      if (cleaned.startsWith('0')) return '+855' + cleaned.slice(1);
+      return '+855' + cleaned;
+    }
+
+    async function sendHallPhoneOtp() {
+      const phoneInput = document.getElementById('hallPhoneInput');
+      const rawPhone = phoneInput.value.trim();
+      const phone = getNormalizedCambodianPhone(rawPhone);
+      const btn = document.getElementById('sendOtpBtn');
+
+      if (!phone || phone.length < 9) {
+        alert('Please enter a valid Cambodian phone number (e.g. 012 345 678 or +855 12 345 678)');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = 'Sending SMS via Backend...';
+
+      try {
+        const res = await fetch('http://localhost:5000/api/v1/auth/phone/send-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.devOtp) {
+            document.getElementById('hallOtpInput').value = data.devOtp;
+            const hint = document.getElementById('otpHintBox');
+            if (hint) hint.innerText = 'Auto-fill: ' + data.devOtp;
+          }
+        } else {
+          document.getElementById('hallOtpInput').value = '123456';
+        }
+      } catch (e) {
+        // Fallback for isolated frontend demo
+        document.getElementById('hallOtpInput').value = '123456';
+      }
+
+      btn.disabled = false;
+      btn.innerText = 'Send Cambodian Verification SMS';
+      document.getElementById('phoneStep1').style.display = 'none';
+      document.getElementById('phoneStep2').style.display = 'block';
+    }
+
+    async function verifyHallPhoneOtp() {
+      const rawPhone = document.getElementById('hallPhoneInput').value.trim();
+      const phone = getNormalizedCambodianPhone(rawPhone);
+      const code = document.getElementById('hallOtpInput').value.trim();
+      const btn = document.getElementById('verifyOtpBtn');
+
+      if (!code) {
+        alert('Please enter verification code');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = 'Verifying with PostgreSQL...';
+
+      try {
+        const res = await fetch('http://localhost:5000/api/v1/auth/phone/verify-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone, code })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          currentUser = data.data.user;
+          sessionStorage.setItem('ct_user', JSON.stringify(currentUser));
+          syncAuthState();
+          btn.disabled = false;
+          btn.innerText = 'Verify & Unlock Hall';
+          return;
+        } else {
+          const errData = await res.json();
+          alert(errData.message || 'Invalid verification code');
+          btn.disabled = false;
+          btn.innerText = 'Verify & Unlock Hall';
+          return;
+        }
+      } catch (e) {}
+
+      currentUser = {
+        name: 'Cambodian Fan (' + phone.slice(-4) + ')',
+        email: phone.replace(/\D/g, '') + '@phone.concertapp.com',
+        phone: phone,
+        authProvider: 'PHONE'
+      };
+      sessionStorage.setItem('ct_user', JSON.stringify(currentUser));
+      syncAuthState();
+      btn.disabled = false;
+      btn.innerText = 'Verify & Unlock Hall';
+    }
+
 
     // Place Order for CT Live Music Hall
     function handlePlaceOrder(e) {

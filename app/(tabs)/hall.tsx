@@ -7,11 +7,13 @@ import {
   TextInput,
   StatusBar,
   Alert,
+  Image,
 } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import QRCode from 'react-native-qrcode-svg';
 import { useAuth } from '@/context/AuthContext';
+import { SocialAuthButtons } from '@/components/SocialAuthButtons';
 
 interface Tier {
   name: string;
@@ -55,15 +57,11 @@ export default function CTLiveHallScreen() {
       {/* Top Header */}
       <View className="pt-14 pb-4 px-5 bg-slate-950/80 border-b border-slate-900 flex-row items-center justify-between">
         <View className="flex-row items-center">
-          <View className="h-10 w-10 rounded-xl bg-violet-600/20 border border-violet-500/40 items-center justify-center mr-3">
-            <Ionicons name="sparkles" size={20} color="#c084fc" />
-          </View>
-          <View>
-            <Text className="text-xs font-bold text-violet-400 tracking-widest uppercase">
-              PHNOM PENH • 2,000 SEATS
-            </Text>
-            <Text className="text-xl font-extrabold text-white">CT Live Music Hall</Text>
-          </View>
+          <Image
+            source={require('@/assets/images/logo.png')}
+            style={{ width: 130, height: 44, marginRight: 8 }}
+            resizeMode="contain"
+          />
         </View>
 
         {user ? (
@@ -89,10 +87,12 @@ export default function CTLiveHallScreen() {
         {/* AUTHENTICATION REQUIRED GATE (IF NOT SIGNED IN) */}
         {/* ========================================================= */}
         {!user ? (
-          <View className="items-center py-12">
-            <View className="h-20 w-20 rounded-full bg-violet-600/10 border border-violet-500/30 items-center justify-center mb-4">
-              <Ionicons name="lock-closed-outline" size={40} color="#a78bfa" />
-            </View>
+          <View className="items-center py-10">
+            <Image
+              source={require('@/assets/images/logo.png')}
+              style={{ width: 220, height: 75, marginBottom: 12 }}
+              resizeMode="contain"
+            />
             <Text className="text-white text-xl font-black">Authentication Required</Text>
             <Text className="text-slate-400 text-xs text-center mt-1.5 max-w-xs leading-relaxed">
               Please sign in to access CT Live Music Hall seat reservations and flash sale tickets.
@@ -102,7 +102,7 @@ export default function CTLiveHallScreen() {
               onPress={() => router.push('/auth/login')}
               activeOpacity={0.85}
               className="mt-6 bg-violet-600 px-8 py-3.5 rounded-2xl w-full items-center shadow-lg shadow-violet-600/40">
-              <Text className="text-white font-extrabold text-sm">Sign In to Continue</Text>
+              <Text className="text-white font-extrabold text-sm">Sign In with Email / Phone</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -111,6 +111,15 @@ export default function CTLiveHallScreen() {
               className="mt-3 bg-slate-900 border border-slate-800 px-8 py-3.5 rounded-2xl w-full items-center">
               <Text className="text-slate-200 font-bold text-sm">Create New Account (Sign Up)</Text>
             </TouchableOpacity>
+
+            {/* Social Authentication: Continue with Google & Facebook under Email/Phone */}
+            <View className="w-full mt-2">
+              <SocialAuthButtons
+                mode="login"
+                onSuccess={() => {}}
+                onError={(msg) => Alert.alert('Authentication Error', msg)}
+              />
+            </View>
 
             <View className="mt-8 bg-slate-900 border border-slate-800/80 rounded-2xl p-4 w-full">
               <Text className="text-slate-400 text-[11px] font-bold uppercase tracking-wider mb-1">
