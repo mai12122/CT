@@ -2,11 +2,7 @@ name: Prod deploy
 
 on:
   push:
-    # Tracks when anyone in the team pushes code to ANY branch
-    branches: ['**']
   pull_request:
-    # Tracks when PRs are opened, updated, or reopened
-    types: [opened, synchronize, reopened]
 
 jobs:
   # =========================================================================
@@ -92,14 +88,25 @@ jobs:
 
       # Deploys to EC2 only when pushing or merging into the main branch
       - name: 🚀 Deploy to AWS EC2
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push' && secrets.EC2_HOST != '' && secrets.EC2_SSH_KEY != ''
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER || 'ubuntu' }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          port: ${{ secrets.EC2_PORT || 22 }}
-          script: |
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER || 'ubuntu' }}
+          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+          EC2_PORT: ${{ secrets.EC2_PORT || '22' }}
+        run: |
+          if [ -z "$EC2_HOST" ] || [ -z "$EC2_SSH_KEY" ]; then
+            echo "ℹ️ EC2_HOST or EC2_SSH_KEY secret not yet set in repository. Build succeeded, skipping remote deploy."
+            exit 0
+          fi
+          
+          echo "🔑 Configuring SSH key..."
+          mkdir -p ~/.ssh
+          echo "$EC2_SSH_KEY" > ~/.ssh/ec2.pem
+          chmod 600 ~/.ssh/ec2.pem
+          
+          echo "🌐 Connecting to $EC2_USER@$EC2_HOST:$EC2_PORT..."
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/ec2.pem -p "$EC2_PORT" "$EC2_USER@$EC2_HOST" 'bash -s' << 'EOF'
             if [ -d "$HOME/CT" ]; then
               cd "$HOME/CT"
             elif [ -d "/var/www/CT" ]; then
@@ -107,6 +114,7 @@ jobs:
             fi
             chmod +x scripts/deploy.sh
             ./scripts/deploy.sh
+          EOF
 
       - name: ℹ️ Skip EC2 Deploy on PR/Branches
         if: github.ref != 'refs/heads/main' || github.event_name != 'push'
