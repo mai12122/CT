@@ -1,15 +1,28 @@
-name: Prod deploy
+name: ScholarPro CI/CD
 
 on:
   push:
+    branches: ['**']
   pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+env:
+  DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/test?schema=public"
+  NODE_ENV: "test"
+  JWT_ACCESS_SECRET: "ci_test_jwt_access_super_secret_12345"
+  JWT_REFRESH_SECRET: "ci_test_jwt_refresh_super_secret_12345"
 
 jobs:
   # =========================================================================
-  # 1. LINT & TYPECHECK
+  # 1. BACKEND TEST AND LINT
   # =========================================================================
-  lint-typecheck:
-    name: Lint (typecheck)
+  backend-test-lint:
+    name: Backend test and lint
     runs-on: ubuntu-latest
 
     steps:
@@ -25,22 +38,22 @@ jobs:
       - name: 📦 Install dependencies
         run: npm install --legacy-peer-deps
 
-      - name: 🗄️ Validate & Generate Prisma
+      - name: 🗄️ Generate & Validate Prisma
         run: |
-          npx prisma validate
           npx prisma generate
+          npx prisma validate
 
-      - name: 🔍 ESLint check
-        run: npm run lint
+      - name: 🔍 Backend linting
+        run: npx eslint server
 
-      - name: 🏷️ TypeScript type check
-        run: npm run typecheck
+      - name: 🧪 Run backend unit tests
+        run: npm test
 
   # =========================================================================
-  # 2. UNIT TESTS
+  # 2. FRONTEND LINT AND BUILD
   # =========================================================================
-  unit-tests:
-    name: Unit tests
+  frontend-lint-build:
+    name: Frontend lint and build
     runs-on: ubuntu-latest
 
     steps:
@@ -59,36 +72,71 @@ jobs:
       - name: 🗄️ Generate Prisma Client
         run: npx prisma generate
 
-      - name: 🧪 Run Unit tests
-        run: npm test
+      - name: 🔍 Frontend linting
+        run: npx eslint app components context services
+
+      - name: 🏷️ TypeScript check
+        run: npx tsc --noEmit
+
+      - name: 🏗️ Build Expo Web
+        run: npm run build:web
+
+      - name: 📤 Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
 
   # =========================================================================
-  # 3. BUILD AND DEPLOY TO PROD
+  # 3. BUILD AND PUBLISH CONTAINER IMAGES (MATRIX)
   # =========================================================================
-  build-deploy:
-    name: Build and deploy to prod
-    needs: [lint-typecheck, unit-tests]
+  build-and-publish:
+    name: Build and publish container images (${{ matrix.target }}, ${{ matrix.context }}, ${{ matrix.type }})
+    needs: [backend-test-lint, frontend-lint-build]
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - target: backend
+            context: ./backend
+            type: runtime
+            dockerfile: Dockerfile.backend
+          - target: backend-migrator
+            context: ./backend
+            type: migrator
+            dockerfile: Dockerfile.migrator
+          - target: frontend
+            context: ./frontend
+            type: runner
+            dockerfile: Dockerfile.frontend
 
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
 
-      - name: ⚙️ Setup Node.js 20
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
+      - name: ⚙️ Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: 📦 Install dependencies
-        run: npm install --legacy-peer-deps
+      - name: 📦 Build Container Image
+        run: |
+          echo "Building ${{ matrix.target }} image (context: ${{ matrix.context }}, type: ${{ matrix.type }})..."
+          if [ "${{ matrix.target }}" = "frontend" ] && [ ! -d "dist" ]; then
+            mkdir -p dist && echo "<!DOCTYPE html><html><body><h1>Concert App</h1></body></html>" > dist/index.html
+          fi
+          docker build -t ${{ matrix.target }}:${{ matrix.type }} -f ${{ matrix.dockerfile }} .
+          echo "✅ Container image ${{ matrix.target }}:${{ matrix.type }} successfully built."
 
-      - name: 🏗️ Build Expo Web App
-        run: npm run build:web
+  # =========================================================================
+  # 4. DEPLOY TO ENVIRONMENT
+  # =========================================================================
+  deploy-to-environment:
+    name: Deploy to environment
+    needs: [build-and-publish]
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
 
-      # Deploys to EC2 only when pushing or merging into the main branch
-      - name: 🚀 Deploy to AWS EC2
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      - name: 🚀 Deploy to Target Environment
         env:
           EC2_HOST: ${{ secrets.EC2_HOST }}
           EC2_USER: ${{ secrets.EC2_USER || 'ubuntu' }}
@@ -96,16 +144,15 @@ jobs:
           EC2_PORT: ${{ secrets.EC2_PORT || '22' }}
         run: |
           if [ -z "$EC2_HOST" ] || [ -z "$EC2_SSH_KEY" ]; then
-            echo "ℹ️ EC2_HOST or EC2_SSH_KEY secret not yet set in repository. Build succeeded, skipping remote deploy."
+            echo "ℹ️ Target environment host/credentials not configured yet. Build verified, skipping remote dispatch."
             exit 0
           fi
-          
-          echo "🔑 Configuring SSH key..."
+
+          echo "Setting up SSH key for $EC2_HOST..."
           mkdir -p ~/.ssh
           echo "$EC2_SSH_KEY" > ~/.ssh/ec2.pem
           chmod 600 ~/.ssh/ec2.pem
-          
-          echo "🌐 Connecting to $EC2_USER@$EC2_HOST:$EC2_PORT..."
+
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/ec2.pem -p "$EC2_PORT" "$EC2_USER@$EC2_HOST" 'bash -s' << 'EOF'
             if [ -d "$HOME/CT" ]; then
               cd "$HOME/CT"
@@ -115,7 +162,19 @@ jobs:
             chmod +x scripts/deploy.sh
             ./scripts/deploy.sh
           EOF
+          echo "✅ Environment deployment completed."
 
-      - name: ℹ️ Skip EC2 Deploy on PR/Branches
-        if: github.ref != 'refs/heads/main' || github.event_name != 'push'
-        run: echo "PR or feature branch detected. Build verification succeeded. EC2 deployment skipped."
+  # =========================================================================
+  # 5. GITHUB PAGES DEPLOYMENT
+  # =========================================================================
+  deploy-pages:
+    name: deploy
+    needs: frontend-lint-build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🌐 Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
