@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import QRCode from 'react-native-qrcode-svg';
 import { api } from '@/services/api';
 import { useAuth } from '@/context/AuthContext';
 import { Ticket } from '@/types';
@@ -157,23 +158,40 @@ export default function MyTicketsScreen() {
 
                   {/* Body Content */}
                   <View className="p-5">
-                    <Text className="text-white font-black text-xl leading-tight">
-                      {ticket.concert?.artist}
-                    </Text>
-                    <Text className="text-slate-300 text-sm font-semibold mt-0.5">
-                      {ticket.concert?.title}
-                    </Text>
+                    <View className="flex-row justify-between items-start">
+                      <View className="flex-1 mr-3">
+                        <Text className="text-white font-black text-xl leading-tight">
+                          {ticket.concert?.artist}
+                        </Text>
+                        <Text className="text-slate-300 text-sm font-semibold mt-0.5">
+                          {ticket.concert?.title}
+                        </Text>
 
-                    <View className="flex-row items-center mt-3">
-                      <Ionicons name="location-outline" size={14} color="#94a3b8" style={{ marginRight: 4 }} />
-                      <Text className="text-slate-400 text-xs">
-                        {ticket.concert?.venue} • {ticket.concert?.city}
-                      </Text>
-                    </View>
+                        <View className="flex-row items-center mt-3">
+                          <Ionicons name="location-outline" size={14} color="#94a3b8" style={{ marginRight: 4 }} />
+                          <Text className="text-slate-400 text-xs">
+                            {ticket.concert?.venue} • {ticket.concert?.city}
+                          </Text>
+                        </View>
 
-                    <View className="flex-row items-center mt-1">
-                      <Ionicons name="calendar-outline" size={14} color="#94a3b8" style={{ marginRight: 4 }} />
-                      <Text className="text-slate-400 text-xs">{dateString}</Text>
+                        <View className="flex-row items-center mt-1">
+                          <Ionicons name="calendar-outline" size={14} color="#94a3b8" style={{ marginRight: 4 }} />
+                          <Text className="text-slate-400 text-xs">{dateString}</Text>
+                        </View>
+                      </View>
+
+                      {/* Real Scannable QR Code */}
+                      <View className="p-2 bg-white rounded-2xl items-center shadow-lg border-2 border-white">
+                        <QRCode
+                          value={ticket.qrPayload || ticket.ticketNumber}
+                          size={58}
+                          color="#020617"
+                          backgroundColor="#ffffff"
+                        />
+                        <Text className="text-[8px] font-black text-slate-800 mt-1 tracking-wider uppercase">
+                          SCAN GATE
+                        </Text>
+                      </View>
                     </View>
 
                     {/* Seat & QR Indicator CTA */}
@@ -187,7 +205,7 @@ export default function MyTicketsScreen() {
 
                       <View className="bg-violet-600/20 border border-violet-500/30 px-3 py-1.5 rounded-xl flex-row items-center">
                         <Ionicons name="qr-code" size={14} color="#c084fc" style={{ marginRight: 6 }} />
-                        <Text className="text-violet-300 font-bold text-xs">Open QR Pass</Text>
+                        <Text className="text-violet-300 font-bold text-xs">View Full QR Pass</Text>
                       </View>
                     </View>
                   </View>
