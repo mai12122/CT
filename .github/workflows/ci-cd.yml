@@ -1,0 +1,121 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch: # Allows manual trigger from GitHub UI
+
+jobs:
+  # =========================================================================
+  # 1. CONTINUOUS INTEGRATION (CI)
+  # Runs on every PR and push to main: checks lint, types, and builds
+  # =========================================================================
+  ci:
+    name: Lint, Typecheck & Build Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: 🗄️ Validate & Generate Prisma
+        run: |
+          npx prisma validate
+          npx prisma generate
+
+      - name: 🔍 Run ESLint
+        run: npm run lint
+
+      - name: 🏷️ Run TypeScript type check
+        run: npm run typecheck
+
+      - name: 🏗️ Test Expo Web Build
+        run: npm run build:web
+
+  # =========================================================================
+  # 2. CONTINUOUS DEPLOYMENT (CD) -> AWS EC2 (Backend API)
+  # Deploys automatically to AWS EC2 when main is updated and CI passes
+  # =========================================================================
+  deploy-backend-ec2:
+    name: Deploy Backend to AWS EC2
+    needs: ci
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🚀 Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        if: "${{ secrets.EC2_HOST != '' && secrets.EC2_SSH_KEY != '' }}"
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER || 'ubuntu' }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: ${{ secrets.EC2_PORT || 22 }}
+          script: |
+            # Detect project directory or clone if not present
+            if [ -d "$HOME/CT" ]; then
+              cd "$HOME/CT"
+            elif [ -d "/var/www/CT" ]; then
+              cd "/var/www/CT"
+            else
+              echo "Repository not found in standard paths. Falling back to current directory."
+            fi
+            
+            # Make deploy script executable and run it
+            chmod +x scripts/deploy.sh
+            ./scripts/deploy.sh
+
+  # =========================================================================
+  # 3. OPTIONAL CD -> AWS S3 + CloudFront (Expo Web Client)
+  # Runs if AWS S3 secrets are configured in GitHub repository
+  # =========================================================================
+  deploy-web-s3:
+    name: Deploy Web App to AWS S3 & CloudFront
+    needs: ci
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: 🏗️ Build Expo Web
+        run: npm run build:web
+
+      - name: ☁️ Configure AWS Credentials
+        if: "${{ secrets.AWS_ACCESS_KEY_ID != '' && secrets.AWS_SECRET_ACCESS_KEY != '' }}"
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION || 'us-east-1' }}
+
+      - name: 📤 Sync to S3
+        if: "${{ secrets.AWS_S3_BUCKET != '' }}"
+        run: |
+          aws s3 sync dist/ s3://${{ secrets.AWS_S3_BUCKET }} --delete
+
+      - name: 🔄 Invalidate CloudFront Cache
+        if: "${{ secrets.CLOUDFRONT_DISTRIBUTION_ID != '' }}"
+        run: |
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
