@@ -90,3 +90,26 @@ Because `npm start` automatically starts the backend server, make sure you don't
   ```bash
   kill -9 $(lsof -t -i:5000)
   ```
+
+---
+
+## 🏛️ AWS Architecture Explained — The Gated Concert Venue Analogy
+
+| Application | Stack | Database |
+| :--- | :--- | :--- |
+| **Concert Ticketing System** | **Node.js + Express + Prisma** | **Multi-AZ RDS PostgreSQL** |
+
+### The Analogy Mapping Table
+
+| AWS Component | Concert Hall Analogy | What it Actually Does in Your App |
+| :--- | :--- | :--- |
+| **VPC (`ct-live-vpc`)** | **The Venue Perimeter** | High fence keeping all app servers and databases together in an isolated secure virtual network. |
+| **Public Subnet** | **Front Gate / Parking Lot** | The only public area where fans arrive; hosts the internet-facing Load Balancer. |
+| **Private App Subnet** | **Backstage Staff Rooms** | Restricted area housing Node.js EC2 servers; fans cannot access these directly. |
+| **Private DB Subnet** | **The Vault / Cash Register** | Super-secure zone deep inside holding RDS PostgreSQL so raw data is protected. |
+| **Application Load Balancer** | **Security at Entrance** | Checks incoming user traffic and balances requests evenly across active ticket booths. |
+| **Target Group (`app-tg`)** | **Open Ticket Booths** | The list of active, healthy EC2 instances (port 5000) ready to take ticket requests. |
+| **Launch Template** | **Standard Setup Blueprint** | The exact checklist/spec used whenever launching a new EC2 instance. |
+| **UserData Script** | **Morning Automated Checklist** | Boot script that clones `mai12122/CT`, sets env vars, runs `prisma db push`, and starts PM2. |
+| **Auto Scaling Group** | **On-Call Staff Manager** | Opens extra EC2 servers when lines get long (Sale Rush) and closes them when traffic cools. |
+

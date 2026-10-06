@@ -75,6 +75,15 @@ resource "aws_launch_template" "app" {
   user_data = base64encode(<<-EOF
               #!/bin/bash
               echo "Starting CT Live application node..."
+              yum update -y
+              curl -fsSL https://rpm.nodesource.com/setup_20.x | bash -
+              yum install -y nodejs git
+              npm install -g pm2
+              git clone https://github.com/mai12122/CT.git /app
+              cd /app
+              npm install --legacy-peer-deps
+              npx prisma db push
+              pm2 start npm --name "ct-backend" -- start
               EOF
   )
 
