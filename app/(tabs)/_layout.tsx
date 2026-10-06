@@ -39,14 +39,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="hall"
         options={{
-          title: 'CT Live Hall',
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? 'flash' : 'flash-outline'}
-              size={22}
-              color={color}
-            />
-          ),
+          href: null,
         }}
       />
       <Tabs.Screen
