@@ -1,5 +1,5 @@
-import { PrismaClient, Role } from '@prisma/client';
-import bcrypt from 'bcryptjs';
+const { PrismaClient, Role } = require('@prisma/client');
+const bcrypt = require('bcryptjs');
 
 const prisma = new PrismaClient();
 
@@ -59,7 +59,7 @@ async function main() {
           name: 'Fanpit',
           price: 45,
           description: 'Front stage mosh pit. Direct proximity to VannDa with exclusive Tour Lanyard.',
-          color: '#ec4899', // Pink
+          color: '#ec4899',
           perks: JSON.stringify([
             'Front Row Catwalk Access',
             'Skull Tour VIP Laminate & Lanyard',
@@ -73,7 +73,7 @@ async function main() {
           name: 'Platinum',
           price: 35,
           description: 'Lower tier center seating with direct stage line-of-sight and air-conditioned lounge access.',
-          color: '#8b5cf6', // Purple
+          color: '#8b5cf6',
           perks: JSON.stringify([
             'Lower Tier Center Rows 1-10',
             'Private VIP Concourse & Drinks Bar',
@@ -87,7 +87,7 @@ async function main() {
           name: 'Gold',
           price: 25,
           description: 'Mid Tier elevated elevation with clear acoustic projection.',
-          color: '#eab308', // Gold
+          color: '#eab308',
           perks: JSON.stringify([
             'Elevated Mid-Tier Seating',
             'Direct Line-of-Sight to Stage',
@@ -100,7 +100,7 @@ async function main() {
           name: 'Silver',
           price: 15,
           description: 'General admission hall view with full acoustic delay towers.',
-          color: '#94a3b8', // Silver
+          color: '#94a3b8',
           perks: JSON.stringify([
             'General Admission Seating',
             'Panoramic Lightshow View',
@@ -417,7 +417,7 @@ async function main() {
 
   console.log(`✅ Seeded ${concertsData.length} authentic Cambodian concerts with Silver, Gold, Platinum, and Fanpit categories!`);
 
-  // 4. Create an initial sample booking for the demo user so Profile & My Tickets immediately shows rich content
+  // 4. Create an initial sample booking for the demo user
   const firstConcert = await prisma.concert.findFirst({
     include: { categories: true },
   });

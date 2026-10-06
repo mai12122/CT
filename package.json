@@ -19,7 +19,7 @@
     "deploy:cloudflare": "wrangler pages deploy public --project-name ct",
     "db:validate": "prisma validate",
     "db:push": "prisma db push",
-    "db:seed": "tsx prisma/seed.ts",
+    "db:seed": "node prisma/seed.js",
     "build:web": "expo export -p web"
   },
   "dependencies": {

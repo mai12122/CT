@@ -16,7 +16,7 @@ import { api } from '@/services/api';
 import { useAuth } from '@/context/AuthContext';
 import { Concert, ReservationSession } from '@/types';
 
-const CITY_FILTERS = ['All', 'Phnom Penh', 'Los Angeles', 'London', 'New York', 'Tokyo'];
+const CITY_FILTERS = ['All', 'Phnom Penh', 'Siem Reap', 'Battambang', 'Preah Sihanouk', 'Kampot'];
 
 export default function ExploreScreen() {
   const { user } = useAuth();
