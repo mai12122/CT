@@ -1,0 +1,4 @@
+2026-10-01 19:20:39 [[32minfo[39m]: Connected to PostgreSQL database successfully.
+2026-10-01 19:20:39 [[32minfo[39m]: Concert Backend API running on http://localhost:5000
+2026-10-01 19:20:39 [[32minfo[39m]: API v1 Base: http://localhost:5000/api/v1
+2026-10-01 19:20:39 [[32minfo[39m]: Environment: development
