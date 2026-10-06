@@ -83,15 +83,11 @@ export default function ExploreScreen() {
       {/* Top Header */}
       <View className="pt-14 pb-4 px-5 bg-slate-950/80 border-b border-slate-900 flex-row items-center justify-between">
         <View className="flex-row items-center">
-          <View className="h-10 w-10 rounded-xl bg-violet-600/20 border border-violet-500/40 items-center justify-center mr-3">
-            <Ionicons name="sparkles" size={20} color="#c084fc" />
-          </View>
-          <View>
-            <Text className="text-xs font-bold text-violet-400 tracking-widest uppercase">
-              CT LIVE CONCERTS
-            </Text>
-            <Text className="text-xl font-extrabold text-white">Event Pass</Text>
-          </View>
+          <Image
+            source={require('@/assets/images/logo.png')}
+            style={{ width: 130, height: 44, marginRight: 8 }}
+            resizeMode="contain"
+          />
         </View>
 
         {user ? (

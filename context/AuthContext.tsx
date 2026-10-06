@@ -8,6 +8,15 @@ interface AuthContextType {
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string, phone?: string) => Promise<void>;
+  oauthLogin: (data: {
+    provider: 'GOOGLE' | 'FACEBOOK';
+    email?: string;
+    name: string;
+    avatar?: string;
+    providerId: string;
+  }) => Promise<void>;
+  sendPhoneOtp: (phone: string) => Promise<{ devOtp?: string; message: string }>;
+  verifyPhoneOtp: (phone: string, code: string, name?: string) => Promise<void>;
   logout: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 }
@@ -61,6 +70,37 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
+  const oauthLogin = async (data: {
+    provider: 'GOOGLE' | 'FACEBOOK';
+    email?: string;
+    name: string;
+    avatar?: string;
+    providerId: string;
+  }) => {
+    setIsLoading(true);
+    try {
+      const res = await api.oauthLogin(data);
+      setUser(res.user);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const sendPhoneOtp = async (phone: string) => {
+    const res = await api.sendPhoneOtp(phone);
+    return { devOtp: res.devOtp, message: res.message };
+  };
+
+  const verifyPhoneOtp = async (phone: string, code: string, name?: string) => {
+    setIsLoading(true);
+    try {
+      const res = await api.verifyPhoneOtp({ phone, code, name });
+      setUser(res.user);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const logout = async () => {
     setIsLoading(true);
     try {
@@ -88,6 +128,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         isAuthenticated: !!user,
         login,
         register,
+        oauthLogin,
+        sendPhoneOtp,
+        verifyPhoneOtp,
         logout,
         refreshProfile,
       }}>

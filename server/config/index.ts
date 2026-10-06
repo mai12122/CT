@@ -16,4 +16,10 @@ export const config = {
   },
   reservationExpiryMinutes: parseInt(process.env.RESERVATION_EXPIRY_MINUTES || '10', 10),
   corsOrigin: process.env.CORS_ORIGIN || '*',
+  facebook: {
+    appId: process.env.FACEBOOK_APP_ID || '',
+    appSecret: process.env.FACEBOOK_APP_SECRET || '',
+    redirectUri: process.env.FACEBOOK_REDIRECT_URI || 'http://localhost:5000/api/v1/auth/facebook/callback',
+  },
 };
+

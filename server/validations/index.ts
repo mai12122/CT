@@ -22,6 +22,30 @@ export const refreshSchema = z.object({
   }),
 });
 
+export const oauthSchema = z.object({
+  body: z.object({
+    provider: z.enum(['GOOGLE', 'FACEBOOK']),
+    email: z.string().email('Invalid email address').optional(),
+    name: z.string().min(1, 'Name is required'),
+    avatar: z.string().optional(),
+    providerId: z.string().min(1, 'Provider user ID is required'),
+  }),
+});
+
+export const sendPhoneOtpSchema = z.object({
+  body: z.object({
+    phone: z.string().min(6, 'Valid phone number is required'),
+  }),
+});
+
+export const verifyPhoneOtpSchema = z.object({
+  body: z.object({
+    phone: z.string().min(6, 'Valid phone number is required'),
+    code: z.string().min(4, 'Verification code must be at least 4 digits'),
+    name: z.string().optional(),
+  }),
+});
+
 export const reservationSchema = z.object({
   body: z.object({
     categoryId: z.string().uuid('Invalid category ID'),

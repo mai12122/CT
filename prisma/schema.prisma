@@ -32,10 +32,14 @@ enum TicketStatus {
 
 model User {
   id                  String               @id @default(uuid())
-  email               String               @unique
-  password            String
+  email               String?              @unique
+  password            String?
   name                String
-  phone               String?
+  phone               String?              @unique
+  authProvider        String               @default("LOCAL") // LOCAL, GOOGLE, FACEBOOK, PHONE
+  facebookId          String?              @unique
+  googleId            String?              @unique
+  avatar              String?
   role                Role                 @default(USER)
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
@@ -46,6 +50,18 @@ model User {
   tickets             Ticket[]
 
   @@map("users")
+}
+
+model PhoneVerification {
+  id        String   @id @default(uuid())
+  phone     String
+  code      String
+  expiresAt DateTime
+  verified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([phone])
+  @@map("phone_verifications")
 }
 
 model RefreshToken {
