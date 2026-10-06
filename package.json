@@ -12,6 +12,8 @@
     "lint": "eslint app components context services",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test tests/utils.test.ts",
+    "test:iac": "python terraform/tests/test_iac.py",
+    "demo:cloudflare": "node scripts/start-demo.js",
     "db:validate": "prisma validate",
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",

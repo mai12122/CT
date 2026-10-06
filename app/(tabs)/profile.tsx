@@ -12,13 +12,6 @@ import { router, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/context/AuthContext';
 import { api } from '@/services/api';
-import {
-  MaterialTopAppBar,
-  MaterialCard,
-  MaterialButton,
-  MaterialBadge,
-  MaterialDivider,
-} from '@/components/material';
 
 export default function ProfileScreen() {
   const { user, logout } = useAuth();
@@ -59,121 +52,114 @@ export default function ProfileScreen() {
   };
 
   return (
-    <View className="flex-1 bg-md-surface">
-      <StatusBar barStyle="light-content" backgroundColor="#141218" />
+    <View className="flex-1 bg-slate-950">
+      <StatusBar barStyle="light-content" />
 
-      {/* Material 3 Top App Bar */}
-      <MaterialTopAppBar
-        title="Profile"
-        subtitle="Account"
-        leading={
-          <View className="h-10 w-10 rounded-full bg-md-primaryContainer items-center justify-center">
-            <Ionicons name="person" size={20} color="#EADDFF" />
-          </View>
-        }
-      />
+      {/* Header */}
+      <View className="pt-14 pb-4 px-5 bg-slate-950/80 border-b border-slate-900">
+        <Text className="text-xs font-bold text-violet-400 tracking-widest uppercase">
+          ACCOUNT
+        </Text>
+        <Text className="text-xl font-extrabold text-white">My Profile</Text>
+      </View>
 
-      <ScrollView contentContainerStyle={{ padding: 16 }}>
+      <ScrollView contentContainerStyle={{ padding: 20 }}>
         {!user ? (
           <View className="items-center py-12">
-            <View className="h-20 w-20 rounded-full bg-md-surfaceContainerHigh items-center justify-center mb-4">
-              <Ionicons name="person-outline" size={38} color="#D0BCFF" />
+            <View className="h-20 w-20 rounded-full bg-violet-600/10 border border-violet-500/30 items-center justify-center mb-4">
+              <Ionicons name="person-outline" size={40} color="#a78bfa" />
             </View>
-            <Text className="text-md-onSurface text-xl font-bold">Guest User</Text>
-            <Text className="text-md-onSurfaceVariant text-xs text-center mt-1.5 max-w-xs leading-relaxed">
-              Sign in to manage your ticket reservations and digital wallet.
+            <Text className="text-white text-xl font-black">Guest User</Text>
+            <Text className="text-slate-400 text-xs text-center mt-1 max-w-xs">
+              Sign in to manage your ticket reservations, access passes, and unlock exclusive fan perks.
             </Text>
 
-            <MaterialButton
-              variant="filled"
-              label="Sign In / Register"
-              className="mt-6 w-full"
+            <TouchableOpacity
               onPress={() => router.push('/auth/login')}
-            />
+              activeOpacity={0.85}
+              className="mt-6 bg-violet-600 px-8 py-3.5 rounded-2xl w-full items-center shadow-lg shadow-violet-600/40">
+              <Text className="text-white font-extrabold text-sm">Sign In</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => router.push('/auth/register')}
+              activeOpacity={0.8}
+              className="mt-3 bg-slate-900 border border-slate-800 px-8 py-3.5 rounded-2xl w-full items-center">
+              <Text className="text-slate-200 font-bold text-sm">Create New Account (Sign Up)</Text>
+            </TouchableOpacity>
           </View>
         ) : (
           <View>
-            {/* User Profile Card (Material Elevated) */}
-            <MaterialCard variant="elevated" className="items-center py-6 px-4">
-              <View className="h-20 w-20 rounded-full bg-md-primaryContainer items-center justify-center mb-3 border-2 border-md-primary/40">
-                <Text className="text-md-onPrimaryContainer font-bold text-2xl">
+            {/* User Card */}
+            <View className="bg-slate-900 border border-slate-800 rounded-3xl p-5 items-center">
+              <View className="h-20 w-20 rounded-full bg-gradient-to-tr from-violet-600 to-fuchsia-600 items-center justify-center mb-3 border-2 border-violet-400/40">
+                <Text className="text-white font-black text-2xl">
                   {user.name.split(' ').map((n) => n[0]).join('')}
                 </Text>
               </View>
 
-              <Text className="text-md-onSurface font-bold text-xl tracking-tight">{user.name}</Text>
-              <Text className="text-md-onSurfaceVariant text-xs mt-0.5">{user.email}</Text>
+              <Text className="text-white font-black text-xl">{user.name}</Text>
+              <Text className="text-slate-400 text-xs mt-0.5">{user.email}</Text>
 
-              <MaterialBadge
-                label={`Verified Fan ${user.role === 'ADMIN' ? '• Admin' : ''}`}
-                variant="primary"
-                className="mt-3 py-1 px-3"
-              />
-            </MaterialCard>
-
-            {/* Stats Row */}
-            <View className="flex-row mt-3.5 space-x-3">
-              <MaterialCard variant="outlined" className="flex-1 items-center py-3.5 mr-2">
-                <Text className="text-2xl font-bold text-md-primary">{stats.tickets}</Text>
-                <Text className="text-md-onSurfaceVariant text-xs font-semibold mt-1">Concert Passes</Text>
-              </MaterialCard>
-
-              <MaterialCard variant="outlined" className="flex-1 items-center py-3.5">
-                <Text className="text-2xl font-bold text-md-primary">{stats.bookings}</Text>
-                <Text className="text-md-onSurfaceVariant text-xs font-semibold mt-1">Total Bookings</Text>
-              </MaterialCard>
+              <View className="mt-3 bg-violet-500/10 border border-violet-500/30 px-3 py-1 rounded-full">
+                <Text className="text-violet-300 font-bold text-[11px] uppercase tracking-wider">
+                  Verified Fan {user.role === 'ADMIN' ? '• Admin' : ''}
+                </Text>
+              </View>
             </View>
 
-            {/* Menu List (Material Outlined Card) */}
-            <MaterialCard variant="outlined" className="mt-4 p-0 overflow-hidden">
+            {/* Stats Row */}
+            <View className="flex-row mt-4 space-x-3">
+              <View className="flex-1 bg-slate-900 border border-slate-800 rounded-2xl p-4 items-center mr-2">
+                <Text className="text-2xl font-black text-white">{stats.tickets}</Text>
+                <Text className="text-slate-400 text-xs font-semibold mt-1">Concert Passes</Text>
+              </View>
+
+              <View className="flex-1 bg-slate-900 border border-slate-800 rounded-2xl p-4 items-center">
+                <Text className="text-2xl font-black text-white">{stats.bookings}</Text>
+                <Text className="text-slate-400 text-xs font-semibold mt-1">Total Bookings</Text>
+              </View>
+            </View>
+
+            {/* Menu List */}
+            <View className="mt-6 bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden">
               <TouchableOpacity
-                activeOpacity={0.7}
                 onPress={() => router.push('/(tabs)/two')}
-                className="p-4 flex-row items-center justify-between">
+                className="p-4 flex-row items-center justify-between border-b border-slate-800">
                 <View className="flex-row items-center">
-                  <View className="h-9 w-9 rounded-full bg-md-surfaceContainerHigh items-center justify-center mr-3">
-                    <Ionicons name="ticket-outline" size={18} color="#D0BCFF" />
+                  <View className="h-9 w-9 rounded-xl bg-violet-600/20 items-center justify-center mr-3">
+                    <Ionicons name="ticket" size={18} color="#a78bfa" />
                   </View>
-                  <Text className="text-md-onSurface font-medium text-sm">My Tickets & QR Passes</Text>
+                  <Text className="text-white font-semibold text-sm">My Tickets & QR Passes</Text>
                 </View>
-                <Ionicons name="chevron-forward" size={18} color="#938F99" />
+                <Ionicons name="chevron-forward" size={18} color="#64748b" />
               </TouchableOpacity>
 
-              <MaterialDivider />
-
               <TouchableOpacity
-                activeOpacity={0.7}
                 onPress={() => router.push('/modal')}
-                className="p-4 flex-row items-center justify-between">
+                className="p-4 flex-row items-center justify-between border-b border-slate-800">
                 <View className="flex-row items-center">
-                  <View className="h-9 w-9 rounded-full bg-md-surfaceContainerHigh items-center justify-center mr-3">
-                    <Ionicons name="information-circle-outline" size={18} color="#D0BCFF" />
+                  <View className="h-9 w-9 rounded-xl bg-emerald-600/20 items-center justify-center mr-3">
+                    <Ionicons name="shield-checkmark" size={18} color="#34d399" />
                   </View>
-                  <Text className="text-md-onSurface font-medium text-sm">App Architecture & System Info</Text>
+                  <Text className="text-white font-semibold text-sm">System & Ticketing Info</Text>
                 </View>
-                <Ionicons name="chevron-forward" size={18} color="#938F99" />
+                <Ionicons name="chevron-forward" size={18} color="#64748b" />
               </TouchableOpacity>
 
-              <MaterialDivider />
-
               <TouchableOpacity
-                activeOpacity={0.7}
                 onPress={handleLogout}
                 disabled={loading}
                 className="p-4 flex-row items-center justify-between">
                 <View className="flex-row items-center">
-                  <View className="h-9 w-9 rounded-full bg-md-errorContainer/60 items-center justify-center mr-3">
-                    <Ionicons name="log-out-outline" size={18} color="#F2B8B5" />
+                  <View className="h-9 w-9 rounded-xl bg-rose-600/20 items-center justify-center mr-3">
+                    <Ionicons name="log-out" size={18} color="#f43f5e" />
                   </View>
-                  <Text className="text-md-error font-medium text-sm">Sign Out</Text>
+                  <Text className="text-rose-400 font-semibold text-sm">Sign Out</Text>
                 </View>
-                {loading ? (
-                  <ActivityIndicator size="small" color="#F2B8B5" />
-                ) : (
-                  <Ionicons name="chevron-forward" size={18} color="#938F99" />
-                )}
+                {loading ? <ActivityIndicator size="small" color="#f43f5e" /> : <Ionicons name="chevron-forward" size={18} color="#64748b" />}
               </TouchableOpacity>
-            </MaterialCard>
+            </View>
           </View>
         )}
       </ScrollView>

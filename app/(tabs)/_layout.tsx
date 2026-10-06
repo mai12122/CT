@@ -1,30 +1,26 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Platform, View } from 'react-native';
-import { MD3Colors } from '@/constants/MaterialTheme';
+import { Platform } from 'react-native';
 
 export default function TabLayout() {
-  const colors = MD3Colors.dark;
-
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.onSurfaceVariant,
+        tabBarActiveTintColor: '#c084fc',
+        tabBarInactiveTintColor: '#64748b',
         tabBarStyle: {
-          backgroundColor: colors.surfaceContainer,
-          borderTopColor: colors.outlineVariant + '33',
+          backgroundColor: '#090d16',
+          borderTopColor: '#1e293b',
           borderTopWidth: 1,
-          height: Platform.OS === 'ios' ? 88 : 72,
-          paddingBottom: Platform.OS === 'ios' ? 26 : 10,
+          height: Platform.OS === 'ios' ? 88 : 64,
+          paddingBottom: Platform.OS === 'ios' ? 28 : 10,
           paddingTop: 8,
         },
         tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: '600',
-          marginTop: 2,
+          fontSize: 11,
+          fontWeight: '700',
         },
       }}>
       <Tabs.Screen
@@ -32,34 +28,24 @@ export default function TabLayout() {
         options={{
           title: 'Explore',
           tabBarIcon: ({ color, focused }) => (
-            <View
-              className={`h-8 w-14 rounded-full items-center justify-center ${
-                focused ? 'bg-md-secondaryContainer' : 'bg-transparent'
-              }`}>
-              <Ionicons
-                name={focused ? 'musical-notes' : 'musical-notes-outline'}
-                size={22}
-                color={focused ? colors.onSecondaryContainer : color}
-              />
-            </View>
+            <Ionicons
+              name={focused ? 'musical-notes' : 'musical-notes-outline'}
+              size={22}
+              color={color}
+            />
           ),
         }}
       />
       <Tabs.Screen
         name="two"
         options={{
-          title: 'Tickets',
+          title: 'My Tickets',
           tabBarIcon: ({ color, focused }) => (
-            <View
-              className={`h-8 w-14 rounded-full items-center justify-center ${
-                focused ? 'bg-md-secondaryContainer' : 'bg-transparent'
-              }`}>
-              <Ionicons
-                name={focused ? 'ticket' : 'ticket-outline'}
-                size={22}
-                color={focused ? colors.onSecondaryContainer : color}
-              />
-            </View>
+            <Ionicons
+              name={focused ? 'ticket' : 'ticket-outline'}
+              size={22}
+              color={color}
+            />
           ),
         }}
       />
@@ -68,16 +54,11 @@ export default function TabLayout() {
         options={{
           title: 'Profile',
           tabBarIcon: ({ color, focused }) => (
-            <View
-              className={`h-8 w-14 rounded-full items-center justify-center ${
-                focused ? 'bg-md-secondaryContainer' : 'bg-transparent'
-              }`}>
-              <Ionicons
-                name={focused ? 'person' : 'person-outline'}
-                size={22}
-                color={focused ? colors.onSecondaryContainer : color}
-              />
-            </View>
+            <Ionicons
+              name={focused ? 'person' : 'person-outline'}
+              size={22}
+              color={color}
+            />
           ),
         }}
       />

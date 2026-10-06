@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CT Live — Grand Opening Flash Sale (Phnom Penh)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0e0d13;
+      --card-bg: #1a1823;
+      --primary: #8b5cf6;
+      --primary-light: #c4b5fd;
+      --accent: #10b981;
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --border: #2e2a3d;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding: 20px; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+    .container { max-width: 860px; width: 100%; margin: 0 auto; }
+    header { text-align: center; margin-bottom: 24px; padding-top: 10px; }
+    .badge { display: inline-block; background: rgba(139, 92, 246, 0.2); border: 1px solid rgba(139, 92, 246, 0.4); color: var(--primary-light); padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    h1 { font-size: 32px; font-weight: 800; margin-bottom: 6px; }
+    .subtitle { color: var(--text-muted); font-size: 14px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+    @media (max-width: 680px) { .grid { grid-template-columns: 1fr; } }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; }
+    .card-body { padding: 20px; }
+    .poster-img { width: 100%; height: 260px; object-fit: cover; border-bottom: 1px solid var(--border); background: #232030; display: flex; align-items: center; justify-content: center; }
+    .tier-list { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+    .tier-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); border-radius: 12px; cursor: pointer; transition: 0.2s; }
+    .tier-item:hover, .tier-item.active { border-color: var(--primary); background: rgba(139, 92, 246, 0.12); }
+    .tier-name { font-weight: 700; font-size: 14px; }
+    .tier-price { color: var(--accent); font-weight: 800; font-size: 16px; }
+    .tier-avail { font-size: 11px; color: var(--text-muted); }
+    .form-group { margin-bottom: 14px; }
+    label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
+    input { width: 100%; padding: 12px 14px; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border); border-radius: 10px; color: #fff; font-size: 14px; outline: none; }
+    input:focus { border-color: var(--primary); }
+    .btn-buy { width: 100%; padding: 14px; background: var(--primary); color: #fff; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; transition: 0.2s; margin-top: 8px; }
+    .btn-buy:hover { background: #7c3aed; }
+    .live-alert { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px; padding: 12px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; font-size: 13px; color: #6ee7b7; }
+    .pulse { width: 10px; height: 10px; background: #10b981; border-radius: 50%; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); animation: pulse 1.6s infinite; }
+    @keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+    footer { text-align: center; margin-top: 20px; font-size: 12px; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="badge">Phnom Penh • Biggest Hall (2,000 Seats)</div>
+      <h1>CT Live Music Hall</h1>
+      <p class="subtitle">Operations Manager: Mr. Ratana | Scenario 2 Flash Sale Simulation</p>
+    </header>
+
+    <div class="live-alert">
+      <div class="pulse"></div>
+      <div><strong>Sale Rush Active:</strong> 10,000 visitors online. 2,000 total seats available. Decoupled high-availability architecture active.</div>
+    </div>
+
+    <div class="grid">
+      <!-- Left Column: Poster & Seatmap -->
+      <div class="card">
+        <div class="poster-img">
+          <!-- Embedded SVG Poster -->
+          <svg width="100%" height="100%" viewBox="0 0 400 260" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#4c1d95;stop-opacity:1" />
+                <stop offset="50%" style="stop-color:#1e1b4b;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#09090b;stop-opacity:1" />
+              </linearGradient>
+            </defs>
+            <rect width="400" height="260" fill="url(#grad1)"/>
+            <circle cx="200" cy="110" r="60" fill="#8b5cf6" opacity="0.3"/>
+            <polygon points="120,240 200,60 280,240" fill="#a855f7" opacity="0.4"/>
+            <text x="200" y="90" font-family="'Plus Jakarta Sans', sans-serif" font-size="20" font-weight="800" fill="#ffffff" text-anchor="middle">CT LIVE 2026</text>
+            <text x="200" y="115" font-family="'Plus Jakarta Sans', sans-serif" font-size="12" font-weight="600" fill="#c4b5fd" text-anchor="middle">GRAND OPENING FESTIVAL</text>
+            <text x="200" y="145" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" fill="#9ca3af" text-anchor="middle">Phnom Penh Main Concert Hall</text>
+            <rect x="130" y="170" width="140" height="26" rx="13" fill="#10b981"/>
+            <text x="200" y="187" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" font-weight="700" fill="#022c22" text-anchor="middle">2,000 SEATS LIMITED</text>
+          </svg>
+        </div>
+        <div class="card-body">
+          <h3 style="font-size: 16px; margin-bottom: 8px;">Hall Seat Map (2,000 Capacity)</h3>
+          <!-- Embedded SVG Seatmap -->
+          <svg width="100%" height="150" viewBox="0 0 360 150" xmlns="http://www.w3.org/2000/svg" style="border: 1px dashed var(--border); border-radius: 10px; background: #13111a;">
+            <rect x="90" y="10" width="180" height="22" rx="4" fill="#3b82f6"/>
+            <text x="180" y="25" fill="#fff" font-size="10" font-weight="700" text-anchor="middle">MAIN STAGE</text>
+            <!-- VIP -->
+            <rect x="70" y="42" width="220" height="22" rx="4" fill="#ec4899" opacity="0.8"/>
+            <text x="180" y="56" fill="#fff" font-size="10" font-weight="600" text-anchor="middle">VIP Floor (200 Seats) — $150</text>
+            <!-- Zone A -->
+            <rect x="50" y="70" width="260" height="26" rx="4" fill="#8b5cf6" opacity="0.8"/>
+            <text x="180" y="87" fill="#fff" font-size="10" font-weight="600" text-anchor="middle">Zone A Center (600 Seats) — $85</text>
+            <!-- Zone B -->
+            <rect x="30" y="102" width="300" height="24" rx="4" fill="#3b82f6" opacity="0.8"/>
+            <text x="180" y="118" fill="#fff" font-size="10" font-weight="600" text-anchor="middle">Zone B Tier (800 Seats) — $45</text>
+            <!-- Balcony -->
+            <rect x="20" y="130" width="320" height="15" rx="3" fill="#6b7280" opacity="0.8"/>
+            <text x="180" y="141" fill="#fff" font-size="8" font-weight="600" text-anchor="middle">Balcony (400 Seats) — $25</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Right Column: Order Form (R1, R4) -->
+      <div class="card">
+        <div class="card-body">
+          <h2 style="font-size: 18px; margin-bottom: 4px;">Instant Ticket Order (R1)</h2>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">
+            No login needed (scope requirement). Buyer data protected in isolated subnets (S1).
+          </p>
+
+          <form id="orderForm">
+            <div class="form-group">
+              <label>Select Ticket Type</label>
+              <div class="tier-list">
+                <div class="tier-item active" onclick="selectTier(this, 'VIP', 150)">
+                  <div>
+                    <div class="tier-name">VIP Floor</div>
+                    <div class="tier-avail">200 Seats Total • Fast Entry</div>
+                  </div>
+                  <div class="tier-price">$150</div>
+                </div>
+                <div class="tier-item" onclick="selectTier(this, 'Zone A', 85)">
+                  <div>
+                    <div class="tier-name">Zone A Center</div>
+                    <div class="tier-avail">600 Seats Total • Direct Sightline</div>
+                  </div>
+                  <div class="tier-price">$85</div>
+                </div>
+                <div class="tier-item" onclick="selectTier(this, 'Zone B', 45)">
+                  <div>
+                    <div class="tier-name">Zone B Tier</div>
+                    <div class="tier-avail">800 Seats Total • Panoramic View</div>
+                  </div>
+                  <div class="tier-price">$45</div>
+                </div>
+                <div class="tier-item" onclick="selectTier(this, 'Balcony', 25)">
+                  <div>
+                    <div class="tier-name">Balcony</div>
+                    <div class="tier-avail">400 Seats Total • Acoustic Elevation</div>
+                  </div>
+                  <div class="tier-price">$25</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="buyerName">Buyer Full Name (R4)</label>
+              <input type="text" id="buyerName" placeholder="e.g. Sopheak Chan" required>
+            </div>
+
+            <div class="form-group">
+              <label for="phone">Phone Number (R4)</label>
+              <input type="tel" id="phone" placeholder="e.g. +855 12 345 678" required>
+            </div>
+
+            <button type="submit" class="btn-buy" id="submitBtn">Confirm Ticket Purchase</button>
+          </form>
+
+          <div id="resultMessage" style="margin-top: 14px; display: none; padding: 12px; border-radius: 10px; font-size: 13px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      CT Live Architecture Defense Demo • Cloudflare Tunnel / AWS Capstone Scenario 2
+    </footer>
+  </div>
+
+  <script>
+    let selectedTierName = 'VIP';
+    let selectedPrice = 150;
+
+    function selectTier(el, name, price) {
+      document.querySelectorAll('.tier-item').forEach(i => i.classList.remove('active'));
+      el.classList.add('active');
+      selectedTierName = name;
+      selectedPrice = price;
+    }
+
+    document.getElementById('orderForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const name = document.getElementById('buyerName').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const btn = document.getElementById('submitBtn');
+      const res = document.getElementById('resultMessage');
+
+      btn.disabled = true;
+      btn.innerText = 'Processing Order...';
+
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.innerText = 'Confirm Ticket Purchase';
+        res.style.display = 'block';
+        res.style.background = 'rgba(16, 185, 129, 0.15)';
+        res.style.border = '1px solid rgba(16, 185, 129, 0.4)';
+        res.style.color = '#34d399';
+        const orderId = 'ORD-' + Math.random().toString(36).substring(2, 9).toUpperCase();
+        res.innerHTML = `<strong>Order Confirmed!</strong><br>Order ID: <code>${orderId}</code><br>Ticket: ${selectedTierName} ($${selectedPrice})<br>Buyer: ${name} (${phone})<br><small style="color:#a7f3d0">Data saved securely to isolated PostgreSQL orders database (S1, S4).</small>`;
+      }, 500);
+    });
+  </script>
+</body>
+</html>

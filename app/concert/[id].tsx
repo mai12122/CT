@@ -14,11 +14,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { api } from '@/services/api';
 import { useAuth } from '@/context/AuthContext';
 import { Concert, TicketCategory } from '@/types';
-import {
-  MaterialCard,
-  MaterialButton,
-  MaterialBadge,
-} from '@/components/material';
 
 export default function ConcertDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -105,26 +100,11 @@ export default function ConcertDetailScreen() {
     }
   };
 
-  if (loading) {
+  if (loading || !concert) {
     return (
-      <View className="flex-1 bg-md-surface items-center justify-center">
-        <ActivityIndicator size="large" color="#D0BCFF" />
-        <Text className="text-md-onSurfaceVariant text-sm mt-3 font-medium">Loading concert details...</Text>
-      </View>
-    );
-  }
-
-  if (!concert) {
-    return (
-      <View className="flex-1 bg-md-surface items-center justify-center p-6">
-        <Ionicons name="alert-circle-outline" size={48} color="#F2B8B5" />
-        <Text className="text-md-onSurface text-lg font-bold mt-3">Concert Not Found</Text>
-        <MaterialButton
-          variant="filled"
-          label="Go Back"
-          className="mt-4"
-          onPress={() => router.back()}
-        />
+      <View className="flex-1 bg-slate-950 items-center justify-center">
+        <ActivityIndicator size="large" color="#8b5cf6" />
+        <Text className="text-slate-400 text-sm mt-3">Loading show details...</Text>
       </View>
     );
   }
@@ -132,7 +112,7 @@ export default function ConcertDetailScreen() {
   const concertDate = new Date(concert.date);
   const formattedDate = concertDate.toLocaleDateString('en-US', {
     weekday: 'short',
-    month: 'long',
+    month: 'short',
     day: 'numeric',
     year: 'numeric',
   });
@@ -141,145 +121,171 @@ export default function ConcertDetailScreen() {
     minute: '2-digit',
   });
 
-  const subtotal = selectedCategory ? selectedCategory.price * quantity : 0;
+  const subtotal = selectedCategory ? (selectedCategory.price * quantity).toFixed(2) : '0.00';
 
   return (
-    <View className="flex-1 bg-md-surface">
-      <StatusBar barStyle="light-content" backgroundColor="#141218" />
+    <View className="flex-1 bg-slate-950">
+      <StatusBar barStyle="light-content" />
 
-      <ScrollView contentContainerStyle={{ paddingBottom: 120 }}>
-        {/* Cover Photo */}
+      <ScrollView contentContainerStyle={{ paddingBottom: 110 }}>
+        {/* Poster Header */}
         <View className="relative">
           <Image
             source={{ uri: concert.imageUrl }}
-            style={{ width: '100%', height: 280 }}
+            style={{ width: '100%', height: 320 }}
             resizeMode="cover"
           />
 
-          {/* Floating Actions on Cover */}
-          <View className="absolute top-12 left-4 right-4 flex-row justify-between items-center z-10">
+          {/* Top Controls Overlay */}
+          <View className="absolute top-12 left-5 right-5 flex-row justify-between items-center">
             <TouchableOpacity
-              activeOpacity={0.78}
               onPress={() => router.back()}
-              className="h-10 w-10 rounded-full bg-md-surface/80 items-center justify-center border border-md-outlineVariant/30">
-              <Ionicons name="arrow-back" size={20} color="#E6E0E9" />
+              className="h-10 w-10 rounded-full bg-slate-950/70 items-center justify-center border border-white/10">
+              <Ionicons name="arrow-back" size={20} color="#fff" />
             </TouchableOpacity>
 
-            <MaterialBadge
-              label={`${concert.totalAvailable} Left`}
-              variant="success"
-              className="py-1 px-3"
-            />
+            <View className="bg-slate-950/70 border border-white/10 px-3 py-1.5 rounded-full flex-row items-center">
+              <View className="h-2 w-2 rounded-full bg-emerald-400 mr-2 animate-pulse" />
+              <Text className="text-white text-xs font-bold tracking-wider">
+                {concert.totalAvailable} Seats Left
+              </Text>
+            </View>
           </View>
+
+          {/* Gradient Tint at bottom of image */}
+          <View className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-slate-950 to-transparent" />
         </View>
 
         {/* Content Section */}
-        <View className="p-4">
-          <Text className="text-xs font-bold text-md-primary uppercase tracking-widest">
-            {concert.city} • STADIUM TOUR
-          </Text>
-          <Text className="text-2xl font-bold text-md-onSurface tracking-tight mt-1">{concert.artist}</Text>
-          <Text className="text-md-onSurfaceVariant text-base font-medium mt-0.5">{concert.title}</Text>
-
-          {/* Date & Location Pill Cards */}
-          <View className="flex-row mt-4 space-x-2">
-            <MaterialCard variant="outlined" className="flex-1 p-3 flex-row items-center mr-2">
-              <View className="h-9 w-9 rounded-full bg-md-primaryContainer items-center justify-center mr-2.5">
-                <Ionicons name="calendar-outline" size={18} color="#EADDFF" />
-              </View>
-              <View className="flex-1">
-                <Text className="text-md-onSurfaceVariant text-[10px] uppercase font-semibold">Event Date</Text>
-                <Text numberOfLines={1} className="text-md-onSurface font-bold text-xs">
-                  {formattedDate}
-                </Text>
-                <Text className="text-md-onSurfaceVariant text-[11px]">{formattedTime}</Text>
-              </View>
-            </MaterialCard>
-
-            <MaterialCard variant="outlined" className="flex-1 p-3 flex-row items-center">
-              <View className="h-9 w-9 rounded-full bg-md-secondaryContainer items-center justify-center mr-2.5">
-                <Ionicons name="location-outline" size={18} color="#E8DEF8" />
-              </View>
-              <View className="flex-1">
-                <Text className="text-md-onSurfaceVariant text-[10px] uppercase font-semibold">Venue</Text>
-                <Text numberOfLines={1} className="text-md-onSurface font-bold text-xs">
-                  {concert.venue}
-                </Text>
-                <Text numberOfLines={1} className="text-md-onSurfaceVariant text-[11px]">
-                  {concert.city}
+        <View className="px-5 -mt-6">
+          <View className="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-2xl">
+            <View className="flex-row items-center justify-between mb-2">
+              <View className="bg-violet-600/30 border border-violet-500/40 px-3 py-1 rounded-full">
+                <Text className="text-violet-300 font-extrabold text-[11px] tracking-wider uppercase">
+                  Live in Concert
                 </Text>
               </View>
-            </MaterialCard>
-          </View>
 
-          {/* Description */}
-          <View className="mt-5">
-            <Text className="text-md-onSurface text-base font-bold mb-2">About The Experience</Text>
-            <Text className="text-md-onSurfaceVariant text-sm leading-relaxed font-normal">
-              {concert.description}
-            </Text>
-          </View>
-
-          {/* Ticket Tier Category Selector */}
-          <View className="mt-6">
-            <View className="flex-row justify-between items-center mb-3">
-              <Text className="text-md-onSurface text-base font-bold">Select Seating Tier</Text>
-              <Text className="text-md-onSurfaceVariant text-xs">Real-time availability</Text>
+              <Text className="text-emerald-400 font-extrabold text-sm">
+                From ${concert.startingPrice}
+              </Text>
             </View>
 
-            <View>
+            <Text className="text-2xl font-black text-white">{concert.artist}</Text>
+            <Text className="text-slate-300 text-sm font-semibold mt-0.5">{concert.title}</Text>
+
+            {/* Date & Location Pill Grid */}
+            <View className="flex-row mt-4 pt-4 border-t border-slate-800">
+              <View className="flex-1 flex-row items-center">
+                <View className="h-8 w-8 rounded-xl bg-violet-600/20 items-center justify-center mr-2.5">
+                  <Ionicons name="calendar" size={16} color="#c084fc" />
+                </View>
+                <View>
+                  <Text className="text-white font-bold text-xs">{formattedDate}</Text>
+                  <Text className="text-slate-400 text-[11px]">{formattedTime}</Text>
+                </View>
+              </View>
+
+              <View className="flex-1 flex-row items-center border-l border-slate-800 pl-3">
+                <View className="h-8 w-8 rounded-xl bg-emerald-600/20 items-center justify-center mr-2.5">
+                  <Ionicons name="location" size={16} color="#34d399" />
+                </View>
+                <View className="flex-1">
+                  <Text className="text-white font-bold text-xs numberOfLines={1}">{concert.venue}</Text>
+                  <Text className="text-slate-400 text-[11px]">{concert.city}</Text>
+                </View>
+              </View>
+            </View>
+          </View>
+
+          {/* About Concert */}
+          <View className="mt-5">
+            <Text className="text-white text-base font-extrabold mb-1.5">About The Show</Text>
+            <Text className="text-slate-400 text-sm leading-relaxed">{concert.description}</Text>
+          </View>
+
+          {/* 10-Minute Hold Explanation Pill */}
+          <View className="mt-5 bg-violet-950/40 border border-violet-500/30 rounded-2xl p-3.5 flex-row items-center">
+            <View className="h-8 w-8 rounded-lg bg-violet-500/20 items-center justify-center mr-3">
+              <Ionicons name="shield-checkmark" size={18} color="#a78bfa" />
+            </View>
+            <View className="flex-1">
+              <Text className="text-violet-300 font-bold text-xs">10-Minute Temporary Hold Guarantee</Text>
+              <Text className="text-slate-400 text-[11px] mt-0.5">
+                Selecting tickets creates an exclusive 10-minute reservation session protected against overselling.
+              </Text>
+            </View>
+          </View>
+
+          {/* Ticket Tier Categories */}
+          <View className="mt-6">
+            <Text className="text-white text-base font-extrabold mb-3">
+              Select Ticket Category
+            </Text>
+
+            <View className="space-y-3">
               {concert.categories.map((category) => {
                 const isSelected = selectedCategory?.id === category.id;
                 const isSoldOut = category.available <= 0;
 
                 return (
-                  <MaterialCard
+                  <TouchableOpacity
                     key={category.id}
-                    variant={isSelected ? 'filled' : 'outlined'}
                     onPress={() => !isSoldOut && setSelectedCategory(category)}
-                    className={`mb-3 p-4 border transition-all ${
+                    disabled={isSoldOut}
+                    activeOpacity={0.8}
+                    className={`rounded-2xl p-4 mb-3 border ${
                       isSelected
-                        ? 'border-md-primary bg-md-primaryContainer/15'
+                        ? 'bg-slate-900 border-violet-500 shadow-lg shadow-violet-500/20'
                         : isSoldOut
-                        ? 'border-md-outlineVariant/20 opacity-50 bg-md-surface'
-                        : 'border-md-outlineVariant/30 bg-md-surface'
+                        ? 'bg-slate-950/60 border-slate-900 opacity-50'
+                        : 'bg-slate-900/60 border-slate-800'
                     }`}>
-                    <View className="flex-row items-center justify-between mb-1.5">
+                    <View className="flex-row items-center justify-between mb-2">
                       <View className="flex-row items-center">
                         <View
                           style={{ backgroundColor: category.color }}
-                          className="h-3 w-3 rounded-full mr-2.5"
+                          className="h-3.5 w-3.5 rounded-full mr-2.5"
                         />
-                        <Text className="text-md-onSurface font-bold text-base">{category.name}</Text>
+                        <Text className="text-white font-extrabold text-base tracking-wide">
+                          {category.name}
+                        </Text>
                       </View>
 
                       <View className="flex-row items-center">
-                        <Text className="text-md-onSurface font-bold text-lg mr-2.5">
+                        <Text className="text-white font-black text-lg mr-3">
                           ${category.price}
                         </Text>
-                        <MaterialBadge
-                          label={isSoldOut ? 'Sold Out' : `${category.available} Available`}
-                          variant={isSoldOut ? 'error' : 'success'}
-                        />
+                        <View
+                          className={`px-2.5 py-1 rounded-full ${
+                            isSoldOut ? 'bg-rose-500/20' : 'bg-emerald-500/10 border border-emerald-500/30'
+                          }`}>
+                          <Text
+                            className={`text-[11px] font-bold ${
+                              isSoldOut ? 'text-rose-400' : 'text-emerald-400'
+                            }`}>
+                            {isSoldOut ? 'Sold Out' : `${category.available} Available`}
+                          </Text>
+                        </View>
                       </View>
                     </View>
 
                     {category.description && (
-                      <Text className="text-md-onSurfaceVariant text-xs mb-2">{category.description}</Text>
+                      <Text className="text-slate-400 text-xs mb-2.5">{category.description}</Text>
                     )}
 
                     {/* Perks List */}
                     {category.perks && category.perks.length > 0 && (
-                      <View className="pt-2 border-t border-md-outlineVariant/20">
+                      <View className="pt-2 border-t border-slate-800/80">
                         {category.perks.map((perk, idx) => (
                           <View key={idx} className="flex-row items-center mt-1">
-                            <Ionicons name="checkmark-circle" size={13} color="#D0BCFF" style={{ marginRight: 6 }} />
-                            <Text className="text-md-onSurfaceVariant text-xs">{perk}</Text>
+                            <Ionicons name="checkmark-circle" size={13} color="#a78bfa" style={{ marginRight: 6 }} />
+                            <Text className="text-slate-300 text-xs">{perk}</Text>
                           </View>
                         ))}
                       </View>
                     )}
-                  </MaterialCard>
+                  </TouchableOpacity>
                 );
               })}
             </View>
@@ -287,69 +293,78 @@ export default function ConcertDetailScreen() {
 
           {/* Quantity Selector */}
           {selectedCategory && (
-            <MaterialCard variant="outlined" className="mt-3 p-4 flex-row items-center justify-between">
+            <View className="mt-4 bg-slate-900 border border-slate-800 rounded-2xl p-4 flex-row items-center justify-between">
               <View>
-                <Text className="text-md-onSurface font-bold text-sm">Number of Tickets</Text>
-                <Text className="text-md-onSurfaceVariant text-xs">Maximum 6 tickets per order</Text>
+                <Text className="text-white font-bold text-sm">Number of Tickets</Text>
+                <Text className="text-slate-400 text-xs">Maximum 6 tickets per order</Text>
               </View>
 
-              <View className="flex-row items-center bg-md-surfaceContainerHigh rounded-full p-1 border border-md-outlineVariant/30">
+              <View className="flex-row items-center bg-slate-950 border border-slate-800 rounded-xl p-1">
                 <TouchableOpacity
-                  activeOpacity={0.7}
                   onPress={() => setQuantity((q) => Math.max(1, q - 1))}
                   disabled={quantity <= 1}
-                  className={`h-8 w-8 rounded-full items-center justify-center ${
-                    quantity <= 1 ? 'opacity-30' : 'bg-md-surfaceContainerLowest'
+                  className={`h-9 w-9 rounded-lg items-center justify-center ${
+                    quantity <= 1 ? 'opacity-30' : 'bg-slate-800'
                   }`}>
-                  <Ionicons name="remove" size={16} color="#E6E0E9" />
+                  <Ionicons name="remove" size={18} color="#fff" />
                 </TouchableOpacity>
 
-                <Text className="text-md-onSurface font-bold text-sm w-9 text-center">
+                <Text className="text-white font-extrabold text-base w-10 text-center">
                   {quantity}
                 </Text>
 
                 <TouchableOpacity
-                  activeOpacity={0.7}
                   onPress={() =>
                     setQuantity((q) => Math.min(Math.min(6, selectedCategory.available), q + 1))
                   }
                   disabled={quantity >= 6 || quantity >= selectedCategory.available}
-                  className={`h-8 w-8 rounded-full items-center justify-center ${
+                  className={`h-9 w-9 rounded-lg items-center justify-center ${
                     quantity >= 6 || quantity >= selectedCategory.available
                       ? 'opacity-30'
-                      : 'bg-md-primary'
+                      : 'bg-violet-600'
                   }`}>
-                  <Ionicons name="add" size={16} color="#381E72" />
+                  <Ionicons name="add" size={18} color="#fff" />
                 </TouchableOpacity>
               </View>
-            </MaterialCard>
+            </View>
           )}
         </View>
       </ScrollView>
 
       {/* Bottom Sticky Action Bar */}
-      <View className="absolute bottom-0 left-0 right-0 bg-md-surfaceContainer/95 border-t border-md-outlineVariant/30 p-4 pb-8 flex-row items-center justify-between">
+      <View className="absolute bottom-0 left-0 right-0 bg-slate-950/95 border-t border-slate-900 p-4 pb-8 flex-row items-center justify-between">
         <View>
-          <Text className="text-md-onSurfaceVariant text-[10px] uppercase font-semibold">Total Estimated</Text>
+          <Text className="text-slate-400 text-xs uppercase font-bold">Total Estimated</Text>
           <View className="flex-row items-baseline">
-            <Text className="text-md-onSurface font-bold text-2xl">${subtotal}</Text>
+            <Text className="text-white font-black text-2xl">${subtotal}</Text>
             {selectedCategory && (
-              <Text className="text-md-onSurfaceVariant text-xs ml-1.5 font-medium">
+              <Text className="text-slate-400 text-xs ml-1.5">
                 ({quantity}x {selectedCategory.name})
               </Text>
             )}
           </View>
         </View>
 
-        <MaterialButton
-          variant="filled"
-          label={reserving ? 'Reserving...' : 'Reserve 10-Min Hold'}
-          loading={reserving}
-          disabled={reserving || !selectedCategory || selectedCategory.available <= 0}
-          icon={!reserving ? <Ionicons name="time-outline" size={18} color="#381E72" /> : undefined}
-          className="h-12 px-6"
+        <TouchableOpacity
           onPress={handleReserve}
-        />
+          disabled={reserving || !selectedCategory || selectedCategory.available <= 0}
+          activeOpacity={0.85}
+          className={`py-3.5 px-6 rounded-2xl flex-row items-center justify-center shadow-lg shadow-violet-600/40 ${
+            reserving || !selectedCategory || selectedCategory.available <= 0
+              ? 'bg-slate-800 opacity-60'
+              : 'bg-violet-600 hover:bg-violet-500'
+          }`}>
+          {reserving ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <>
+              <Ionicons name="time-outline" size={18} color="#fff" style={{ marginRight: 6 }} />
+              <Text className="text-white font-extrabold text-sm tracking-wide">
+                Reserve 10-Min Hold
+              </Text>
+            </>
+          )}
+        </TouchableOpacity>
       </View>
     </View>
   );

@@ -8,6 +8,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  StatusBar,
 } from 'react-native';
 import { router, Link } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -47,6 +48,21 @@ export default function RegisterScreen() {
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={{ flex: 1, backgroundColor: '#090d16' }}>
+      <StatusBar barStyle="light-content" />
+
+      {/* Top Navigation Bar with Back Button */}
+      <View className="pt-12 pb-2 px-5 flex-row items-center justify-between">
+        <TouchableOpacity
+          onPress={() => router.back()}
+          className="h-10 w-10 rounded-full bg-slate-900 border border-slate-800 items-center justify-center">
+          <Ionicons name="arrow-back" size={20} color="#fff" />
+        </TouchableOpacity>
+        <Text className="text-slate-400 text-xs font-semibold uppercase tracking-wider">
+          Create Account
+        </Text>
+        <View style={{ width: 40 }} />
+      </View>
+
       <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', padding: 24 }}>
         <View className="mb-6 items-center">
           <View className="h-16 w-16 rounded-2xl bg-violet-600/20 items-center justify-center border border-violet-500/40 mb-3">
@@ -109,7 +125,7 @@ export default function RegisterScreen() {
               <TextInput
                 value={phone}
                 onChangeText={setPhone}
-                placeholder="+1 555 123 4567"
+                placeholder="+855 12 345 678"
                 placeholderTextColor="#64748b"
                 keyboardType="phone-pad"
                 className="flex-1 text-white text-base"

@@ -49,6 +49,9 @@ jobs:
       - name: 🧪 Run backend unit tests
         run: npm test
 
+      - name: 🛡️ Verify Infrastructure as Code (Levels 1, 2, 3)
+        run: npm run test:iac
+
   # =========================================================================
   # 2. FRONTEND LINT AND BUILD
   # =========================================================================
