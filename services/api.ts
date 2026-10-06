@@ -6,9 +6,10 @@ const STORAGE_KEY_REFRESH = '@concert_refresh_token';
 
 // In development, Android emulator connects to host machine via 10.0.2.2
 export const API_BASE_URL =
-  Platform.OS === 'android'
+  process.env.EXPO_PUBLIC_API_URL ||
+  (Platform.OS === 'android'
     ? 'http://10.0.2.2:5000/api/v1'
-    : 'http://localhost:5000/api/v1';
+    : 'http://localhost:5000/api/v1');
 
 class ApiClient {
   private accessToken: string | null = null;
