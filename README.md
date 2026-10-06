@@ -71,6 +71,8 @@ You can use the seeded test user to test ticket booking immediately:
 | Command | What it does |
 |---|---|
 | `npm start` | **Starts both backend API and Expo app together** |
+| `npm run demo:cloudflare` | **Starts local app + Cloudflare Tunnel (1-click public link)** |
+| `npm run tunnel:api` | **Tunnels port 5000 backend API over Cloudflare** |
 | `npm run db:seed` | Re-seeds the database with fresh concerts and tickets |
 | `npx tsc --noEmit` | Checks for TypeScript errors |
 | `npx expo lint` | Runs ESLint |
