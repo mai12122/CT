@@ -1,60 +1,131 @@
-# VPC: 10.0.0.0/16
+# ==============================================================================
+# VPC & NETWORKING MODULE: Dual-AZ Isolated Network Topology
+# ==============================================================================
+
 resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr
   enable_dns_hostnames = true
   enable_dns_support   = true
 
   tags = {
-    Name        = "${var.project_name}-vpc"
-    Environment = var.environment
+    Name = "bassac-live-vpc"
   }
 }
 
-# Internet Gateway for Public Ingress
-resource "aws_internet_gateway" "igw" {
-  vpc_id = aws_vpc.main.id
-
-  tags = {
-    Name = "${var.project_name}-igw"
-  }
-}
-
-# Public Subnets (AZ-a and AZ-b for ALB & NAT Gateways)
-resource "aws_subnet" "public" {
-  count                   = 2
+# ------------------------------------------------------------------------------
+# 1. Public Subnets (Tier 1 - DMZ: ALB and NAT Gateway)
+# ------------------------------------------------------------------------------
+resource "aws_subnet" "public_1a" {
   vpc_id                  = aws_vpc.main.id
-  cidr_block              = var.public_subnet_cidrs[count.index]
-  availability_zone       = var.availability_zones[count.index]
+  cidr_block              = "10.0.1.0/24"
+  availability_zone       = "${var.aws_region}a"
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "${var.project_name}-public-subnet-${count.index + 1}"
+    Name = "public-subnet-1a"
     Tier = "Public"
   }
 }
 
-# Elastic IPs for NAT Gateways
+resource "aws_subnet" "public_1b" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.2.0/24"
+  availability_zone       = "${var.aws_region}b"
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name = "public-subnet-1b"
+    Tier = "Public"
+  }
+}
+
+# ------------------------------------------------------------------------------
+# 2. Private App Subnets (Tier 2 - Compute Fleet)
+# ------------------------------------------------------------------------------
+resource "aws_subnet" "app_1a" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.10.0/24"
+  availability_zone       = "${var.aws_region}a"
+  map_public_ip_on_launch = false
+
+  tags = {
+    Name = "app-subnet-1a"
+    Tier = "PrivateApp"
+  }
+}
+
+resource "aws_subnet" "app_1b" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.20.0/24"
+  availability_zone       = "${var.aws_region}b"
+  map_public_ip_on_launch = false
+
+  tags = {
+    Name = "app-subnet-1b"
+    Tier = "PrivateApp"
+  }
+}
+
+# ------------------------------------------------------------------------------
+# 3. Private DB Subnets (Tier 3 - Data Isolation - Rule S1)
+# ------------------------------------------------------------------------------
+resource "aws_subnet" "db_1a" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.30.0/24"
+  availability_zone       = "${var.aws_region}a"
+  map_public_ip_on_launch = false
+
+  tags = {
+    Name = "db-subnet-1a"
+    Tier = "PrivateDB"
+  }
+}
+
+resource "aws_subnet" "db_1b" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.40.0/24"
+  availability_zone       = "${var.aws_region}b"
+  map_public_ip_on_launch = false
+
+  tags = {
+    Name = "db-subnet-1b"
+    Tier = "PrivateDB"
+  }
+}
+
+# ------------------------------------------------------------------------------
+# Gateways
+# ------------------------------------------------------------------------------
+resource "aws_internet_gateway" "igw" {
+  vpc_id = aws_vpc.main.id
+
+  tags = {
+    Name = "bassac-live-igw"
+  }
+}
+
 resource "aws_eip" "nat" {
-  count  = 2
   domain = "vpc"
-
   tags = {
-    Name = "${var.project_name}-nat-eip-${count.index + 1}"
+    Name = "bassac-nat-eip"
   }
 }
 
-# NAT Gateways in Public Subnets (High Availability Multi-AZ)
 resource "aws_nat_gateway" "nat" {
-  count         = 2
-  allocation_id = aws_eip.nat[count.index].id
-  subnet_id     = aws_subnet.public[count.index].id
+  allocation_id = aws_eip.nat.id
+  subnet_id     = aws_subnet.public_1a.id
 
   tags = {
-    Name = "${var.project_name}-nat-gw-${count.index + 1}"
+    Name = "bassac-nat-gw"
   }
+
+  depends_on = [aws_internet_gateway.igw]
 }
 
-# Public Route Table
+# ------------------------------------------------------------------------------
+# Route Tables & Associations
+# ------------------------------------------------------------------------------
+# Public Route Table (Routes 0.0.0.0/0 to IGW)
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
 
@@ -64,77 +135,60 @@ resource "aws_route_table" "public" {
   }
 
   tags = {
-    Name = "${var.project_name}-public-rt"
+    Name = "public-rt"
   }
 }
 
-resource "aws_route_table_association" "public" {
-  count          = 2
-  subnet_id      = aws_subnet.public[count.index].id
+resource "aws_route_table_association" "pub_1a" {
+  subnet_id      = aws_subnet.public_1a.id
   route_table_id = aws_route_table.public.id
 }
 
-# Private Application Subnets (EC2 Auto Scaling Group)
-resource "aws_subnet" "private_app" {
-  count             = 2
-  vpc_id            = aws_vpc.main.id
-  cidr_block        = var.private_app_subnet_cidrs[count.index]
-  availability_zone = var.availability_zones[count.index]
-
-  tags = {
-    Name = "${var.project_name}-private-app-subnet-${count.index + 1}"
-    Tier = "Private-App"
-  }
+resource "aws_route_table_association" "pub_1b" {
+  subnet_id      = aws_subnet.public_1b.id
+  route_table_id = aws_route_table.public.id
 }
 
-# Private Route Tables (Routing through NAT Gateways)
+# Private App Route Table (Routes outbound updates 0.0.0.0/0 to NAT Gateway)
 resource "aws_route_table" "private_app" {
-  count  = 2
   vpc_id = aws_vpc.main.id
 
   route {
     cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.nat[count.index].id
+    nat_gateway_id = aws_nat_gateway.nat.id
   }
 
   tags = {
-    Name = "${var.project_name}-private-app-rt-${count.index + 1}"
+    Name = "private-app-rt"
   }
 }
 
-resource "aws_route_table_association" "private_app" {
-  count          = 2
-  subnet_id      = aws_subnet.private_app[count.index].id
-  route_table_id = aws_route_table.private_app[count.index].id
+resource "aws_route_table_association" "app_1a" {
+  subnet_id      = aws_subnet.app_1a.id
+  route_table_id = aws_route_table.private_app.id
 }
 
-# Isolated Database Subnets (Security Rule S1, S4: ZERO Internet Routes)
-resource "aws_subnet" "isolated_db" {
-  count                   = 2
-  vpc_id                  = aws_vpc.main.id
-  cidr_block              = var.isolated_db_subnet_cidrs[count.index]
-  availability_zone       = var.availability_zones[count.index]
-  map_public_ip_on_launch = false
-
-  tags = {
-    Name = "${var.project_name}-isolated-db-subnet-${count.index + 1}"
-    Tier = "Isolated-DB"
-  }
+resource "aws_route_table_association" "app_1b" {
+  subnet_id      = aws_subnet.app_1b.id
+  route_table_id = aws_route_table.private_app.id
 }
 
-resource "aws_route_table" "isolated_db" {
+# Private DB Route Table (Rule S1: Strictly Local Only - Zero Default Route)
+resource "aws_route_table" "private_db" {
   vpc_id = aws_vpc.main.id
 
-  # Local route only (10.0.0.0/16 implicitly created by AWS)
-  # Zero default internet routes exist here -> strictly unroutable (S1)
-
   tags = {
-    Name = "${var.project_name}-isolated-db-rt"
+    Name = "private-db-rt"
+    Rule = "S1-ZeroInternetRouting"
   }
 }
 
-resource "aws_route_table_association" "isolated_db" {
-  count          = 2
-  subnet_id      = aws_subnet.isolated_db[count.index].id
-  route_table_id = aws_route_table.isolated_db.id
+resource "aws_route_table_association" "db_1a" {
+  subnet_id      = aws_subnet.db_1a.id
+  route_table_id = aws_route_table.private_db.id
+}
+
+resource "aws_route_table_association" "db_1b" {
+  subnet_id      = aws_subnet.db_1b.id
+  route_table_id = aws_route_table.private_db.id
 }

@@ -4,16 +4,10 @@ variable "aws_region" {
   default     = "ap-southeast-1"
 }
 
-variable "project_name" {
-  description = "Project name"
-  type        = string
-  default     = "ct-live"
-}
-
 variable "environment" {
-  description = "Environment tier"
+  description = "Deployment environment name"
   type        = string
-  default     = "production"
+  default     = "prod"
 }
 
 variable "vpc_cidr" {
@@ -22,28 +16,36 @@ variable "vpc_cidr" {
   default     = "10.0.0.0/16"
 }
 
-variable "public_subnet_cidrs" {
-  type    = list(string)
-  default = ["10.0.1.0/24", "10.0.2.0/24"]
-}
-
-variable "private_app_subnet_cidrs" {
-  type    = list(string)
-  default = ["10.0.10.0/24", "10.0.20.0/24"]
-}
-
-variable "isolated_db_subnet_cidrs" {
-  type    = list(string)
-  default = ["10.0.30.0/24", "10.0.40.0/24"]
-}
-
-variable "availability_zones" {
-  type    = list(string)
-  default = ["ap-southeast-1a", "ap-southeast-1b"]
-}
-
-variable "manager_email" {
-  description = "Email address for immediate incident notifications (R5)"
+variable "db_username" {
+  description = "PostgreSQL administrator username"
   type        = string
-  default     = "ratana@ctlive.com.kh"
+  sensitive   = true
+
+  validation {
+    condition     = length(var.db_username) >= 3
+    error_message = "Database username must be at least 3 characters."
+  }
+}
+
+variable "db_password" {
+  description = "PostgreSQL administrator password (Rule S3 & S4)"
+  type        = string
+  sensitive   = true
+
+  validation {
+    condition     = length(var.db_password) >= 12
+    error_message = "Database password must be at least 12 characters for production security."
+  }
+}
+
+variable "alert_email" {
+  description = "Operations manager email address for urgent site alerts (Rule R5)"
+  type        = string
+  default     = "ratana@bassaclive.com"
+}
+
+variable "acm_certificate_arn" {
+  description = "ARN of an ACM certificate for HTTPS on the ALB (optional: if not set, only HTTP listener is created)"
+  type        = string
+  default     = ""
 }

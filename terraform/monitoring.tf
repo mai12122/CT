@@ -1,78 +1,77 @@
-# SNS Topic for Incident Alerts (R5: Email manager when site fails)
-resource "aws_sns_topic" "incident_alerts" {
-  name = "${var.project_name}-incident-alerts"
+# ==============================================================================
+# MONITORING & ALERTING MODULE: CloudWatch Alarms & SNS Escalation
+# Fulfills Rule R5 (Email manager when site failing) & Alert 1 (Rush scaling)
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. Urgent SNS Topic
+# ------------------------------------------------------------------------------
+resource "aws_sns_topic" "urgent_alerts" {
+  name              = "bassac-live-urgent-alerts"
+  kms_master_key_id = aws_kms_key.bassac_cmk.id
 
   tags = {
-    Name = "${var.project_name}-incident-alerts"
+    Name = "bassac-live-urgent-alerts"
   }
 }
 
-# Email Subscription to Operations Manager (Mr. Ratana)
-resource "aws_sns_topic_subscription" "manager_email" {
-  topic_arn = aws_sns_topic.incident_alerts.arn
+resource "aws_sns_topic_subscription" "email_sub" {
+  topic_arn = aws_sns_topic.urgent_alerts.arn
   protocol  = "email"
-  endpoint  = var.manager_email
+  endpoint  = var.alert_email
 }
 
-# =========================================================================
-# ALERT 1: SALE RUSH (Load rises as sale opens -> scale out capacity)
-# =========================================================================
+# ------------------------------------------------------------------------------
+# 2. CloudWatch Alarm 1: Sale Rush Surge Alarm (Alert 1)
+# ------------------------------------------------------------------------------
 resource "aws_cloudwatch_metric_alarm" "sale_rush" {
-  alarm_name          = "${var.project_name}-alarm-sale-rush"
+  alarm_name          = "SaleRush-CapacityBoost"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
   metric_name         = "RequestCountPerTarget"
   namespace           = "AWS/ApplicationELB"
   period              = 60
   statistic           = "Sum"
-  threshold           = 1200
-  alarm_description   = "Triggers when flash sale opens and request load surges (R2)"
+  threshold           = 400
+  alarm_description   = "Triggers when incoming HTTP request surge exceeds 400 requests/target"
+
+  alarm_actions = [aws_sns_topic.urgent_alerts.arn]
+  ok_actions    = [aws_sns_topic.urgent_alerts.arn]
 
   dimensions = {
-    TargetGroup  = aws_lb_target_group.app_tg.arn_suffix
-    LoadBalancer = aws_lb.main.arn_suffix
+    TargetGroup  = aws_lb_target_group.tg.arn_suffix
+    LoadBalancer = aws_lb.alb.arn_suffix
   }
 
-  alarm_actions = [aws_autoscaling_policy.target_tracking_requests.arn]
+  tags = {
+    Name = "SaleRush-CapacityBoost"
+  }
 }
 
-# =========================================================================
-# ALERT 2: SITE FAILING (Any server fails health check -> email manager immediately)
-# =========================================================================
-resource "aws_cloudwatch_metric_alarm" "unhealthy_hosts" {
-  alarm_name          = "${var.project_name}-alarm-unhealthy-hosts-site-failing"
+# ------------------------------------------------------------------------------
+# 3. CloudWatch Alarm 2: Site Outage Urgent Alarm (Alert 2 & Rule R5)
+# ------------------------------------------------------------------------------
+resource "aws_cloudwatch_metric_alarm" "site_failing" {
+  alarm_name          = "SiteFailing-UnhealthyHosts-Urgent"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = 1
   metric_name         = "UnHealthyHostCount"
   namespace           = "AWS/ApplicationELB"
   period              = 60
-  statistic           = "Maximum"
+  statistic           = "Average"
   threshold           = 1
-  alarm_description   = "R5: Immediately alerts Mr. Ratana via email if any server stops answering health checks"
+  alarm_description   = "Rule R5: Urgent alert to Mr. Ratana when any backend host becomes unhealthy"
+
+  alarm_actions = [aws_sns_topic.urgent_alerts.arn]
+  ok_actions    = [aws_sns_topic.urgent_alerts.arn]
 
   dimensions = {
-    TargetGroup  = aws_lb_target_group.app_tg.arn_suffix
-    LoadBalancer = aws_lb.main.arn_suffix
+    TargetGroup  = aws_lb_target_group.tg.arn_suffix
+    LoadBalancer = aws_lb.alb.arn_suffix
   }
 
-  alarm_actions = [aws_sns_topic.incident_alerts.arn]
-}
-
-resource "aws_cloudwatch_metric_alarm" "high_5xx_errors" {
-  alarm_name          = "${var.project_name}-alarm-high-5xx-errors"
-  comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods  = 1
-  metric_name         = "HTTPCode_Target_5XX_Count"
-  namespace           = "AWS/ApplicationELB"
-  period              = 60
-  statistic           = "Sum"
-  threshold           = 10
-  alarm_description   = "R5: Alerts operations manager if target servers emit 5xx errors"
-
-  dimensions = {
-    TargetGroup  = aws_lb_target_group.app_tg.arn_suffix
-    LoadBalancer = aws_lb.main.arn_suffix
+  tags = {
+    Name = "SiteFailing-UnhealthyHosts-Urgent"
+    Rule = "R5-EmailManagerWhenSiteFailing"
   }
-
-  alarm_actions = [aws_sns_topic.incident_alerts.arn]
 }

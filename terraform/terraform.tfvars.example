@@ -1,0 +1,12 @@
+# Bassac Live Ticketing - Terraform Variables
+# Copy this file to terraform.tfvars and fill in your values.
+# NEVER commit terraform.tfvars to version control.
+
+db_username = "bassac_admin"
+db_password = "CHANGE_ME_use_a_strong_password"
+
+# Optional: ACM certificate ARN for HTTPS on ALB
+# acm_certificate_arn = "arn:aws:acm:ap-southeast-1:123456789012:certificate/abc-123"
+
+# Optional: Override alert email
+# alert_email = "your-email@example.com"

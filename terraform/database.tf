@@ -1,47 +1,54 @@
-# Database Subnet Group (Using Isolated Subnets)
+# ==============================================================================
+# DATABASE MODULE: PostgreSQL Multi-AZ Deployment
+# Fulfills Rule S1 (Zero Public Exposure), S3 (KMS CMK), S4 (Strict App SG Access), R6 (Multi-AZ)
+# ==============================================================================
+
 resource "aws_db_subnet_group" "db_subnets" {
-  name        = "${var.project_name}-db-subnet-group"
-  description = "Isolated subnets across Multi-AZ for PostgreSQL"
-  subnet_ids  = aws_subnet.isolated_db[*].id
+  name        = "bassac-live-db-subnet-group"
+  description = "Isolated database subnets spanning AZ-a and AZ-b"
+  subnet_ids  = [aws_subnet.db_1a.id, aws_subnet.db_1b.id]
 
   tags = {
-    Name = "${var.project_name}-db-subnet-group"
+    Name = "bassac-live-db-subnet-group"
   }
 }
 
-# Amazon RDS PostgreSQL (ACID compliant for orders & ticket counts)
 resource "aws_db_instance" "postgres" {
-  identifier             = "${var.project_name}-orders-db"
-  allocated_storage      = 100
-  max_allocated_storage  = 200
-  storage_type           = "gp3"
-  engine                 = "postgres"
-  engine_version         = "16.3"
-  instance_class         = "db.t4g.medium"
-  db_name                = "ct_ticketing"
-  username               = "ct_admin"
-  password               = "CTSecurePassword2026!#" # In production injected via AWS Secrets Manager
-  
-  # Multi-AZ enabled for R6 (Sale continues if primary dies)
-  multi_az               = true
-  
-  # Security Rule S1: DB is physically inaccessible from public internet
-  publicly_accessible    = false
-  db_subnet_group_name   = aws_db_subnet_group.db_subnets.name
-  
-  # Security Rule S4: Strictly accessible by app security group
+  identifier            = "bassac-live-db"
+  engine                = "postgres"
+  engine_version        = "16"
+  instance_class        = "db.t4g.micro"
+  allocated_storage     = 20
+  max_allocated_storage = 100
+  storage_type          = "gp3"
+
+  db_name  = "bassac_live_db"
+  username = var.db_username
+  password = var.db_password
+  port     = 5432
+
+  # High Availability & Failover (Rule R6: If one database node fails, standby takes over)
+  multi_az = true
+
+  # Rule S1: Physical Isolation from Public Internet
+  publicly_accessible  = false
+  db_subnet_group_name = aws_db_subnet_group.db_subnets.name
+
+  # Rule S4: Chained Security Group (Port 5432 only from App SG)
   vpc_security_group_ids = [aws_security_group.db.id]
-  
-  # Security Rule S3: Encrypted at rest with KMS Customer Managed Key
-  storage_encrypted      = true
-  kms_key_id             = aws_kms_key.ct_cmk.arn
-  
-  # Backup & maintenance
-  backup_retention_period = 7
-  deletion_protection     = false
-  skip_final_snapshot     = true
+
+  # Rule S3: Encryption at Rest via Customer Managed Key
+  storage_encrypted = true
+  kms_key_id        = aws_kms_key.bassac_cmk.arn
+
+  # Operational Safeguards
+  skip_final_snapshot       = false
+  final_snapshot_identifier = "bassac-live-db-final-snapshot"
+  backup_retention_period   = 7
+  deletion_protection       = true
 
   tags = {
-    Name = "${var.project_name}-rds-orders"
+    Name = "bassac-live-db"
+    Rule = "S1-S4-ACID-MultiAZ"
   }
 }
