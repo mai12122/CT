@@ -3,7 +3,6 @@ import {
   View,
   Text,
   ScrollView,
-  TouchableOpacity,
   RefreshControl,
   ActivityIndicator,
   StatusBar,
@@ -13,6 +12,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { api } from '@/services/api';
 import { useAuth } from '@/context/AuthContext';
 import { Ticket } from '@/types';
+import {
+  MaterialTopAppBar,
+  MaterialCard,
+  MaterialButton,
+  MaterialBadge,
+  MaterialDivider,
+} from '@/components/material';
 
 export default function MyTicketsScreen() {
   const { user } = useAuth();
@@ -49,72 +55,78 @@ export default function MyTicketsScreen() {
   };
 
   return (
-    <View className="flex-1 bg-slate-950">
-      <StatusBar barStyle="light-content" />
+    <View className="flex-1 bg-md-surface">
+      <StatusBar barStyle="light-content" backgroundColor="#141218" />
 
-      {/* Header */}
-      <View className="pt-14 pb-4 px-5 bg-slate-950/80 border-b border-slate-900 flex-row items-center justify-between">
-        <View>
-          <Text className="text-xs font-bold text-violet-400 tracking-widest uppercase">
-            MY WALLET
-          </Text>
-          <Text className="text-xl font-extrabold text-white">Concert Tickets</Text>
-        </View>
-
-        {user && (
-          <View className="bg-slate-900 border border-slate-800 rounded-full px-3 py-1">
-            <Text className="text-slate-300 font-bold text-xs">{tickets.length} Passes</Text>
+      {/* Material 3 Top App Bar */}
+      <MaterialTopAppBar
+        title="My Tickets"
+        subtitle="Pass Wallet"
+        leading={
+          <View className="h-10 w-10 rounded-full bg-md-primaryContainer items-center justify-center">
+            <Ionicons name="ticket" size={20} color="#EADDFF" />
           </View>
-        )}
-      </View>
+        }
+        trailing={
+          user && (
+            <MaterialBadge
+              label={`${tickets.length} Passes`}
+              variant="secondary"
+              className="py-1 px-3"
+            />
+          )
+        }
+      />
 
       {!user ? (
         <View className="flex-1 items-center justify-center p-6">
-          <View className="h-20 w-20 rounded-3xl bg-violet-600/10 border border-violet-500/30 items-center justify-center mb-4">
-            <Ionicons name="ticket-outline" size={40} color="#a78bfa" />
+          <View className="h-20 w-20 rounded-full bg-md-surfaceContainerHigh items-center justify-center mb-4">
+            <Ionicons name="ticket-outline" size={38} color="#D0BCFF" />
           </View>
-          <Text className="text-white text-xl font-extrabold text-center">
+          <Text className="text-md-onSurface text-xl font-bold text-center">
             Sign In to View Passes
           </Text>
-          <Text className="text-slate-400 text-sm text-center mt-1.5 max-w-xs leading-relaxed">
+          <Text className="text-md-onSurfaceVariant text-sm text-center mt-2 max-w-xs leading-relaxed font-normal">
             Your booked concert tickets, seat reservations, and entry QR codes will appear here.
           </Text>
-          <TouchableOpacity
+          <MaterialButton
+            variant="filled"
+            label="Sign In to Continue"
+            icon={<Ionicons name="log-in-outline" size={18} color="#381E72" />}
+            className="mt-6"
             onPress={() => router.push('/auth/login')}
-            activeOpacity={0.85}
-            className="mt-6 bg-violet-600 px-8 py-3.5 rounded-2xl shadow-lg shadow-violet-600/30">
-            <Text className="text-white font-extrabold text-sm">Sign In to Continue</Text>
-          </TouchableOpacity>
+          />
         </View>
       ) : loading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#8b5cf6" />
-          <Text className="text-slate-400 text-sm mt-3">Fetching your concert passes...</Text>
+          <ActivityIndicator size="large" color="#D0BCFF" />
+          <Text className="text-md-onSurfaceVariant text-sm mt-3 font-medium">
+            Fetching your concert passes...
+          </Text>
         </View>
       ) : tickets.length === 0 ? (
         <ScrollView
           contentContainerStyle={{ flexGrow: 1, alignItems: 'center', justifyContent: 'center', padding: 24 }}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#a78bfa" />}>
-          <View className="h-20 w-20 rounded-3xl bg-slate-900 border border-slate-800 items-center justify-center mb-4">
-            <Ionicons name="ticket-outline" size={36} color="#64748b" />
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#D0BCFF" />}>
+          <View className="h-20 w-20 rounded-full bg-md-surfaceContainerLow items-center justify-center mb-4">
+            <Ionicons name="ticket-outline" size={36} color="#938F99" />
           </View>
-          <Text className="text-white text-lg font-bold">No Tickets Yet</Text>
-          <Text className="text-slate-400 text-xs text-center mt-1 max-w-xs">
+          <Text className="text-md-onSurface text-lg font-bold">No Tickets Yet</Text>
+          <Text className="text-md-onSurfaceVariant text-xs text-center mt-1.5 max-w-xs leading-relaxed font-normal">
             You don&apos;t have any active concert tickets yet. Browse upcoming shows and grab your seats!
           </Text>
-          <TouchableOpacity
+          <MaterialButton
+            variant="tonal"
+            label="Explore Concerts"
+            className="mt-5"
             onPress={() => router.push('/(tabs)')}
-            className="mt-5 bg-violet-600 px-6 py-3 rounded-xl">
-            <Text className="text-white font-bold text-xs uppercase tracking-wider">
-              Explore Concerts
-            </Text>
-          </TouchableOpacity>
+          />
         </ScrollView>
       ) : (
         <ScrollView
-          contentContainerStyle={{ padding: 20, paddingBottom: 50 }}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#a78bfa" />}>
-          <View className="space-y-4">
+          contentContainerStyle={{ padding: 16, paddingBottom: 50 }}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#D0BCFF" />}>
+          <View>
             {tickets.map((ticket) => {
               const concertDate = ticket.concert ? new Date(ticket.concert.date) : new Date();
               const dateString = concertDate.toLocaleDateString('en-US', {
@@ -124,66 +136,70 @@ export default function MyTicketsScreen() {
               });
 
               return (
-                <TouchableOpacity
+                <MaterialCard
                   key={ticket.id}
+                  variant="elevated"
                   onPress={() => router.push(`/ticket/${ticket.id}` as any)}
-                  activeOpacity={0.88}
-                  className="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden mb-4 shadow-xl">
-                  {/* Top Category Header Stripe */}
+                  className="p-0 overflow-hidden mb-4 rounded-md-xl">
+                  {/* Category Accent Bar */}
                   <View
-                    style={{ backgroundColor: ticket.category?.color || '#8b5cf6' }}
+                    style={{ backgroundColor: ticket.category?.color || '#6750A4' }}
                     className="py-2.5 px-4 flex-row items-center justify-between">
                     <View className="flex-row items-center">
                       <Ionicons name="musical-notes" size={16} color="#020617" style={{ marginRight: 6 }} />
-                      <Text className="text-slate-950 font-black text-xs uppercase tracking-wider">
+                      <Text className="text-slate-950 font-bold text-xs uppercase tracking-wider">
                         {ticket.category?.name} Pass
                       </Text>
                     </View>
 
-                    <View className="bg-slate-950/20 px-2 py-0.5 rounded-full border border-black/20">
-                      <Text className="text-slate-950 font-extrabold text-[10px] uppercase">
+                    <View className="bg-black/25 px-2 py-0.5 rounded-full">
+                      <Text className="text-white font-bold text-[10px] uppercase">
                         {ticket.status}
                       </Text>
                     </View>
                   </View>
 
                   {/* Body Content */}
-                  <View className="p-5">
-                    <Text className="text-white font-black text-xl leading-tight">
+                  <View className="p-4 bg-md-surfaceContainerLow">
+                    <Text className="text-md-onSurface font-bold text-lg tracking-tight">
                       {ticket.concert?.artist}
                     </Text>
-                    <Text className="text-slate-300 text-sm font-semibold mt-0.5">
+                    <Text className="text-md-onSurfaceVariant text-sm font-medium mt-0.5">
                       {ticket.concert?.title}
                     </Text>
 
                     <View className="flex-row items-center mt-3">
-                      <Ionicons name="location-outline" size={14} color="#94a3b8" style={{ marginRight: 4 }} />
-                      <Text className="text-slate-400 text-xs">
+                      <Ionicons name="location-outline" size={14} color="#D0BCFF" style={{ marginRight: 4 }} />
+                      <Text className="text-md-onSurfaceVariant text-xs font-normal">
                         {ticket.concert?.venue} • {ticket.concert?.city}
                       </Text>
                     </View>
 
                     <View className="flex-row items-center mt-1">
-                      <Ionicons name="calendar-outline" size={14} color="#94a3b8" style={{ marginRight: 4 }} />
-                      <Text className="text-slate-400 text-xs">{dateString}</Text>
+                      <Ionicons name="calendar-outline" size={14} color="#D0BCFF" style={{ marginRight: 4 }} />
+                      <Text className="text-md-onSurfaceVariant text-xs font-normal">{dateString}</Text>
                     </View>
 
+                    <MaterialDivider className="my-3" />
+
                     {/* Seat & QR Indicator CTA */}
-                    <View className="mt-4 pt-3 border-t border-slate-800/80 flex-row items-center justify-between">
+                    <View className="flex-row items-center justify-between">
                       <View>
-                        <Text className="text-slate-400 text-[10px] uppercase font-bold">Assigned Seat</Text>
-                        <Text className="text-emerald-400 font-extrabold text-xs mt-0.5">
+                        <Text className="text-md-onSurfaceVariant text-[10px] uppercase font-semibold">
+                          Assigned Seat
+                        </Text>
+                        <Text className="text-emerald-400 font-bold text-xs mt-0.5">
                           {ticket.seat || 'General Admission'}
                         </Text>
                       </View>
 
-                      <View className="bg-violet-600/20 border border-violet-500/30 px-3 py-1.5 rounded-xl flex-row items-center">
-                        <Ionicons name="qr-code" size={14} color="#c084fc" style={{ marginRight: 6 }} />
-                        <Text className="text-violet-300 font-bold text-xs">Open QR Pass</Text>
+                      <View className="bg-md-primaryContainer px-3 py-1.5 rounded-full flex-row items-center">
+                        <Ionicons name="qr-code" size={14} color="#EADDFF" style={{ marginRight: 6 }} />
+                        <Text className="text-md-onPrimaryContainer font-bold text-xs">View QR Pass</Text>
                       </View>
                     </View>
                   </View>
-                </TouchableOpacity>
+                </MaterialCard>
               );
             })}
           </View>
