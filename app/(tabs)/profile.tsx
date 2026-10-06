@@ -13,6 +13,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/context/AuthContext';
 import { api } from '@/services/api';
 
+import { SocialAuthButtons } from '@/components/SocialAuthButtons';
+
 export default function ProfileScreen() {
   const { user, logout } = useAuth();
   const [stats, setStats] = useState<{ bookings: number; tickets: number }>({ bookings: 0, tickets: 0 });
@@ -65,7 +67,7 @@ export default function ProfileScreen() {
 
       <ScrollView contentContainerStyle={{ padding: 20 }}>
         {!user ? (
-          <View className="items-center py-12">
+          <View className="items-center py-8">
             <View className="h-20 w-20 rounded-full bg-violet-600/10 border border-violet-500/30 items-center justify-center mb-4">
               <Ionicons name="person-outline" size={40} color="#a78bfa" />
             </View>
@@ -78,7 +80,7 @@ export default function ProfileScreen() {
               onPress={() => router.push('/auth/login')}
               activeOpacity={0.85}
               className="mt-6 bg-violet-600 px-8 py-3.5 rounded-2xl w-full items-center shadow-lg shadow-violet-600/40">
-              <Text className="text-white font-extrabold text-sm">Sign In</Text>
+              <Text className="text-white font-extrabold text-sm">Sign In with Email / Phone</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -87,6 +89,14 @@ export default function ProfileScreen() {
               className="mt-3 bg-slate-900 border border-slate-800 px-8 py-3.5 rounded-2xl w-full items-center">
               <Text className="text-slate-200 font-bold text-sm">Create New Account (Sign Up)</Text>
             </TouchableOpacity>
+
+            {/* Quick 1-tap Social Auth on Profile page */}
+            <View className="w-full mt-2">
+              <SocialAuthButtons
+                onSuccess={() => {}}
+                onError={(msg) => Alert.alert('Auth Error', msg)}
+              />
+            </View>
           </View>
         ) : (
           <View>
@@ -100,6 +110,12 @@ export default function ProfileScreen() {
 
               <Text className="text-white font-black text-xl">{user.name}</Text>
               <Text className="text-slate-400 text-xs mt-0.5">{user.email}</Text>
+              {user.phone ? (
+                <View className="flex-row items-center mt-1">
+                  <Ionicons name="call-outline" size={12} color="#94a3b8" style={{ marginRight: 4 }} />
+                  <Text className="text-slate-400 text-xs">{user.phone}</Text>
+                </View>
+              ) : null}
 
               <View className="mt-3 bg-violet-500/10 border border-violet-500/30 px-3 py-1 rounded-full">
                 <Text className="text-violet-300 font-bold text-[11px] uppercase tracking-wider">

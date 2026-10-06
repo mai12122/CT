@@ -166,6 +166,52 @@ class ApiClient {
     return res.data;
   }
 
+  async oauthLogin(data: {
+    provider: 'GOOGLE' | 'FACEBOOK';
+    email?: string;
+    name: string;
+    avatar?: string;
+    providerId: string;
+  }) {
+    const res = await this.request<{
+      success: boolean;
+      data: { user: any; tokens: { accessToken: string; refreshToken: string }; isNewUser?: boolean };
+    }>('/auth/oauth', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    if (res.data?.tokens) {
+      await this.setTokens(res.data.tokens.accessToken, res.data.tokens.refreshToken);
+    }
+    return res.data;
+  }
+
+  async sendPhoneOtp(phone: string) {
+    const res = await this.request<{
+      success: boolean;
+      message: string;
+      devOtp?: string;
+    }>('/auth/phone/send-otp', {
+      method: 'POST',
+      body: JSON.stringify({ phone }),
+    });
+    return res;
+  }
+
+  async verifyPhoneOtp(data: { phone: string; code: string; name?: string }) {
+    const res = await this.request<{
+      success: boolean;
+      data: { user: any; tokens: { accessToken: string; refreshToken: string }; isNewUser?: boolean };
+    }>('/auth/phone/verify-otp', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    if (res.data?.tokens) {
+      await this.setTokens(res.data.tokens.accessToken, res.data.tokens.refreshToken);
+    }
+    return res.data;
+  }
+
   async logout() {
     try {
       if (this.refreshToken) {

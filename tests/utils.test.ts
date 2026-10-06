@@ -32,3 +32,102 @@ describe("Unit Tests: Server Utilities", () => {
     assert.equal(decoded.role, payload.role);
   });
 });
+
+describe("Unit Tests: Authentication Validation", () => {
+  it("Validates OAuth schema with Google and Facebook", async () => {
+    const { oauthSchema } = await import("../server/validations");
+    const validGoogle = oauthSchema.safeParse({
+      body: {
+        provider: "GOOGLE",
+        email: "fan@gmail.com",
+        name: "Google Fan",
+        providerId: "google_123456",
+      },
+    });
+    assert.equal(validGoogle.success, true);
+
+    const validFb = oauthSchema.safeParse({
+      body: {
+        provider: "FACEBOOK",
+        name: "Facebook Fan",
+        providerId: "fb_789012",
+      },
+    });
+    assert.equal(validFb.success, true);
+
+    const invalidProvider = oauthSchema.safeParse({
+      body: {
+        provider: "TWITTER",
+        name: "Invalid",
+        providerId: "tw_123",
+      },
+    });
+    assert.equal(invalidProvider.success, false);
+  });
+
+  it("Validates Phone OTP sending and verification schemas", async () => {
+    const { sendPhoneOtpSchema, verifyPhoneOtpSchema } = await import("../server/validations");
+
+    const validSend = sendPhoneOtpSchema.safeParse({
+      body: { phone: "+85512345678" },
+    });
+    assert.equal(validSend.success, true);
+
+    const invalidSend = sendPhoneOtpSchema.safeParse({
+      body: { phone: "123" },
+    });
+    assert.equal(invalidSend.success, false);
+
+    const validVerify = verifyPhoneOtpSchema.safeParse({
+      body: { phone: "+85512345678", code: "123456", name: "Sokha" },
+    });
+    assert.equal(validVerify.success, true);
+
+    const invalidVerify = verifyPhoneOtpSchema.safeParse({
+      body: { phone: "+85512345678", code: "12" },
+    });
+    assert.equal(invalidVerify.success, false);
+  });
+});
+
+describe("Unit Tests: Cambodian Phone Utilities (+855)", () => {
+  it("Normalizes various Cambodian phone formats to +855XXXXXXXX", async () => {
+    const { normalizeCambodianPhone, isValidCambodianPhone, formatCambodianPhone } = await import(
+      "../server/utils/phone"
+    );
+
+    // Local Cambodian with 0
+    assert.equal(normalizeCambodianPhone("012 345 678"), "+85512345678");
+    assert.equal(isValidCambodianPhone("012 345 678"), true);
+
+    // Local Cambodian with 9 digits
+    assert.equal(normalizeCambodianPhone("097 123 4567"), "+855971234567");
+    assert.equal(isValidCambodianPhone("097 123 4567"), true);
+
+    // With 00855
+    assert.equal(normalizeCambodianPhone("0085512345678"), "+85512345678");
+
+    // With 855 without plus
+    assert.equal(normalizeCambodianPhone("85512345678"), "+85512345678");
+
+    // Redundant 0 after +855 (+855012345678)
+    assert.equal(normalizeCambodianPhone("+855012345678"), "+85512345678");
+
+    // Pure 8 digits
+    assert.equal(normalizeCambodianPhone("12345678"), "+85512345678");
+
+    // Formatted presentation
+    assert.equal(formatCambodianPhone("+85512345678"), "+855 12 345 678");
+  });
+});
+
+describe("Unit Tests: Facebook OAuth Configuration & URLs", () => {
+  it("Generates valid Facebook OAuth Authorization URL", async () => {
+    const { AuthService } = await import("../server/services/auth.service");
+    const fbUrl = AuthService.getFacebookAuthUrl();
+    assert.ok(fbUrl.startsWith("https://www.facebook.com/v19.0/dialog/oauth"));
+    assert.ok(fbUrl.includes("client_id="));
+    assert.ok(fbUrl.includes("redirect_uri="));
+    assert.ok(fbUrl.includes("scope=email"));
+  });
+});

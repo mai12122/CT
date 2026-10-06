@@ -1,9 +1,11 @@
 export interface User {
   id: string;
   name: string;
-  email: string;
+  email?: string | null;
   phone?: string;
   role: 'USER' | 'ADMIN';
+  authProvider?: 'LOCAL' | 'GOOGLE' | 'FACEBOOK' | 'PHONE';
+  avatar?: string;
   createdAt: string;
 }
 
