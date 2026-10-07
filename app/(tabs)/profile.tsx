@@ -1,12 +1,12 @@
 import React, { useState, useCallback } from 'react';
 import {
   Alert,
+  Image,
   ScrollView,
   StatusBar,
   Text,
   TouchableOpacity,
   View,
-  Image,
 } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -174,6 +174,33 @@ export default function ProfileScreen() {
                   <Text className="text-mist text-[11px] mt-1">
                     Member since 2024
                   </Text>
+                </View>
+              </View>
+
+              {/* Brand identity row */}
+              <View className="flex-row items-center mt-4 pt-4 border-t border-line/60">
+                <View
+                  style={{
+                    shadowColor: '#8b5cf6',
+                    shadowOffset: { width: 0, height: 0 },
+                    shadowOpacity: 0.5,
+                    shadowRadius: 8,
+                    elevation: 4,
+                  }}
+                  className="rounded-full border-[1.5px] border-iris-500/40 mr-3">
+                  <Image
+                    source={require('@/assets/images/logo.png')}
+                    style={{ width: 28, height: 28, borderRadius: 14 }}
+                    resizeMode="cover"
+                  />
+                </View>
+                <View className="flex-1">
+                  <Text className="text-white font-bold text-[13px] tracking-tight">Bassac Live</Text>
+                  <Text className="text-dim text-[10px]">Verified Event Pass Holder</Text>
+                </View>
+                <View className="flex-row items-center bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded-full">
+                  <View className="h-1.5 w-1.5 rounded-full bg-emerald-400 mr-1" />
+                  <Text className="text-emerald-300 font-bold text-[8px] tracking-wider uppercase">ACTIVE</Text>
                 </View>
               </View>
             </View>
