@@ -202,7 +202,7 @@ export default function MyTicketsScreen() {
                       {/* Scannable Micro QR Code Preview */}
                       <View className="p-2.5 bg-white rounded-2xl items-center shadow-md">
                         <QRCode
-                          value={ticket.qrPayload || ticket.ticketNumber}
+                          value={ticket.qrPayload || ticket.ticketNumber || ticket.id || 'VALID-TICKET'}
                           size={62}
                           color="#0B1020"
                           backgroundColor="#ffffff"

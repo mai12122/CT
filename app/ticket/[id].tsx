@@ -193,7 +193,7 @@ export default function TicketDetailScreen() {
             {/* Large Scannable QR Code */}
             <View className="p-4 bg-white rounded-3xl items-center shadow-xl my-2">
               <QRCode
-                value={ticket.qrPayload || ticket.ticketNumber}
+                value={ticket.qrPayload || ticket.ticketNumber || ticket.id || 'VALID-TICKET'}
                 size={180}
                 color="#0B1020"
                 backgroundColor="#ffffff"
