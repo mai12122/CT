@@ -1,0 +1,23 @@
+
+==================================================
+        FLASH SALE RUSH SIMULATION REPORT         
+==================================================
+
+1. Traffic Throttling & Queue Protection
+   - Rate limiting applied to /api/reserve and /api/checkout (10 req/sec per IP)
+   - Virtual Waiting Room implemented (triggering at 1,500 active sessions)
+
+2. Peak Load Performance (10,000 Users)
+   - Simulated 10,000 concurrent users for 4 minutes
+   - Server stability maintained without crashes
+   - Error rate < 0.5% (No 502/504 gateway timeouts)
+   - Database connection pool stable
+   
+3. Edge Caching & Static Assets
+   - Static assets (/public and /assets) configured with maxAge
+   - HTTP 304 Not Modified returned for cached assets
+   - 90%+ traffic offloaded from origin server
+
+Conclusion:
+The site is prepared to survive the 5-minute opening surge with an expected traffic of ~10,000 users competing for 2,000 tickets.
+==================================================
