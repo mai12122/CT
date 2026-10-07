@@ -168,7 +168,7 @@ export default function ProfileScreen() {
                             { text: 'Cancel', style: 'cancel' },
                             {
                               text: 'Save',
-                              onPress: (val) => {
+                              onPress: (val?: string) => {
                                 if (val && val.trim()) {
                                   setCustomName(val.trim());
                                   Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
