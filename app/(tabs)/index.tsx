@@ -18,12 +18,13 @@ import { Concert, ReservationSession } from '@/types';
 import { AppHeader, HeaderAvatar } from '@/components/AppHeader';
 import { ConcertListSkeleton } from '@/components/ui/Skeleton';
 import { LiveDot } from '@/components/ui/LiveDot';
+import { CAMBODIAN_CONCERTS } from '@/constants/cambodianConcerts';
 
-const CITY_FILTERS = ['All', 'Phnom Penh', 'Los Angeles', 'London', 'New York', 'Tokyo'];
+const CITY_FILTERS = ['All', 'Phnom Penh', 'Siem Reap', 'Battambang', 'Preah Sihanouk', 'Kampot'];
 
 export default function ExploreScreen() {
   const { user } = useAuth();
-  const [concerts, setConcerts] = useState<Concert[]>([]);
+  const [concerts, setConcerts] = useState<Concert[]>(CAMBODIAN_CONCERTS);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [search, setSearch] = useState('');
@@ -36,10 +37,25 @@ export default function ExploreScreen() {
         search: search.trim() || undefined,
         city: selectedCity === 'All' ? undefined : selectedCity,
       });
-      setConcerts(data);
+      if (data && data.length > 0) {
+        setConcerts(data);
+        return;
+      }
     } catch (err) {
-      console.warn('Failed to load concerts:', err);
+      console.warn('Backend concerts unreachable, using local Cambodian catalogue:', err);
     }
+
+    // High-availability fallback: filter authentic Cambodian catalogue
+    const filtered = CAMBODIAN_CONCERTS.filter((c) => {
+      const matchesCity = selectedCity === 'All' || c.city.toLowerCase() === selectedCity.toLowerCase();
+      const matchesSearch =
+        !search.trim() ||
+        c.artist.toLowerCase().includes(search.toLowerCase()) ||
+        c.title.toLowerCase().includes(search.toLowerCase()) ||
+        c.venue.toLowerCase().includes(search.toLowerCase());
+      return matchesCity && matchesSearch;
+    });
+    setConcerts(filtered);
   }, [search, selectedCity]);
 
   const fetchActiveSessions = useCallback(async () => {
@@ -111,6 +127,34 @@ export default function ExploreScreen() {
                 className="bg-card border border-line rounded-full py-2 px-3.5 active:opacity-80">
                 <Text className="text-slate-300 text-xs font-semibold">Join</Text>
               </TouchableOpacity>
+      {/* Top Header */}
+      <View className="pt-14 pb-4 px-5 bg-slate-950/80 border-b border-slate-900 flex-row items-center justify-between">
+        <View className="flex-row items-center">
+          <Image
+            source={require('@/assets/images/logo.png')}
+            style={{ width: 110, height: 38, marginRight: 8 }}
+            resizeMode="contain"
+          />
+
+          {/* Interactive CT LIVE Status Badge Button */}
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => router.push('/(tabs)/hall' as any)}
+            className="flex-row items-center bg-rose-500/15 border border-rose-500/40 rounded-full px-2.5 py-1">
+            <View className="w-2 h-2 rounded-full bg-rose-500 mr-1.5" />
+            <Text className="text-rose-400 font-black text-[11px] tracking-wider uppercase">
+              CT LIVE
+            </Text>
+            <Ionicons name="flash" size={11} color="#fb7185" style={{ marginLeft: 3 }} />
+          </TouchableOpacity>
+        </View>
+
+        {user ? (
+          <TouchableOpacity
+            onPress={() => router.push('/(tabs)/profile')}
+            className="flex-row items-center bg-slate-900 border border-slate-800 rounded-full py-1.5 px-3">
+            <View className="h-6 w-6 rounded-full bg-violet-600 items-center justify-center mr-2">
+              <Text className="text-white text-xs font-bold">{user.name[0]}</Text>
             </View>
           )
         }

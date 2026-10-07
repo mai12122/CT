@@ -1,9 +1,10 @@
 FROM node:20-alpine
 WORKDIR /app
 COPY package*.json ./
-RUN npm install --legacy-peer-deps --omit=dev
+COPY .npmrc* ./
+RUN npm install --legacy-peer-deps
 COPY . .
 ENV DATABASE_URL="postgresql://postgres:postgres@localhost:5432/test?schema=public"
 RUN npx prisma generate
 EXPOSE 5000
-CMD ["node", "server/index.ts"]
+CMD ["npx", "tsx", "server/index.ts"]

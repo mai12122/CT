@@ -60,3 +60,6 @@ __pycache__/
 
 # Agents
 .agents/
+# local binaries
+bin/
+*.exe
