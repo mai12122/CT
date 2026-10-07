@@ -1,7 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import {
   Alert,
-  Image,
   ScrollView,
   StatusBar,
   Text,
@@ -13,6 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useAuth } from '@/context/AuthContext';
 import { api } from '@/services/api';
+import { BrandLogo } from '@/components/BrandLogo';
 import { AppHeader } from '@/components/AppHeader';
 import { SocialAuthButtons } from '@/components/SocialAuthButtons';
 import { PhoneAuthForm } from '@/components/PhoneAuthForm';
@@ -95,18 +95,19 @@ export default function ProfileScreen() {
                 Sign in to manage your ticket reservations, access QR passes, and unlock fast 10-minute seat holds.
               </Text>
 
-              {/* Quick 1-Tap Demo Button */}
+              {/* Quick 1-Tap Demo Switcher */}
               <TouchableOpacity
                 onPress={handleQuickDemoLogin}
                 activeOpacity={0.85}
                 disabled={loading}
+                accessibilityRole="button"
                 className="mt-6 bg-iris-500 border border-iris-400/30 py-3 rounded-2xl w-full flex-row items-center px-4 shadow-md shadow-iris-500/30 active:scale-[0.98]">
                 <View className="h-10 w-10 bg-white/20 rounded-full items-center justify-center mr-3">
                   <Ionicons name="flash" size={20} color="#FFFFFF" />
                 </View>
                 <View className="flex-1">
                   <Text className="text-white font-bold text-[15px]">
-                    {loading ? 'Signing in…' : 'Quick Demo Access'}
+                    {loading ? 'Switching account…' : '1-Tap Demo Switcher'}
                   </Text>
                   <Text className="text-iris-200 text-xs mt-0.5">user@example.com</Text>
                 </View>
@@ -179,20 +180,8 @@ export default function ProfileScreen() {
 
               {/* Brand identity row */}
               <View className="flex-row items-center mt-4 pt-4 border-t border-line/60">
-                <View
-                  style={{
-                    shadowColor: '#8b5cf6',
-                    shadowOffset: { width: 0, height: 0 },
-                    shadowOpacity: 0.5,
-                    shadowRadius: 8,
-                    elevation: 4,
-                  }}
-                  className="rounded-full border-[1.5px] border-iris-500/40 mr-3">
-                  <Image
-                    source={require('@/assets/images/logo.png')}
-                    style={{ width: 28, height: 28, borderRadius: 14 }}
-                    resizeMode="cover"
-                  />
+                <View className="mr-3">
+                  <BrandLogo size={32} />
                 </View>
                 <View className="flex-1">
                   <Text className="text-white font-bold text-[13px] tracking-tight">Bassac Live</Text>
@@ -206,10 +195,10 @@ export default function ProfileScreen() {
             </View>
 
             {/* Stats Bento Grid */}
-            <View className="flex-row gap-3">
-              <View className="flex-1 bg-card border border-line rounded-2xl p-4">
+            <View className="flex-row flex-wrap gap-3">
+              <View className="min-w-[100px] flex-1 bg-card border border-line rounded-2xl p-4">
                 <View className="flex-row items-center justify-between mb-2">
-                  <Text className="text-dim text-[10px] font-bold uppercase tracking-wider">
+                  <Text numberOfLines={2} className="text-dim text-[10px] font-bold uppercase tracking-wider">
                     Active Passes
                   </Text>
                   <Ionicons name="ticket" size={14} color="#9282F4" />
@@ -218,10 +207,10 @@ export default function ProfileScreen() {
                 <Text className="text-mist text-[10px] mt-0.5">In Wallet</Text>
               </View>
 
-              <View className="flex-1 bg-card border border-line rounded-2xl p-4">
+              <View className="min-w-[100px] flex-1 bg-card border border-line rounded-2xl p-4">
                 <View className="flex-row items-center justify-between mb-2">
-                  <Text className="text-dim text-[10px] font-bold uppercase tracking-wider">
-                    Trust Score
+                  <Text numberOfLines={2} className="text-dim text-[10px] font-bold uppercase tracking-wider">
+                    Authenticity Score
                   </Text>
                   <Ionicons name="shield-checkmark" size={14} color="#10B981" />
                 </View>
@@ -229,9 +218,9 @@ export default function ProfileScreen() {
                 <Text className="text-mist text-[10px] mt-0.5">Excellent</Text>
               </View>
 
-              <View className="flex-1 bg-card border border-line rounded-2xl p-4">
+              <View className="min-w-[100px] flex-1 bg-card border border-line rounded-2xl p-4">
                 <View className="flex-row items-center justify-between mb-2">
-                  <Text className="text-dim text-[10px] font-bold uppercase tracking-wider">
+                  <Text numberOfLines={2} className="text-dim text-[10px] font-bold uppercase tracking-wider">
                     Venue Access
                   </Text>
                   <Ionicons name="globe" size={14} color="#F5B04C" />
@@ -240,6 +229,26 @@ export default function ProfileScreen() {
                 <Text className="text-mist text-[10px] mt-0.5">Global</Text>
               </View>
             </View>
+
+            <TouchableOpacity
+              onPress={handleQuickDemoLogin}
+              activeOpacity={0.85}
+              disabled={loading}
+              accessibilityRole="button"
+              className="flex-row items-center rounded-2xl border border-iris-500/30 bg-iris-500/10 p-4 active:bg-iris-500/20">
+              <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-iris-500/20">
+                <Ionicons name="flash" size={19} color="#C4B5FD" />
+              </View>
+              <View className="flex-1">
+                <Text className="text-white font-bold text-sm">
+                  {loading ? 'Switching account…' : '1-Tap Demo Switcher'}
+                </Text>
+                <Text className="text-mist text-[11px] mt-0.5">
+                  Switch to the Sopheak Chan demo wallet
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={16} color="#9282F4" />
+            </TouchableOpacity>
 
             {/* Phone Verification Section */}
             <View className="bg-card border border-line rounded-3xl p-5 shadow-lg">

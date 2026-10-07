@@ -14,6 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { api } from '@/services/api';
 import { useAuth } from '@/context/AuthContext';
+import { BrandLogo } from '@/components/BrandLogo';
 import { Concert, ReservationSession } from '@/types';
 import { AppHeader, HeaderAvatar } from '@/components/AppHeader';
 import { ConcertListSkeleton } from '@/components/ui/Skeleton';
@@ -242,11 +243,7 @@ export default function ExploreScreen() {
                 {/* Top Badges */}
                 <View className="absolute top-4 left-4 right-4 flex-row items-center justify-between">
                   <View className="flex-row items-center bg-iris-500/90 border border-white/20 px-2.5 py-1 rounded-full shadow-sm gap-1.5">
-                    <Image
-                      source={require('@/assets/images/logo.png')}
-                      style={{ width: 16, height: 16, borderRadius: 8 }}
-                      resizeMode="cover"
-                    />
+                    <BrandLogo size={20} />
                     <Text className="text-white text-[10px] font-black tracking-[0.14em] uppercase">
                       STADIUM TOUR
                     </Text>

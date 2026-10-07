@@ -1,8 +1,10 @@
 import React from 'react';
-import { Image, Pressable, Text, TouchableOpacity, View } from 'react-native';
+import { Pressable, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
+import { BrandLogo } from '@/components/BrandLogo';
 
 export interface AppHeaderProps {
   right?: React.ReactNode;
@@ -24,11 +26,15 @@ export function AppHeader({ right, showBack, onBack, title, subtitle }: AppHeade
     <View
       style={{
         paddingTop: insets.top + 8,
-        backgroundColor: 'rgba(11, 16, 32, 0.82)',
-        backdropFilter: 'blur(24px)',
-        WebkitBackdropFilter: 'blur(24px)',
-      } as any}
-      className="px-5 pb-3.5 flex-row items-center justify-between border-b border-line/60">
+        backgroundColor: 'rgba(11, 16, 32, 0.68)',
+      }}
+      className="relative flex-row items-center justify-between overflow-hidden border-b border-line/70 px-4 pb-3.5">
+      <BlurView
+        intensity={65}
+        tint="dark"
+        pointerEvents="none"
+        style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }}
+      />
       <View className="flex-row items-center flex-1 mr-3">
         {showBack ? (
           <TouchableOpacity
@@ -53,39 +59,22 @@ export function AppHeader({ right, showBack, onBack, title, subtitle }: AppHeade
         ) : (
           <Pressable
             onPress={() => router.push('/(tabs)')}
+            accessibilityRole="button"
+            accessibilityLabel="Bassac Live home"
             className="flex-row items-center active:opacity-85">
-            <View className="flex-row items-center gap-2.5">
-              <View
-                style={{
-                  shadowColor: '#8b5cf6',
-                  shadowOffset: { width: 0, height: 0 },
-                  shadowOpacity: 0.6,
-                  shadowRadius: 10,
-                  elevation: 5,
-                }}
-                className="rounded-full border-[2px] border-iris-500/40">
-                <Image
-                  source={require('@/assets/images/logo.png')}
-                  style={{ width: 36, height: 36, borderRadius: 18, aspectRatio: 1 }}
-                  resizeMode="cover"
-                />
-              </View>
+            <View className="flex-row items-center gap-2">
+              <BrandLogo size={34} />
               <View className="justify-center">
-                <Text className="text-white font-black text-base tracking-tight leading-5">
+                <Text className="text-white font-black text-[15px] tracking-tight leading-5">
                   Bassac Live
                 </Text>
-                <View className="flex-row items-center gap-1.5 mt-0.5">
-                  <View className="flex-row items-center bg-emerald-500/10 border border-emerald-500/30 px-1.5 py-0.5 rounded-full">
-                    <View className="h-1.5 w-1.5 rounded-full bg-emerald-400 mr-1" />
-                    <Text className="text-emerald-300 font-bold text-[8px] tracking-wider uppercase">
-                      PHNOM PENH
-                    </Text>
-                  </View>
-                  <View className="flex-row items-center bg-iris-500/10 border border-iris-500/30 px-1.5 py-0.5 rounded-full">
-                    <Text className="text-iris-300 font-bold text-[8px] tracking-wider uppercase">
-                      WORLDWIDE
-                    </Text>
-                  </View>
+                <View className="mt-0.5 flex-row items-center rounded-full border border-emerald-500/30 bg-emerald-500/10 px-1.5 py-0.5 self-start">
+                  <View className="mr-1 h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                  <Text
+                    numberOfLines={1}
+                    className="text-emerald-300 font-bold uppercase text-[7px] tracking-[0.04em] sm:text-[8px] sm:tracking-wider">
+                    PHNOM PENH & WORLDWIDE
+                  </Text>
                 </View>
               </View>
             </View>
@@ -103,6 +92,8 @@ export function HeaderAvatar({ name, onPress }: { name: string; onPress: () => v
   return (
     <Pressable
       onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={`Open ${name || 'account'} profile`}
       className="flex-row items-center bg-card border border-line rounded-full py-1.5 px-3 active:scale-95 transition-transform">
       <View className="relative mr-2">
         <View className="h-6 w-6 rounded-full bg-iris-500 border border-iris-400 items-center justify-center shadow-sm shadow-iris-500/40">
