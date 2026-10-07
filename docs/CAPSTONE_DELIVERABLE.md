@@ -23,14 +23,14 @@ flowchart TB
         
         subgraph PublicSubnets["Public Subnets (Internet Ingress)"]
             ALB["Application Load Balancer (ALB)\nAZ 1a: 10.0.1.0/24 | AZ 1b: 10.0.2.0/24\nSecurity Group: sg-alb (Port 80/443)"]
-            NAT["NAT Gateways\n(Outbound internet for patch/deps)"]
+            NAT["NAT Gateway (1)\n(Shared outbound internet for private app subnets)"]
         end
 
         subgraph AppSubnets["Private Application Subnets (No Public IPs)"]
-            subgraph ASG["EC2 Auto Scaling Group (min: 2, max: 8, target: 4)\nAZ 1a: 10.0.10.0/24 | AZ 1b: 10.0.20.0/24\nSecurity Group: sg-app (Port 5000 from sg-alb only)"]
-                EC2_1["EC2 Instance 1\n(c6g.large)"]
-                EC2_2["EC2 Instance 2\n(c6g.large)"]
-                EC2_N["EC2 Auto-Scaled Instances\n(Pre-warmed at 08:45 AM)"]
+            subgraph ASG["EC2 Auto Scaling Group (min: 2, desired: 2, max: 8)\nAZ 1a: 10.0.10.0/24 | AZ 1b: 10.0.20.0/24\nSecurity Group: sg-app (Port 3000 from sg-alb only)"]
+                EC2_1["EC2 Instance 1\n(t3.micro)"]
+                EC2_2["EC2 Instance 2\n(t3.micro)"]
+                EC2_N["EC2 Auto-Scaled Instances\n(Pre-warmed at 08:50 AM)"]
             end
         end
 
@@ -44,10 +44,10 @@ flowchart TB
     end
 
     subgraph Storage_Security["Decoupled Storage & Security Services"]
-        S3["Amazon S3 Bucket\n(bassac-live-assets-prod)\nPrivate / Block Public Access = ON\nFiles: posters/*, seatmaps/*"]
+        S3["Amazon S3 Bucket\n(ct-live-assets-prod)\nPrivate / Block Public Access = ON\nFiles: posters/*, seatmaps/*"]
         KMS["AWS KMS Customer-Managed Key (CMK)\n(SSE-KMS Encryption at Rest)"]
         CW["Amazon CloudWatch\n(Metrics: UnhealthyHosts, 5XX, RequestCount)"]
-        SNS["Amazon SNS Topic\n(bassac-live-urgent-alerts)"]
+        SNS["Amazon SNS Topic\n(ct-live-urgent-alerts)"]
         Manager["Mr. Ratana\n(Emergency Alert Email: ratana@bassaclive.com)"]
     end
 
@@ -66,17 +66,17 @@ flowchart TB
     ALB -.->|"Target Health Metrics"| CW
     CW -->|"Alarm: UnhealthyHostCount >= 1"| SNS
     SNS -->|"Instant Incident Email (R5)"| Manager
-    CW -->|"TargetTracking / RequestCount > 1500"| ASG
+    CW -->|"TargetTracking / RequestCountPerTarget = 400"| ASG
 ```
 
 ### Network Topology & Addressing Table
 
 | Subnet Tier | Availability Zone | CIDR Block | Route Target | Purpose |
 |---|---|---|---|---|
-| **Public Subnet 1** | `ap-southeast-1a` | `10.0.1.0/24` | Internet Gateway (`igw-...`) | ALB Node 1, NAT Gateway 1 |
-| **Public Subnet 2** | `ap-southeast-1b` | `10.0.2.0/24` | Internet Gateway (`igw-...`) | ALB Node 2, NAT Gateway 2 |
-| **Private App Subnet 1** | `ap-southeast-1a` | `10.0.10.0/24` | NAT Gateway 1 | EC2 App Instances (AZ-a) |
-| **Private App Subnet 2** | `ap-southeast-1b` | `10.0.20.0/24` | NAT Gateway 2 | EC2 App Instances (AZ-b) |
+| **Public Subnet 1** | `ap-southeast-1a` | `10.0.1.0/24` | Internet Gateway (`igw-...`) | ALB Node 1, NAT Gateway |
+| **Public Subnet 2** | `ap-southeast-1b` | `10.0.2.0/24` | Internet Gateway (`igw-...`) | ALB Node 2 |
+| **Private App Subnet 1** | `ap-southeast-1a` | `10.0.10.0/24` | Shared NAT Gateway (AZ 1a) | EC2 App Instances (AZ-a) |
+| **Private App Subnet 2** | `ap-southeast-1b` | `10.0.20.0/24` | Shared NAT Gateway (AZ 1a) | EC2 App Instances (AZ-b) |
 | **Isolated DB Subnet 1**| `ap-southeast-1a` | `10.0.30.0/24` | Local Only (`10.0.0.0/16`) | RDS PostgreSQL Primary (AZ-a) |
 | **Isolated DB Subnet 2**| `ap-southeast-1b` | `10.0.40.0/24` | Local Only (`10.0.0.0/16`) | RDS PostgreSQL Standby (AZ-b) |
 
@@ -93,12 +93,12 @@ flowchart TB
 
 | AWS Component | Concert Hall Analogy | What it Actually Does in Your App |
 | :--- | :--- | :--- |
-| **VPC (`bassac-live-vpc`)** | **The Venue Perimeter** | High fence keeping all app servers and databases together in an isolated, secure virtual network. |
+| **VPC (`ct-live-vpc`)** | **The Venue Perimeter** | High fence keeping all app servers and databases together in an isolated, secure virtual network. |
 | **Public Subnet** | **Front Gate / Parking Lot** | The only public area where fans arrive; hosts the internet-facing Application Load Balancer. |
 | **Private App Subnet** | **Backstage Staff Rooms** | Restricted area housing Node.js EC2 servers; fans cannot access these directly. |
 | **Private DB Subnet** | **The Vault / Cash Register** | Super-secure zone deep inside holding RDS PostgreSQL so raw data is protected. |
 | **Application Load Balancer** | **Security at Entrance** | Checks incoming user traffic and balances requests evenly across active ticket booths. |
-| **Target Group (`app-tg`)** | **Open Ticket Booths** | The list of active, healthy EC2 instances (port 5000) ready to take ticket requests. |
+| **Target Group (`app-tg`)** | **Open Ticket Booths** | The list of active, healthy EC2 instances (port 3000) ready to take ticket requests. |
 | **Launch Template** | **Standard Setup Blueprint** | The exact checklist/spec used whenever launching a new EC2 instance. |
 | **UserData Script** | **Morning Automated Checklist** | Boot script that clones `mai12122/CT`, sets env vars, runs `prisma db push`, and starts PM2. |
 | **Auto Scaling Group** | **On-Call Staff Manager** | Opens extra EC2 servers when lines get long (Sale Rush) and closes them when traffic cools. |
@@ -109,11 +109,11 @@ flowchart TB
 
 ### 1. Network & Routing Configuration
 
-* **VPC:** `10.0.0.0/16` (`bassac-live-vpc`).  
+* **VPC:** `10.0.0.0/16` (`ct-live-vpc`).
   * *Reason:* Provides 65,536 private IPs across multi-AZ tiers with non-overlapping RFC 1918 blocks.
-* **Internet Gateway:** Attached to VPC (`bassac-live-igw`).  
+* **Internet Gateway:** Attached to VPC (`ct-live-igw`).
   * *Reason:* Enables public internet ingress solely for the Application Load Balancer.
-* **NAT Gateways (2 AZs):** One per public subnet (`bassac-nat-1a`, `bassac-nat-1b`).  
+* **NAT Gateway (1):** One gateway (`ct-nat-gw`) in public subnet 1a serves both private app subnets.
   * *Reason:* Allows private EC2 instances to fetch OS/security patches without exposing them to incoming internet connections.
 * **Isolated DB Route Table:** No default route (`0.0.0.0/0`). Local routing only.  
   * *Reason:* Guarantees database tier is physically unroutable to/from the internet (**S1, S4**).
@@ -127,11 +127,11 @@ flowchart TB
   * Port 80 (HTTP) from `0.0.0.0/0` — *Redirects all traffic to HTTPS*.
   * Port 443 (HTTPS) from `0.0.0.0/0` — *Accepts encrypted TLS customer traffic from anywhere*.
 * **Outbound:**
-  * Port 5000 to `sg-app` (Security Group Reference) — *Forwards traffic strictly to application layer*.
+  * Port 3000 to `sg-app` (Security Group Reference) — *Forwards traffic strictly to application layer*.
 
 #### `sg-app` (EC2 Application Tier)
 * **Inbound:**
-  * Port 5000 from `sg-alb` ONLY (Security Group Reference).  
+  * Port 3000 from `sg-alb` ONLY (Security Group Reference).
   * *Reason:* Prevents any internet entity from bypassing the ALB or probing EC2 directly (**S1**).
 * **Outbound:**
   * Port 5432 to `sg-db` (Security Group Reference) — *Database communication*.
@@ -161,7 +161,7 @@ flowchart TB
         "Service": "cloudfront.amazonaws.com"
       },
       "Action": "s3:GetObject",
-      "Resource": "arn:aws:s3:::bassac-live-assets-prod/*",
+      "Resource": "arn:aws:s3:::ct-live-assets-prod/*",
       "Condition": {
         "StringEquals": {
           "AWS:SourceArn": "arn:aws:cloudfront::123456789012:distribution/EDFDVBD632BHDS5"
@@ -173,7 +173,7 @@ flowchart TB
       "Effect": "Deny",
       "Principal": "*",
       "Action": "s3:PutObject",
-      "Resource": "arn:aws:s3:::bassac-live-assets-prod/*",
+      "Resource": "arn:aws:s3:::ct-live-assets-prod/*",
       "Condition": {
         "StringNotEquals": {
           "s3:x-amz-server-side-encryption": "aws:kms"
@@ -188,7 +188,7 @@ flowchart TB
 ```json
 {
   "Version": "2012-10-17",
-  "Id": "bassac-live-cmk-policy",
+  "Id": "ct-live-cmk-policy",
   "Statement": [
     {
       "Sid": "EnableRootPermissions",
@@ -241,7 +241,7 @@ flowchart TB
       "Action": [
         "s3:GetObject"
       ],
-      "Resource": "arn:aws:s3:::bassac-live-assets-prod/*"
+      "Resource": "arn:aws:s3:::ct-live-assets-prod/*"
     }
   ]
 }
@@ -251,24 +251,24 @@ flowchart TB
 
 ### 4. Compute, Capacity & Auto Scaling Detail
 
-* **Instance Type:** `c6g.large` (2 vCPU Graviton2, 4 GB RAM).  
-  * *Reason:* Optimal compute-to-cost ratio for Node.js high-throughput JSON processing during peak sale.
+* **Instance Type:** `t3.micro` (2 burstable vCPUs, 1 GB RAM).
+  * *Reason:* Matches the EC2 launch template configuration.
 * **Auto Scaling Group Size:**
   * **Normal State (Off-Peak):** Min = 2, Desired = 2, Max = 8 across 2 AZs. (Provides redundancy with low baseline cost).
-  * **Pre-Warmed Peak State:** Scheduled Scaling Action at `08:45 AM` sets Desired = 4 instances ahead of 09:00 AM rush.
-* **Dynamic Scaling Policy:** Target Tracking on `ALBRequestCountPerTarget` = `1200 requests/min/target` and `CPUUtilization` = `65%`.  
-  * *Reason:* Immediately triggers scale-out when rush hits without waiting for CPU threshold lag.
+  * **Pre-Warmed Peak State:** Scheduled Scaling Action at `08:50 AM` sets Desired = 6 instances ahead of the rush.
+* **Dynamic Scaling Policy:** Target Tracking on `ALBRequestCountPerTarget` = `400 requests per target`.
+  * *Reason:* Target tracking scales the fleet based on per-target application request load.
 
 ---
 
 ### 5. Storage, Encryption & Backups
 
-* **Object Storage:** Amazon S3 (`bassac-live-assets-prod`).  
+* **Object Storage:** Amazon S3 (`ct-live-assets-prod`).
   * `BlockPublicAcls = true`, `IgnorePublicAcls = true`, `BlockPublicPolicy = true`, `RestrictPublicBuckets = true`.
-  * *Encryption:* `aws:kms` using Customer-Managed Key `alias/bassac-live-key` (`aws_kms_key.bassac_cmk`).
+  * *Encryption:* `aws:kms` using Customer-Managed Key `alias/ct-live-key` (`aws_kms_key.bassac_cmk`).
 * **Database:** Amazon RDS PostgreSQL 16.  
   * *Multi-AZ Deployment:* Enabled (Standby in `ap-southeast-1b`, Primary in `ap-southeast-1a`).
-  * *Instance Class:** `db.t4g.medium` (2 vCPU, 4GB RAM), 100GB GP3 SSD (3,000 IOPS).
+  * *Instance Class:** `db.t4g.micro`, 20GB GP3 SSD initially with autoscaling up to 100GB.
   * *Storage Encryption:* Enabled using KMS Customer-Managed Key (`aws_kms_key.bassac_cmk`).
   * *Automated Backups:* 7-day retention with point-in-time recovery (PITR).
 
@@ -278,14 +278,14 @@ flowchart TB
 
 #### Alert 1: Sale Rush (Auto Scaling Capacity Trigger)
 * **Metric:** `AWS/ApplicationELB` `RequestCountPerTarget`
-* **Threshold:** `> 1200 requests/minute` over 1 consecutive period of 60 seconds.
-* **Action:** Auto Scaling Step Scaling policy scales out by adding **+2 instances immediately**.
+* **Threshold:** `> 400 requests per target` over 1 consecutive period of 60 seconds.
+* **Action:** Sends an SNS notification; the separate target-tracking policy scales the ASG to maintain 400 requests per target.
 * *Reason:* Absorbs sudden surge of 8,000 users in minutes 0–5 before servers get saturated (**R2**).
 
 #### Alert 2: Site Failing (Manager Immediate Alert — R5)
-* **Metric:** `AWS/ApplicationELB` `UnHealthyHostCount` OR `HTTPCode_Target_5XX_Count`
-* **Threshold:** `UnHealthyHostCount >= 1` OR `Target_5XX_Count >= 10` for 1 evaluation period of 60 seconds.
-* **Action:** Triggers SNS Topic `arn:aws:sns:ap-southeast-1:123456789012:bassac-live-urgent-alerts`.
+* **Metric:** `AWS/ApplicationELB` `UnHealthyHostCount`
+* **Threshold:** `UnHealthyHostCount >= 1` for 1 evaluation period of 60 seconds.
+* **Action:** Triggers the `ct-live-urgent-alerts` SNS topic.
 * **Subscribers:** Email to `ratana@bassaclive.com`.
 * *Reason:* Instant email notification to operations manager the moment any server health-check degrades (**R5**).
 
@@ -293,7 +293,7 @@ flowchart TB
 
 ### 7. Resource Tags
 * `Environment`: `Production`
-* `Project`: `Bassac-Live-Ticketing`
+* `Project`: `CT-Live-Ticketing`
 * `Client`: `Bassac-Live`
 * `ManagedBy`: `Terraform`
 * `Owner`: `Ratana-Operations`
@@ -307,10 +307,10 @@ flowchart TB
 | Requirement | How Our AWS Design Meets It | Component Proof |
 |---|---|---|
 | **R1. People buy tickets on website** | React Native/Expo Web UI talks to Express API running in Auto Scaling EC2 instances behind an ALB. | ALB, EC2 ASG, PostgreSQL `orders` table. |
-| **R2. Survives first 5 min of sale (10k people for 2k seats)** | Pre-warming to 4 instances at 08:45 AM + dynamic Target Tracking ASG (up to 8 instances) handles ~8,000 concurrent requests smoothly. | ALB + ASG Scheduled Scaling + Graviton2 compute. |
+| **R2. Survives first 5 min of sale (10k people for 2k seats)** | Pre-warming to 6 instances at 08:50 AM + target tracking at 400 requests per target handles the sale rush across up to 8 instances. | ALB + ASG Scheduled Scaling + t3.micro compute. |
 | **R3. Posters & seatmaps load fast during rush** | Offloaded entirely to Amazon CloudFront edge caching with Origin Access Control. 0% load on EC2 app servers for image files. | CloudFront + S3 + KMS. |
 | **R4. Customer names & phone numbers are safe** | Stored in isolated RDS database in private subnets with no internet route. Encrypted at rest via KMS. Transport encrypted via TLS 1.3. | VPC Isolated Subnets, KMS CMK, TLS. |
-| **R5. Email manager as soon as site starts failing** | CloudWatch Alarm triggers on `UnHealthyHostCount >= 1` or `HTTP 5XX >= 10`, immediately dispatching email via SNS to Mr. Ratana. | CloudWatch Alarm + SNS Email Subscription. |
+| **R5. Email manager as soon as site starts failing** | CloudWatch Alarm sends an SNS notification when `UnHealthyHostCount >= 1`; the SNS email subscription alerts Mr. Ratana. | CloudWatch Alarm + SNS Email Subscription. |
 | **R6. If one server dies mid-sale, sale continues** | ALB health checks detect failing instance within 10s and reroutes traffic to healthy instances in parallel AZs. Multi-AZ database survives primary crash. | ALB Health Checks + ASG Self-Healing + RDS Multi-AZ. |
 
 ### Security Rules Traceability Matrix
@@ -340,7 +340,7 @@ If the remaining seats are less than the request, the database rejects the updat
 ---
 
 #### Q2: Where do posters live, and what happens to them if a server is replaced?
-**Answer:** Posters and seat maps live in a dedicated **Amazon S3 Object Storage Bucket** (`bassac-live-assets-prod`), cached globally across edge locations by **Amazon CloudFront**.  
+**Answer:** Posters and seat maps live in a dedicated **Amazon S3 Object Storage Bucket** (`ct-live-assets-prod`), cached globally across edge locations by **Amazon CloudFront**.
 *Server replacement impact:* **Zero impact.** Because posters are completely decoupled from EC2 instances, when an EC2 instance crashes, terminates, or is replaced by Auto Scaling, the poster files remain safe, intact, and continuously served directly from CloudFront edge caches.
 
 ---
@@ -357,9 +357,9 @@ If the remaining seats are less than the request, the database rejects the updat
 **Answer:** A hybrid approach: **Scheduled Scaling (Pre-Warming) combined with Dynamic Auto Scaling**.  
 *Justification:* Dynamic Auto Scaling reacts to CloudWatch alarms with a 2-to-4 minute lag (time to evaluate alarms, boot instances, and pass health checks). Since 80% of Bassac Live's traffic crashes in during the **first 5 minutes after 09:00**, relying *solely* on reactive auto-scaling will cause the site to crash before new servers are ready.  
 *Strategy:*  
-1. **15 Minutes Before Sale (08:45 AM):** AWS Scheduled Scaling increases desired instances from 2 to 4 pre-warmed instances.  
+1. **10 Minutes Before Sale (08:50 AM):** AWS Scheduled Scaling increases desired instances from 2 to 6 pre-warmed instances.
 2. **During the Rush (09:00 – 09:15 AM):** Dynamic Target Tracking scales up to 8 instances if demand peaks further.  
-3. **Rest of the Year (12 Months):** Automatically scales down to **2 minimal `t4g.small` instances**, avoiding paying for idle capacity when traffic drops back to a few hundred daily visits.
+3. **Rest of the Year (12 Months):** Automatically scales down to **2 minimal `t3.micro` instances**, avoiding paying for idle capacity when traffic drops back to a few hundred daily visits.
 
 ---
 
@@ -389,21 +389,21 @@ If the remaining seats are less than the request, the database rejects the updat
 
 | Resource | Specification & Tier | Normal Month (Off-Peak) | Peak Sale Month (Flash Sale) | Notes |
 |---|---|---|---|---|
-| **EC2 Instances** | `c6g.large` / `t4g.small` (Graviton2) | $24.80 *(2x t4g.small 24/7)* | $62.40 *(Scaled to 4–6 c6g.large during rush)* | 12-month baseline vs flash sale scale-out |
+| **EC2 Instances** | `t3.micro` | Recalculate | Recalculate | Pricing estimate should be refreshed for the current schedule |
 | **Application Load Balancer** | 1 ALB across 2 AZs | $22.50 *(730 hrs + 2 LCU)* | $28.00 *(Higher LCUs during rush)* | Handles TLS termination & health checks |
-| **NAT Gateways** | 2 NAT Gateways (Multi-AZ) | $65.70 *(baseline hourly)* | $70.20 *(Data processed)* | High availability outbound internet |
-| **RDS PostgreSQL** | `db.t4g.medium` (Multi-AZ, 100GB GP3) | $96.40 | $96.40 | Synchronous failover standby |
+| **NAT Gateway** | 1 NAT Gateway (Single-AZ) | Recalculate | Recalculate | Shared outbound egress; single-AZ |
+| **RDS PostgreSQL** | `db.t4g.micro` (Multi-AZ, 20GB GP3; autoscaling to 100GB) | Recalculate | Recalculate | Pricing estimate should be refreshed for current sizing |
 | **Amazon S3** | Standard Storage (20GB media assets) | $0.50 | $1.20 *(Uploads + Requests)* | Posters, seat maps |
 | **Amazon CloudFront** | Data Transfer Out (500GB peak) | $4.20 | $18.50 *(10k users poster requests)* | Free tier covers first 1TB |
 | **AWS KMS** | 1 Customer-Managed Key (CMK) | $1.00 | $1.00 | Key storage |
 | **Amazon CloudWatch & SNS**| Metrics, 2 Alarms, SMS/Email | $2.10 | $3.50 | Health monitoring and incident alert |
-| **TOTAL ESTIMATED COST** | | **$217.20 / month** | **$281.20 / month** | |
+| **TOTAL ESTIMATED COST** | | **Recalculate** | **Recalculate** | |
 
 ---
 
 ### What to Change to Cut Cost by ~45%
 
-1. **Single NAT Gateway for Staging/Off-Peak:** Using 1 NAT Gateway instead of 2 cuts **$32.85/month**.
+1. **Single NAT Gateway (current Terraform configuration):** Reduces baseline egress cost but creates a single-AZ outbound dependency.
 2. **Compute Savings Plan:** Committing to a 1-year Compute Savings Plan for baseline instances reduces EC2 cost by **up to 40%**.
 3. **S3 Intelligent-Tiering:** Automatically moves unused historical posters to archive tiers at $0.004/GB.
 4. **Single-AZ RDS for Non-Critical Months:** For 11 months without active sales, turning off Multi-AZ standby cuts database cost by **50% ($48.20/month savings)**, then enabling Multi-AZ 48 hours before the major ticket sale.

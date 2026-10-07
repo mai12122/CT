@@ -49,3 +49,15 @@ variable "acm_certificate_arn" {
   type        = string
   default     = ""
 }
+
+variable "jwt_access_secret" {
+  description = "Secret used to sign access JWTs"
+  type        = string
+  sensitive   = true
+}
+
+variable "jwt_refresh_secret" {
+  description = "Secret used to sign refresh JWTs"
+  type        = string
+  sensitive   = true
+}

@@ -11,11 +11,11 @@ resource "random_id" "bucket_suffix" {
 # 1. Private S3 Bucket with KMS Encryption
 # ------------------------------------------------------------------------------
 resource "aws_s3_bucket" "assets" {
-  bucket        = "bassac-live-assets-prod-${random_id.bucket_suffix.hex}"
+  bucket        = "ct-live-assets-prod-${random_id.bucket_suffix.hex}"
   force_destroy = false
 
   tags = {
-    Name = "bassac-live-assets-prod"
+    Name = "ct-live-assets-prod"
   }
 }
 
@@ -54,7 +54,7 @@ resource "aws_s3_bucket_public_access_block" "assets_block" {
 # 2. CloudFront Origin Access Control (OAC)
 # ------------------------------------------------------------------------------
 resource "aws_cloudfront_origin_access_control" "oac" {
-  name                              = "bassac-s3-oac"
+  name                              = "ct-s3-oac"
   description                       = "OAC for Bassac Live concert posters and seat maps"
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"
@@ -106,7 +106,7 @@ resource "aws_cloudfront_distribution" "cdn" {
   }
 
   tags = {
-    Name = "bassac-live-cdn"
+    Name = "ct-live-cdn"
     Rule = "R3-FastPostersAndSeatmaps"
   }
 }

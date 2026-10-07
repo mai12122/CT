@@ -15,6 +15,12 @@ def read_tf_file(filename):
     with open(filepath, "r", encoding="utf-8") as f:
         return f.read()
 
+def kms_key_reference():
+    content = read_tf_file("kms_iam.tf")
+    match = re.search(r'resource\s+"aws_kms_key"\s+"([^"]+)"', content)
+    assert match is not None, "KMS key resource must exist"
+    return f"aws_kms_key.{match.group(1)}"
+
 # ==============================================================================
 # SECURITY RULE S1 TESTS: Customer Names & Phones Physically Isolated
 # ==============================================================================
@@ -71,18 +77,21 @@ def test_rule_s3_kms_cmk_rotation_enabled():
 def test_rule_s3_rds_encrypted_with_cmk():
     """Rule S3: Asserts RDS database storage encryption references the KMS CMK."""
     content = read_tf_file("database.tf")
+    kms_key = re.escape(kms_key_reference())
     assert re.search(r"storage_encrypted\s*=\s*true", content) is not None
-    assert re.search(r"kms_key_id\s*=\s*aws_kms_key\.bassac_cmk\.arn", content) is not None
+    assert re.search(rf"kms_key_id\s*=\s*{kms_key}\.arn", content) is not None
 
 def test_rule_s3_s3_encrypted_with_cmk():
     """Rule S3: Asserts S3 bucket server-side encryption references the KMS CMK."""
     content = read_tf_file("storage.tf")
-    assert re.search(r"kms_master_key_id\s*=\s*aws_kms_key\.bassac_cmk\.arn", content) is not None
+    kms_key = re.escape(kms_key_reference())
+    assert re.search(rf"kms_master_key_id\s*=\s*{kms_key}\.arn", content) is not None
 
 def test_rule_s3_sns_encrypted_with_cmk():
     """Rule S3: Asserts SNS topic is encrypted with the KMS CMK."""
     content = read_tf_file("monitoring.tf")
-    assert re.search(r"kms_master_key_id\s*=\s*aws_kms_key\.bassac_cmk\.id", content) is not None, (
+    kms_key = re.escape(kms_key_reference())
+    assert re.search(rf"kms_master_key_id\s*=\s*{kms_key}\.id", content) is not None, (
         "Rule S3 Violation: SNS topic must be encrypted with the Customer Managed Key"
     )
 
@@ -101,6 +110,35 @@ def test_rule_s4_db_security_group_ingress_strictly_app_sg():
         "Rule S4 Violation: DB SG must restrict port 5432 ingress strictly to aws_security_group.app.id"
     )
     assert "0.0.0.0/0" not in db_sg_block, "Rule S4 Violation: DB SG must NOT allow any public CIDRs"
+
+# ==============================================================================
+# APPLICATION PORT & HEALTH CHECK CONTRACT
+# ==============================================================================
+def test_app_target_health_and_security_ports_match():
+    """Asserts ALB, app SG, health check, and launched app server use port 3000."""
+    compute = read_tf_file("compute.tf")
+    security = read_tf_file("security.tf")
+
+    target_group_match = re.search(
+        r'resource\s+"aws_lb_target_group"\s+"tg"\s+\{(.*?)^\}',
+        compute,
+        re.DOTALL | re.MULTILINE,
+    )
+    assert target_group_match is not None, "ALB target group must exist"
+    target_group = target_group_match.group(1)
+    assert re.search(r"port\s*=\s*3000", target_group) is not None
+    assert re.search(r'path\s*=\s*"/api/v1/health"', target_group) is not None
+
+    app_sg_match = re.search(
+        r'resource\s+"aws_security_group"\s+"app"\s+\{(.*?)^\}',
+        security,
+        re.DOTALL | re.MULTILINE,
+    )
+    assert app_sg_match is not None, "Application security group must exist"
+    app_sg = app_sg_match.group(1)
+    assert re.search(r"from_port\s*=\s*3000", app_sg) is not None
+    assert re.search(r"to_port\s*=\s*3000", app_sg) is not None
+    assert re.search(r"(?m)^\s*PORT=3000\s*$", compute) is not None
 
 # ==============================================================================
 # HIGH AVAILABILITY & AUTO SCALING RULES (R1, R2, R5, R6)

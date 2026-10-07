@@ -13,7 +13,7 @@ provider "aws" {
 
   default_tags {
     tags = {
-      Project     = "Bassac-Live-Ticketing"
+      Project     = "CT-Live-Ticketing"
       Environment = var.environment
       ManagedBy   = "Terraform"
       Scenario    = "Scenario-2-Concert-Festival"
