@@ -8,7 +8,7 @@ on:
 
 permissions:
   contents: read
-  pages: write
+  deployments: write
   id-token: write
 
 env:
@@ -110,11 +110,6 @@ jobs:
           path: dist
           retention-days: 7
 
-      - name: 📤 Upload Pages Artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist
-
   # =========================================================================
   # 3. BUILD CONTAINER IMAGES (DOCKER MATRIX)
   # =========================================================================
@@ -159,10 +154,13 @@ jobs:
   # 4. CLOUDFLARE PAGES & ZERO TRUST DEPLOYMENT
   # =========================================================================
   deploy-cloudflare:
-    name: Deploy to Cloudflare Pages
+    name: Deploy to Production
     needs: [frontend-lint-build]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    environment:
+      name: production
+      url: https://ct.pages.dev
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
