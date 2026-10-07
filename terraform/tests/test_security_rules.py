@@ -1,6 +1,11 @@
 import os
 import re
-import pytest
+import sys
+
+try:
+    import pytest
+except ImportError:
+    pytest = None
 
 TERRAFORM_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
@@ -202,3 +207,25 @@ def test_no_hardcoded_credentials_in_variables():
         assert re.search(r'default\s*=', var_block) is None, (
             f"Security Violation: variable '{var_name}' must NOT have a hardcoded default value"
         )
+
+
+if __name__ == "__main__":
+    tests = [v for k, v in list(globals().items()) if k.startswith("test_") and callable(v)]
+    passed = 0
+    failed = 0
+    print("=" * 70)
+    print("  RUNNING IAC SECURITY COMPLIANCE TESTS")
+    print("=" * 70)
+    for test in tests:
+        try:
+            test()
+            print(f"  [PASS] {test.__name__}")
+            passed += 1
+        except Exception as e:
+            print(f"  [FAIL] {test.__name__}: {e}")
+            failed += 1
+    print("=" * 70)
+    print(f"  {passed} passed, {failed} failed out of {len(tests)} tests")
+    print("=" * 70)
+    if failed > 0:
+        sys.exit(1)
