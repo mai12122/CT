@@ -1,5 +1,4 @@
-import { PrismaClient, Role } from '@prisma/client';
-import bcrypt from 'bcryptjs';
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -15,34 +14,7 @@ async function main() {
   await prisma.refreshToken.deleteMany({});
   await prisma.user.deleteMany({});
 
-  // 2. Create Demo Users with Cambodian names
-  const salt = await bcrypt.genSalt(10);
-  const userPassword = await bcrypt.hash('password123', salt);
-  const adminPassword = await bcrypt.hash('admin123', salt);
-
-  const demoUser = await prisma.user.create({
-    data: {
-      name: 'Sopheak Chan',
-      email: 'user@example.com',
-      password: userPassword,
-      phone: '+855 12 345 678',
-      role: Role.USER,
-    },
-  });
-
-  await prisma.user.create({
-    data: {
-      name: 'Mr. Ratana (Operations)',
-      email: 'admin@example.com',
-      password: adminPassword,
-      phone: '+855 12 888 999',
-      role: Role.ADMIN,
-    },
-  });
-
-  console.log('✅ Created demo users: user@example.com (Sopheak Chan) / admin@example.com (Mr. Ratana)');
-
-  // 3. Seed Authentic Cambodian Concerts across Provinces
+  // 2. Seed Authentic Cambodian Concerts across Provinces
   const concertsData = [
     {
       title: 'Skull Tour: Born in Battambang Live',
@@ -416,60 +388,6 @@ async function main() {
   }
 
   console.log(`✅ Seeded ${concertsData.length} authentic Cambodian concerts with Silver, Gold, Platinum, and Fanpit categories!`);
-
-  // 4. Create an initial sample booking for the demo user so Profile & My Tickets immediately shows rich content
-  const firstConcert = await prisma.concert.findFirst({
-    include: { categories: true },
-  });
-
-  if (firstConcert) {
-    const fanpitCategory = firstConcert.categories.find((cat) => cat.name === 'Fanpit') || firstConcert.categories[0];
-    const bookingRef = `BK-KH-${Date.now().toString(36).toUpperCase()}`;
-
-    const sampleBooking = await prisma.booking.create({
-      data: {
-        bookingRef,
-        userId: demoUser.id,
-        concertId: firstConcert.id,
-        totalAmount: fanpitCategory.price,
-        status: 'CONFIRMED',
-        paymentMethod: 'CREDIT_CARD',
-        paymentStatus: 'PAID',
-      },
-    });
-
-    const ticketId = 'demo-tkt-uuid-001';
-    const ticketNumber = `TKT-VANNDA-001`;
-    const qrPayload = JSON.stringify({
-      ticketId,
-      ticketNumber,
-      bookingRef,
-      concertId: firstConcert.id,
-      concertTitle: firstConcert.title,
-      category: fanpitCategory.name,
-      seat: 'Fanpit Standing #001',
-      holderId: demoUser.id,
-      holderName: demoUser.name,
-      issuedAt: new Date().toISOString(),
-      signature: 'bassac_live_verified_sig_2026',
-    });
-
-    await prisma.ticket.create({
-      data: {
-        id: ticketId,
-        ticketNumber,
-        bookingId: sampleBooking.id,
-        userId: demoUser.id,
-        categoryId: fanpitCategory.id,
-        seat: 'Fanpit Standing #001',
-        price: fanpitCategory.price,
-        qrPayload,
-        status: 'VALID',
-      },
-    });
-
-    console.log('✅ Created sample booking & ticket for Sopheak Chan (VannDa Skull Tour)');
-  }
 
   console.log('🎉 Database seeding with Cambodian artists & provinces completed successfully!');
 }

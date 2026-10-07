@@ -21,7 +21,7 @@ export const PhoneAuthForm: React.FC<PhoneAuthFormProps> = ({
   onError,
 }) => {
   const { sendPhoneOtp, verifyPhoneOtp } = useAuth();
-  const [countryCode, setCountryCode] = useState('+855');
+  const countryCode = '+855';
   const [phoneNumber, setPhoneNumber] = useState('');
   const [name, setName] = useState('');
   const [otpCode, setOtpCode] = useState('');
@@ -55,7 +55,7 @@ export const PhoneAuthForm: React.FC<PhoneAuthFormProps> = ({
     setLoading(true);
     try {
       const res = await sendPhoneOtp(fullPhone);
-      setDevOtpHint(res.devOtp || '123456');
+      setDevOtpHint(res.devOtp || null);
       setStep('VERIFY_OTP');
       setResendTimer(45);
     } catch (err: any) {
@@ -81,22 +81,10 @@ export const PhoneAuthForm: React.FC<PhoneAuthFormProps> = ({
       );
       onSuccess();
     } catch (err: any) {
-      onError(err.message || 'Invalid verification code. Try demo code: 123456');
+      onError(err.message || 'Invalid or expired verification code.');
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleFillDemoCode = () => {
-    setOtpCode(devOtpHint || '123456');
-    onError(null);
-  };
-
-  const handleFillDemoPhone = () => {
-    setCountryCode('+855');
-    setPhoneNumber('12345678');
-    if (mode === 'register') setName('Sopheak Chan');
-    onError(null);
   };
 
   return (
@@ -155,17 +143,6 @@ export const PhoneAuthForm: React.FC<PhoneAuthFormProps> = ({
             </View>
           </View>
 
-          {/* Quick Demo Phone Fill */}
-          <TouchableOpacity
-            onPress={handleFillDemoPhone}
-            activeOpacity={0.7}
-            className="mt-3 flex-row items-center">
-            <Ionicons name="flash-outline" size={13} color="#9282F4" style={{ marginRight: 4 }} />
-            <Text className="text-iris-300 text-xs font-semibold">
-              Fill demo phone (+855 12 345 678)
-            </Text>
-          </TouchableOpacity>
-
           {/* Send Verification Code Button */}
           <TouchableOpacity
             onPress={handleSendOtp}
@@ -204,24 +181,11 @@ export const PhoneAuthForm: React.FC<PhoneAuthFormProps> = ({
             </Text>
           </View>
 
-          {/* Demo OTP Helper Pill */}
-          <TouchableOpacity
-            onPress={handleFillDemoCode}
-            activeOpacity={0.8}
-            className="mb-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-3 flex-row items-center justify-between">
-            <View className="flex-row items-center flex-1">
-              <Ionicons
-                name="key-outline"
-                size={16}
-                color="#34d399"
-                style={{ marginRight: 8 }}
-              />
-              <Text className="text-emerald-300 text-xs font-medium">
-                Demo Code: <Text className="font-extrabold text-white">{devOtpHint || '123456'}</Text>
-              </Text>
-            </View>
-            <Text className="text-emerald-400 text-xs font-bold underline">Tap to autofill</Text>
-          </TouchableOpacity>
+          {devOtpHint ? (
+            <Text className="mb-4 text-center text-slate-400 text-xs">
+              Development verification code: <Text className="font-bold text-white">{devOtpHint}</Text>
+            </Text>
+          ) : null}
 
           <Text className="text-slate-300 text-xs font-semibold uppercase tracking-wider mb-2">
             6-Digit Verification Code *
@@ -236,7 +200,7 @@ export const PhoneAuthForm: React.FC<PhoneAuthFormProps> = ({
             <TextInput
               value={otpCode}
               onChangeText={setOtpCode}
-              placeholder="123456"
+              placeholder="Enter code"
               placeholderTextColor="#5D6A8C"
               keyboardType="number-pad"
               maxLength={6}

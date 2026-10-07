@@ -18,12 +18,11 @@ import { SocialAuthButtons } from '@/components/SocialAuthButtons';
 import { PhoneAuthForm } from '@/components/PhoneAuthForm';
 
 export default function ProfileScreen() {
-  const { user, logout, login } = useAuth();
+  const { user, logout } = useAuth();
   const [stats, setStats] = useState<{ bookings: number; tickets: number }>({
     bookings: 0,
     tickets: 0,
   });
-  const [loading, setLoading] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
@@ -50,28 +49,11 @@ export default function ProfileScreen() {
         text: 'Sign Out',
         style: 'destructive',
         onPress: async () => {
-          setLoading(true);
-          try {
-            await logout();
-            router.replace('/(tabs)');
-          } finally {
-            setLoading(false);
-          }
+          await logout();
+          router.replace('/(tabs)');
         },
       },
     ]);
-  };
-
-  const handleQuickDemoLogin = async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setLoading(true);
-    try {
-      await login('user@example.com', 'password123');
-    } catch (err: any) {
-      Alert.alert('Demo Sign-In Failed', err.message || 'Could not sign in with demo credentials.');
-    } finally {
-      setLoading(false);
-    }
   };
 
   return (
@@ -95,25 +77,7 @@ export default function ProfileScreen() {
                 Sign in to manage your ticket reservations, access QR passes, and unlock fast 10-minute seat holds.
               </Text>
 
-              {/* Quick 1-Tap Demo Switcher */}
-              <TouchableOpacity
-                onPress={handleQuickDemoLogin}
-                activeOpacity={0.85}
-                disabled={loading}
-                accessibilityRole="button"
-                className="mt-6 bg-iris-500 border border-iris-400/30 py-3 rounded-2xl w-full flex-row items-center px-4 shadow-md shadow-iris-500/30 active:scale-[0.98]">
-                <View className="h-10 w-10 bg-white/20 rounded-full items-center justify-center mr-3">
-                  <Ionicons name="flash" size={20} color="#FFFFFF" />
-                </View>
-                <View className="flex-1">
-                  <Text className="text-white font-bold text-[15px]">
-                    {loading ? 'Switching account…' : '1-Tap Demo Switcher'}
-                  </Text>
-                  <Text className="text-iris-200 text-xs mt-0.5">user@example.com</Text>
-                </View>
-              </TouchableOpacity>
-
-              <View className="flex-row gap-3 w-full mt-4">
+              <View className="flex-row gap-3 w-full mt-6">
                 <TouchableOpacity
                   onPress={() => router.push('/auth/login')}
                   activeOpacity={0.8}
@@ -229,26 +193,6 @@ export default function ProfileScreen() {
                 <Text className="text-mist text-[10px] mt-0.5">Global</Text>
               </View>
             </View>
-
-            <TouchableOpacity
-              onPress={handleQuickDemoLogin}
-              activeOpacity={0.85}
-              disabled={loading}
-              accessibilityRole="button"
-              className="flex-row items-center rounded-2xl border border-iris-500/30 bg-iris-500/10 p-4 active:bg-iris-500/20">
-              <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-iris-500/20">
-                <Ionicons name="flash" size={19} color="#C4B5FD" />
-              </View>
-              <View className="flex-1">
-                <Text className="text-white font-bold text-sm">
-                  {loading ? 'Switching account…' : '1-Tap Demo Switcher'}
-                </Text>
-                <Text className="text-mist text-[11px] mt-0.5">
-                  Switch to the Sopheak Chan demo wallet
-                </Text>
-              </View>
-              <Ionicons name="chevron-forward" size={16} color="#9282F4" />
-            </TouchableOpacity>
 
             {/* Phone Verification Section */}
             <View className="bg-card border border-line rounded-3xl p-5 shadow-lg">

@@ -38,6 +38,15 @@ describe('Integration Tests: Express Auth Routes & DB Integration', () => {
     assert.equal(dbRecord.verified, false);
   });
 
+  it('POST /api/v1/auth/phone/verify-otp rejects the former universal demo code', async () => {
+    const { AuthService } = await import('../server/services/auth.service');
+
+    await assert.rejects(
+      AuthService.verifyPhoneOtp({ phone: '012 345 678', code: '123456' }),
+      /Invalid or expired verification code/
+    );
+  });
+
   it('POST /api/v1/auth/phone/verify-otp marks verified and saves user to PostgreSQL', async () => {
     const { AuthService } = await import('../server/services/auth.service');
     const cambodianPhone = '012 888 777';

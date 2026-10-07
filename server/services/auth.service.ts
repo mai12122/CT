@@ -435,7 +435,6 @@ export class AuthService {
     }
 
     // Verify in PostgreSQL DB
-    const isMasterDemoOtp = cleanCode === '123456';
     const record = await prisma.phoneVerification.findFirst({
       where: {
         phone,
@@ -446,11 +445,8 @@ export class AuthService {
       orderBy: { createdAt: 'desc' },
     });
 
-    if (!isMasterDemoOtp && !record) {
-      throw new AppError(
-        'Invalid or expired verification code. Use code 123456 for instant demo.',
-        400
-      );
+    if (!record) {
+      throw new AppError('Invalid or expired verification code.', 400);
     }
 
     if (record) {

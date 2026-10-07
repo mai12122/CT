@@ -56,13 +56,11 @@ Once running in your terminal:
 
 ---
 
-## 🔑 Demo Login Credentials
+## 🔐 Account Setup
 
-You can use the seeded test user to test ticket booking immediately:
-
-* **Email**: `user@example.com`
-* **Password**: `password123`
-*(There is also an **"Auto-fill Demo Account"** button directly on the Login screen for 1-tap sign in).*
+The database seed creates concert listings only. Create an account from the app's
+**Register** screen, then sign in with your registered credentials. No demo users
+or sample bookings are seeded.
 
 ---
 
@@ -114,4 +112,3 @@ Because `npm start` automatically starts the backend server, make sure you don't
 | **Launch Template** | **Standard Setup Blueprint** | The exact checklist/spec used whenever launching a new EC2 instance. |
 | **UserData Script** | **Morning Automated Checklist** | Boot script that clones `mai12122/CT`, sets env vars, runs `prisma db push`, and starts PM2. |
 | **Auto Scaling Group** | **On-Call Staff Manager** | Opens extra EC2 servers when lines get long (Sale Rush) and closes them when traffic cools. |
-

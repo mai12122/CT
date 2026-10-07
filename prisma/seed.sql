@@ -5,14 +5,7 @@
 -- 1. Truncate existing tables in dependency order
 TRUNCATE TABLE tickets, bookings, reservation_sessions, ticket_categories, concerts, refresh_tokens, phone_verifications, users CASCADE;
 
--- 2. Insert Demo Users (bcrypt hashes for 'password123' and 'admin123')
--- user@example.com (Sopheak Chan), admin@example.com (Mr. Ratana)
-INSERT INTO users (id, name, email, password, phone, "authProvider", role, "createdAt", "updatedAt")
-VALUES 
-  ('usr-sopheak-01', 'Sopheak Chan', 'user@example.com', '$2a$10$wT8f615j7wR7iW8z0M/FpeVdQw8xW9mE2Jm1.gNnQo987XmZ.8K2C', '+855 12 345 678', 'LOCAL', 'USER', NOW(), NOW()),
-  ('usr-ratana-02', 'Mr. Ratana (Operations)', 'admin@example.com', '$2a$10$8wT615j7wR7iW8z0M/FpeVdQw8xW9mE2Jm1.gNnQo987XmZ.8K2C', '+855 12 888 999', 'LOCAL', 'ADMIN', NOW(), NOW());
-
--- 3. Insert Verified Authentic Cambodian Concerts
+-- 2. Insert Verified Authentic Cambodian Concerts
 INSERT INTO concerts (id, title, artist, description, venue, city, date, "imageUrl", featured, status, "createdAt", "updatedAt")
 VALUES
   (
@@ -138,32 +131,3 @@ VALUES
   ('cat-rk-02', 'kh-concert-006', 'Platinum', 20, 'Covered veranda seating with scenic sea-view mist.', '["Scenic Veranda Seating", "Campfire Lounge Access"]', 80, 12, '#8b5cf6', NOW(), NOW()),
   ('cat-rk-03', 'kh-concert-006', 'Gold', 14, 'Mid Tier amphitheatre stone bench seating.', '["Stone Amphitheatre Seating"]', 120, 25, '#eab308', NOW(), NOW()),
   ('cat-rk-04', 'kh-concert-006', 'Silver', 8, 'Mountain ridge general admission.', '["General Ridge Admission"]', 250, 30, '#94a3b8', NOW(), NOW());
-
--- 5. Create a sample initial booking and ticket for Demo User
-INSERT INTO bookings (id, "bookingRef", "userId", "concertId", "totalAmount", status, "paymentMethod", "paymentStatus", "createdAt", "updatedAt")
-VALUES (
-  'bk-sopheak-vannda-01',
-  'BK-KH-VANNDA-2026',
-  'usr-sopheak-01',
-  'kh-concert-001',
-  45.00,
-  'CONFIRMED',
-  'ABA_PAYWAY',
-  'PAID',
-  NOW(),
-  NOW()
-);
-
-INSERT INTO tickets (id, "ticketNumber", "bookingId", "userId", "categoryId", seat, price, "qrPayload", status, "createdAt")
-VALUES (
-  'tkt-kh-vd-001',
-  'TKT-VANNDA-FANPIT-001',
-  'bk-sopheak-vannda-01',
-  'usr-sopheak-01',
-  'cat-vd-01',
-  'PIT-A-04',
-  45.00,
-  '{"ticketId":"tkt-kh-vd-001","artist":"VannDa","concert":"Skull Tour: Born in Battambang Live","tier":"Fanpit","seat":"PIT-A-04","venue":"Bassac Live Main Hall (Koh Pich)","verified":true}',
-  'VALID',
-  NOW()
-);

@@ -47,13 +47,6 @@ export default function LoginScreen() {
     }
   };
 
-  const fillDemoUser = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setEmail('user@example.com');
-    setPassword('password123');
-    setError(null);
-  };
-
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -92,17 +85,6 @@ export default function LoginScreen() {
             Sign in to access your concert passes and exclusive ticket holds
           </Text>
         </View>
-
-        {/* 1-Tap Demo Account Pill */}
-        <TouchableOpacity
-          onPress={fillDemoUser}
-          activeOpacity={0.85}
-          className="mb-5 bg-iris-500/15 border border-iris-500/35 py-2.5 px-4 rounded-2xl flex-row items-center justify-center active:bg-iris-500/25">
-          <Ionicons name="flash" size={15} color="#C4B5FD" style={{ marginRight: 6 }} />
-          <Text className="text-iris-300 font-bold text-xs tracking-wide">
-            Auto-fill Demo Account (user@example.com)
-          </Text>
-        </TouchableOpacity>
 
         {/* Auth Method Segment Switcher */}
         <View className="flex-row bg-card border border-line p-1 rounded-2xl mb-5">
