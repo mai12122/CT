@@ -1,20 +1,23 @@
 import React, { useState, useCallback } from 'react';
 import {
-  View,
-  Text,
-  ScrollView,
   Image,
-  TouchableOpacity,
-  TextInput,
   RefreshControl,
-  ActivityIndicator,
+  ScrollView,
   StatusBar,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { api } from '@/services/api';
 import { useAuth } from '@/context/AuthContext';
 import { Concert, ReservationSession } from '@/types';
+import { AppHeader, HeaderAvatar } from '@/components/AppHeader';
+import { ConcertListSkeleton } from '@/components/ui/Skeleton';
+import { LiveDot } from '@/components/ui/LiveDot';
 
 const CITY_FILTERS = ['All', 'Phnom Penh', 'Los Angeles', 'London', 'New York', 'Tokyo'];
 
@@ -65,106 +68,109 @@ export default function ExploreScreen() {
     setRefreshing(false);
   };
 
+  const handleCitySelect = (city: string) => {
+    Haptics.selectionAsync();
+    setSelectedCity(city);
+  };
+
   const featuredConcert = concerts.find((c) => c.featured) || concerts[0];
 
   const formatConcertDate = (dateString: string) => {
     const d = new Date(dateString);
+    const month = d.toLocaleString('en-US', { month: 'short' }).toUpperCase();
+    const day = d.getDate();
+    const time = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
     return {
-      month: d.toLocaleString('en-US', { month: 'short' }).toUpperCase(),
-      day: d.getDate(),
-      time: d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+      month,
+      day,
+      time,
+      badge: `${month} ${day} • ${time}`,
     };
   };
 
   return (
-    <View className="flex-1 bg-slate-950">
+    <View className="flex-1 bg-night">
       <StatusBar barStyle="light-content" />
 
-      {/* Top Header */}
-      <View className="pt-14 pb-4 px-5 bg-slate-950/80 border-b border-slate-900 flex-row items-center justify-between">
-        <View className="flex-row items-center">
-          <Image
-            source={require('@/assets/images/logo.png')}
-            style={{ width: 130, height: 44, marginRight: 8 }}
-            resizeMode="contain"
-          />
-        </View>
-
-        {user ? (
-          <TouchableOpacity
-            onPress={() => router.push('/(tabs)/profile')}
-            className="flex-row items-center bg-slate-900 border border-slate-800 rounded-full py-1.5 px-3">
-            <View className="h-6 w-6 rounded-full bg-violet-600 items-center justify-center mr-2">
-              <Text className="text-white text-xs font-bold">{user.name[0]}</Text>
+      {/* Revamped Header matching CT LIVE CONCERTS Event Pass branding */}
+      <AppHeader
+        right={
+          user ? (
+            <HeaderAvatar name={user.name} onPress={() => router.push('/(tabs)/profile')} />
+          ) : (
+            <View className="flex-row items-center gap-2">
+              <TouchableOpacity
+                onPress={() => router.push('/auth/login')}
+                activeOpacity={0.85}
+                className="bg-iris-500 border border-iris-400/30 rounded-full py-2 px-4 shadow-sm shadow-iris-500/40 active:scale-95 transition-transform">
+                <Text className="text-white text-xs font-bold tracking-wide">Sign In</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => router.push('/auth/register')}
+                activeOpacity={0.8}
+                className="bg-card border border-line rounded-full py-2 px-3.5 active:opacity-80">
+                <Text className="text-slate-300 text-xs font-semibold">Join</Text>
+              </TouchableOpacity>
             </View>
-            <Text className="text-slate-200 text-xs font-semibold">{user.name.split(' ')[0]}</Text>
-          </TouchableOpacity>
-        ) : (
-          <View className="flex-row items-center">
-            <TouchableOpacity
-              onPress={() => router.push('/auth/login')}
-              className="bg-violet-600 rounded-full py-1.5 px-3.5 shadow-sm shadow-violet-500/50 mr-2">
-              <Text className="text-white text-xs font-bold">Sign In</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => router.push('/auth/register')}
-              className="bg-slate-900 border border-slate-700 rounded-full py-1.5 px-3">
-              <Text className="text-slate-300 text-xs font-semibold">Sign Up</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-      </View>
+          )
+        }
+      />
 
       <ScrollView
-        contentContainerStyle={{ paddingBottom: 40 }}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#a78bfa" />}>
-        {/* Active 10-Minute Reservation Alert Banner */}
+        contentContainerStyle={{ paddingBottom: 130 }}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#9282F4" />
+        }>
+        {/* Active 10-Minute Hold Alert Banner */}
         {activeSessions.length > 0 && (
-          <View className="mx-5 mt-4">
+          <View className="px-5 pt-4 gap-2.5">
             {activeSessions.map((session) => (
               <TouchableOpacity
                 key={session.id}
                 onPress={() => router.push(`/reservation/${session.id}` as any)}
                 activeOpacity={0.9}
-                className="bg-amber-500/10 border border-amber-500/40 rounded-2xl p-3.5 mb-2 flex-row items-center justify-between">
+                className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-3.5 flex-row items-center justify-between shadow-sm">
                 <View className="flex-row items-center flex-1 mr-2">
                   <View className="h-9 w-9 rounded-xl bg-amber-500/20 items-center justify-center mr-3">
-                    <Ionicons name="time" size={20} color="#f59e0b" />
+                    <Ionicons name="time" size={18} color="#F5B04C" />
                   </View>
                   <View className="flex-1">
-                    <Text className="text-amber-400 font-bold text-xs uppercase tracking-wider">
-                      Active 10-Min Hold
+                    <Text className="text-amber-300 font-bold text-[10px] tracking-[0.14em] uppercase">
+                      10-Min Hold Active · Expires Soon
                     </Text>
-                    <Text className="text-white font-semibold text-sm numberOfLines={1}">
-                      {session.concertTitle} ({session.categoryName})
+                    <Text className="text-white font-semibold text-[13px] mt-0.5" numberOfLines={1}>
+                      {session.concertTitle} · {session.categoryName}
                     </Text>
                   </View>
                 </View>
-                <View className="bg-amber-500 px-3 py-1.5 rounded-lg flex-row items-center">
-                  <Text className="text-slate-950 font-bold text-xs">Checkout</Text>
-                  <Ionicons name="arrow-forward" size={14} color="#020617" style={{ marginLeft: 4 }} />
+                <View className="flex-row items-center bg-amber-500/20 px-3 py-1.5 rounded-full border border-amber-500/30">
+                  <Text className="text-amber-300 font-bold text-xs mr-1">Checkout</Text>
+                  <Ionicons name="chevron-forward" size={13} color="#F5B04C" />
                 </View>
               </TouchableOpacity>
             ))}
           </View>
         )}
 
-        {/* Search Bar */}
-        <View className="px-5 mt-5">
-          <View className="bg-slate-900 border border-slate-800 rounded-2xl px-4 py-3 flex-row items-center">
-            <Ionicons name="search" size={18} color="#94a3b8" style={{ marginRight: 10 }} />
+        {/* High-Precision Search Bar */}
+        <View className="px-5 pt-4">
+          <View className="bg-card border border-line rounded-2xl px-4 flex-row items-center h-12 shadow-sm focus-within:border-iris-400">
+            <Ionicons name="search" size={18} color="#9282F4" style={{ marginRight: 10 }} />
             <TextInput
               value={search}
               onChangeText={setSearch}
               onSubmitEditing={fetchConcerts}
               placeholder="Search by artist, venue, or tour..."
-              placeholderTextColor="#64748b"
-              className="flex-1 text-white text-sm"
+              placeholderTextColor="#5D6A8C"
+              autoCorrect={false}
               returnKeyType="search"
+              className="flex-1 text-white text-[14px]"
             />
             {search.length > 0 && (
-              <TouchableOpacity onPress={() => setSearch('')}>
-                <Ionicons name="close-circle" size={18} color="#64748b" />
+              <TouchableOpacity onPress={() => setSearch('')} hitSlop={10}>
+                <Ionicons name="close-circle" size={18} color="#5D6A8C" />
               </TouchableOpacity>
             )}
           </View>
@@ -174,21 +180,22 @@ export default function ExploreScreen() {
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 14, paddingBottom: 4 }}>
+          contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 14, gap: 8 }}>
           {CITY_FILTERS.map((city) => {
             const isSelected = selectedCity === city;
             return (
               <TouchableOpacity
                 key={city}
-                onPress={() => setSelectedCity(city)}
-                className={`mr-2.5 px-4 py-2 rounded-full border ${
+                onPress={() => handleCitySelect(city)}
+                activeOpacity={0.8}
+                className={`px-4 py-2 rounded-full border transition-all ${
                   isSelected
-                    ? 'bg-violet-600 border-violet-500'
-                    : 'bg-slate-900/80 border-slate-800'
+                    ? 'bg-iris-500 border-iris-500 shadow-sm shadow-iris-500/30'
+                    : 'bg-card border-line active:bg-card2'
                 }`}>
                 <Text
-                  className={`text-xs font-semibold ${
-                    isSelected ? 'text-white font-bold' : 'text-slate-400'
+                  className={`text-[12px] ${
+                    isSelected ? 'text-white font-bold tracking-wide' : 'text-mist font-medium'
                   }`}>
                   {city}
                 </Text>
@@ -197,51 +204,63 @@ export default function ExploreScreen() {
           })}
         </ScrollView>
 
-        {/* Hero Featured Concert */}
+        {/* Hero Featured Concert (Headliner) */}
         {featuredConcert && !search && selectedCity === 'All' && (
-          <View className="px-5 mt-5">
-            <Text className="text-white text-lg font-extrabold mb-3 tracking-wide">
-              Featured Headliner
-            </Text>
+          <View className="px-5 pt-6">
             <TouchableOpacity
               onPress={() => router.push(`/concert/${featuredConcert.id}` as any)}
-              activeOpacity={0.9}
-              className="rounded-3xl overflow-hidden bg-slate-900 border border-slate-800 shadow-2xl relative">
-              <Image
-                source={{ uri: featuredConcert.imageUrl }}
-                style={{ width: '100%', height: 220 }}
-                resizeMode="cover"
-              />
-              {/* Gradient tint */}
-              <View className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent justify-end p-5">
-                <View className="flex-row items-center mb-2">
-                  <View className="bg-violet-600/90 px-3 py-1 rounded-full mr-2">
-                    <Text className="text-white text-[11px] font-bold tracking-wider uppercase">
-                      Stadium Tour
+              activeOpacity={0.92}
+              className="rounded-3xl overflow-hidden bg-card border border-line shadow-2xl relative">
+              <View className="relative">
+                <Image
+                  source={{ uri: featuredConcert.imageUrl }}
+                  style={{ width: '100%', height: 235 }}
+                  resizeMode="cover"
+                />
+
+                {/* Layered Gradient Overlays for High Legibility */}
+                <View className="absolute inset-0 bg-night/30" />
+                <View className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-night via-night/85 to-transparent" />
+                <View className="absolute inset-x-0 bottom-0 h-32 bg-night/90" />
+
+                {/* Top Badges */}
+                <View className="absolute top-4 left-4 right-4 flex-row items-center justify-between">
+                  <View className="bg-iris-500/90 border border-white/20 px-3 py-1 rounded-full shadow-sm">
+                    <Text className="text-white text-[10px] font-black tracking-[0.14em] uppercase">
+                      STADIUM TOUR
                     </Text>
                   </View>
-                  <View className="bg-emerald-500/20 border border-emerald-500/40 px-2.5 py-0.5 rounded-full">
-                    <Text className="text-emerald-400 text-[11px] font-semibold">
+                  <View className="flex-row items-center bg-night/80 border border-emerald-500/30 px-2.5 py-1 rounded-full">
+                    <LiveDot color="#34D399" size={6} />
+                    <Text className="text-emerald-300 text-[11px] font-bold ml-1.5">
                       {featuredConcert.totalAvailable} Tickets Left
                     </Text>
                   </View>
                 </View>
 
-                <Text className="text-2xl font-black text-white">{featuredConcert.artist}</Text>
-                <Text className="text-slate-300 text-sm font-medium mt-0.5">
-                  {featuredConcert.title}
-                </Text>
+                {/* Bottom Content Area */}
+                <View className="absolute inset-x-0 bottom-0 p-5">
+                  <Text className="text-[26px] leading-[30px] font-black text-white tracking-[-0.02em]">
+                    {featuredConcert.artist}
+                  </Text>
+                  <Text className="text-slate-300 text-[13px] font-medium mt-0.5" numberOfLines={1}>
+                    {featuredConcert.title}
+                  </Text>
 
-                <View className="flex-row items-center justify-between mt-3 pt-3 border-t border-slate-800/80">
-                  <View className="flex-row items-center">
-                    <Ionicons name="location" size={14} color="#a78bfa" style={{ marginRight: 4 }} />
-                    <Text className="text-slate-400 text-xs">{featuredConcert.venue}, {featuredConcert.city}</Text>
-                  </View>
-                  <View className="items-end">
-                    <Text className="text-slate-400 text-[10px] uppercase font-bold">Starts at</Text>
-                    <Text className="text-emerald-400 font-extrabold text-base">
-                      ${featuredConcert.startingPrice}
-                    </Text>
+                  <View className="flex-row items-center justify-between mt-3.5 pt-3.5 border-t border-line/90">
+                    <View className="flex-row items-center flex-1 mr-3">
+                      <Ionicons name="location" size={14} color="#9282F4" />
+                      <Text className="text-mist text-[12px] font-medium ml-1.5" numberOfLines={1}>
+                        {featuredConcert.venue}, {featuredConcert.city}
+                      </Text>
+                    </View>
+
+                    <View className="flex-row items-baseline">
+                      <Text className="text-mist text-[12px] font-medium mr-1">Starts at</Text>
+                      <Text className="text-white font-black text-[18px] tracking-tight">
+                        ${featuredConcert.startingPrice}
+                      </Text>
+                    </View>
                   </View>
                 </View>
               </View>
@@ -249,87 +268,112 @@ export default function ExploreScreen() {
           </View>
         )}
 
-        {/* All Concerts List */}
-        <View className="px-5 mt-6">
-          <View className="flex-row justify-between items-center mb-3">
-            <Text className="text-white text-lg font-extrabold tracking-wide">
-              Upcoming Shows ({concerts.length})
+        {/* Upcoming Shows List */}
+        <View className="px-5 pt-7">
+          <View className="flex-row items-baseline justify-between mb-3.5">
+            <Text className="text-white text-[18px] font-black tracking-tight">
+              Upcoming Shows
             </Text>
+            {!loading && concerts.length > 0 && (
+              <View className="bg-card border border-line px-2.5 py-0.5 rounded-full">
+                <Text className="text-mist text-[11px] font-bold">{concerts.length} Shows</Text>
+              </View>
+            )}
           </View>
 
           {loading ? (
-            <View className="py-16 items-center justify-center">
-              <ActivityIndicator size="large" color="#8b5cf6" />
-              <Text className="text-slate-400 text-sm mt-3">Loading live concert availability...</Text>
-            </View>
+            <ConcertListSkeleton />
           ) : concerts.length === 0 ? (
-            <View className="py-16 items-center justify-center">
-              <Ionicons name="musical-note-outline" size={48} color="#475569" />
-              <Text className="text-slate-300 text-base font-semibold mt-3">No concerts found</Text>
-              <Text className="text-slate-500 text-xs mt-1">Try adjusting your search or filters</Text>
+            <View className="py-16 items-center">
+              <View className="h-16 w-16 rounded-3xl bg-card border border-line items-center justify-center mb-4">
+                <Ionicons name="search-outline" size={28} color="#5D6A8C" />
+              </View>
+              <Text className="text-white text-[16px] font-bold">No shows found</Text>
+              <Text className="text-mist text-[13px] mt-1 text-center">
+                Try adjusting your city filter or search terms
+              </Text>
             </View>
           ) : (
-            <View className="space-y-4">
+            <View className="gap-3.5">
               {concerts.map((concert) => {
                 const dateInfo = formatConcertDate(concert.date);
                 return (
                   <TouchableOpacity
                     key={concert.id}
                     onPress={() => router.push(`/concert/${concert.id}` as any)}
-                    activeOpacity={0.85}
-                    className="bg-slate-900 border border-slate-800/80 rounded-2xl overflow-hidden mb-4 flex-row">
-                    <Image
-                      source={{ uri: concert.imageUrl }}
-                      style={{ width: 110, height: 135 }}
-                      resizeMode="cover"
-                    />
+                    activeOpacity={0.88}
+                    className="bg-card border border-line rounded-2xl overflow-hidden flex-row active:opacity-95 shadow-sm">
+                    {/* Left Thumbnail Image */}
+                    <View className="relative">
+                      <Image
+                        source={{ uri: concert.imageUrl }}
+                        style={{ width: 112, height: 138 }}
+                        resizeMode="cover"
+                      />
+                      <View className="absolute inset-0 bg-night/10" />
+                    </View>
 
+                    {/* Right Card Body */}
                     <View className="flex-1 p-3.5 justify-between">
                       <View>
-                        <View className="flex-row items-center justify-between mb-1">
-                          <View className="bg-slate-800 px-2 py-0.5 rounded-md flex-row items-center">
-                            <Ionicons name="calendar-outline" size={11} color="#a78bfa" style={{ marginRight: 4 }} />
-                            <Text className="text-violet-300 text-[10px] font-bold">
-                              {dateInfo.month} {dateInfo.day}
+                        {/* Top Date & Availability Pill */}
+                        <View className="flex-row items-center justify-between mb-1.5">
+                          <View className="flex-row items-center bg-iris-500/15 border border-iris-500/30 px-2 py-0.5 rounded-md">
+                            <Ionicons name="calendar-outline" size={11} color="#C4B5FD" style={{ marginRight: 4 }} />
+                            <Text className="text-iris-300 text-[10px] font-bold uppercase tracking-wider">
+                              {dateInfo.month} {dateInfo.day} • {dateInfo.time}
                             </Text>
                           </View>
-                          <Text className="text-slate-400 text-[11px]">{dateInfo.time}</Text>
+                          <Text className="text-mist text-[10px] font-semibold">
+                            {concert.totalAvailable > 500 ? `${concert.totalAvailable.toLocaleString()} Seats` : `${concert.totalAvailable} Left`}
+                          </Text>
                         </View>
 
-                        <Text className="text-white font-extrabold text-base leading-tight">
+                        {/* Artist & Tour Titles */}
+                        <Text
+                          className="text-white font-extrabold text-[16px] leading-tight tracking-tight"
+                          numberOfLines={1}>
                           {concert.artist}
                         </Text>
-                        <Text className="text-slate-400 text-xs numberOfLines={1} mt-0.5">
+                        <Text className="text-slate-300 text-[12px] font-medium mt-0.5" numberOfLines={1}>
                           {concert.title}
                         </Text>
                       </View>
 
-                      <View className="mt-2">
-                        <View className="flex-row items-center mb-1.5">
-                          <Ionicons name="pin-outline" size={12} color="#94a3b8" style={{ marginRight: 3 }} />
-                          <Text className="text-slate-400 text-[11px] numberOfLines={1}">
+                      <View>
+                        {/* Location */}
+                        <View className="flex-row items-center mt-1.5 mb-2">
+                          <Ionicons name="location-outline" size={12} color="#5D6A8C" />
+                          <Text className="text-dim text-[11px] ml-1 flex-1 font-medium" numberOfLines={1}>
                             {concert.venue} • {concert.city}
                           </Text>
                         </View>
 
-                        <View className="flex-row items-center justify-between pt-1 border-t border-slate-800">
-                          <View className="flex-row space-x-1">
-                            {concert.categories.slice(0, 3).map((cat) => (
+                        {/* Bottom Tags & Price */}
+                        <View className="flex-row items-center justify-between pt-2 border-t border-line/80">
+                          <View className="flex-row gap-1">
+                            {concert.categories.slice(0, 2).map((cat) => (
                               <View
                                 key={cat.id}
-                                style={{ backgroundColor: `${cat.color}20` }}
-                                className="px-1.5 py-0.5 rounded mr-1">
+                                style={{
+                                  backgroundColor: `${cat.color}18`,
+                                  borderColor: `${cat.color}40`,
+                                }}
+                                className="px-2 py-0.5 rounded border">
                                 <Text
                                   style={{ color: cat.color }}
-                                  className="text-[9px] font-bold uppercase">
+                                  className="text-[9px] font-extrabold uppercase tracking-wider">
                                   {cat.name}
                                 </Text>
                               </View>
                             ))}
                           </View>
-                          <Text className="text-emerald-400 font-extrabold text-sm">
-                            From ${concert.startingPrice}
-                          </Text>
+                          <View className="flex-row items-baseline">
+                            <Text className="text-mist text-[11px] font-medium mr-1">From</Text>
+                            <Text className="text-white font-extrabold text-[15px] tracking-tight">
+                              ${concert.startingPrice}
+                            </Text>
+                          </View>
                         </View>
                       </View>
                     </View>

@@ -1,41 +1,48 @@
 import React, { useState, useCallback } from 'react';
 import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  ActivityIndicator,
   Alert,
+  ScrollView,
   StatusBar,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { useAuth } from '@/context/AuthContext';
 import { api } from '@/services/api';
-
+import { AppHeader } from '@/components/AppHeader';
 import { SocialAuthButtons } from '@/components/SocialAuthButtons';
 
 export default function ProfileScreen() {
-  const { user, logout } = useAuth();
-  const [stats, setStats] = useState<{ bookings: number; tickets: number }>({ bookings: 0, tickets: 0 });
+  const { user, logout, login } = useAuth();
+  const [stats, setStats] = useState<{ bookings: number; tickets: number }>({
+    bookings: 0,
+    tickets: 0,
+  });
   const [loading, setLoading] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
       if (!user) return;
-      api.getMe().then((data) => {
-        if (data?._count) {
-          setStats({
-            bookings: data._count.bookings || 0,
-            tickets: data._count.tickets || 0,
-          });
-        }
-      }).catch(() => {});
+      api
+        .getMe()
+        .then((data) => {
+          if (data?._count) {
+            setStats({
+              bookings: data._count.bookings || 0,
+              tickets: data._count.tickets || 0,
+            });
+          }
+        })
+        .catch(() => {});
     }, [user])
   );
 
-  const handleLogout = async () => {
-    Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
+  const handleLogout = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    Alert.alert('Sign Out', 'Are you sure you want to sign out of Event Pass?', [
       { text: 'Cancel', style: 'cancel' },
       {
         text: 'Sign Out',
@@ -53,129 +60,180 @@ export default function ProfileScreen() {
     ]);
   };
 
+  const handleQuickDemoLogin = async () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setLoading(true);
+    try {
+      await login('user@example.com', 'password123');
+    } catch (err: any) {
+      Alert.alert('Demo Sign-In Failed', err.message || 'Could not sign in with demo credentials.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <View className="flex-1 bg-slate-950">
+    <View className="flex-1 bg-night">
       <StatusBar barStyle="light-content" />
 
-      {/* Header */}
-      <View className="pt-14 pb-4 px-5 bg-slate-950/80 border-b border-slate-900">
-        <Text className="text-xs font-bold text-violet-400 tracking-widest uppercase">
-          ACCOUNT
-        </Text>
-        <Text className="text-xl font-extrabold text-white">My Profile</Text>
-      </View>
+      <AppHeader title="Profile" subtitle="ACCOUNT & WALLET" />
 
-      <ScrollView contentContainerStyle={{ padding: 20 }}>
+      <ScrollView
+        contentContainerStyle={{ padding: 20, paddingBottom: 130 }}
+        showsVerticalScrollIndicator={false}>
         {!user ? (
-          <View className="items-center py-8">
-            <View className="h-20 w-20 rounded-full bg-violet-600/10 border border-violet-500/30 items-center justify-center mb-4">
-              <Ionicons name="person-outline" size={40} color="#a78bfa" />
-            </View>
-            <Text className="text-white text-xl font-black">Guest User</Text>
-            <Text className="text-slate-400 text-xs text-center mt-1 max-w-xs">
-              Sign in to manage your ticket reservations, access passes, and unlock exclusive fan perks.
-            </Text>
+          /* Guest Experience */
+          <View className="pt-4">
+            <View className="bg-card border border-line rounded-3xl p-6 items-center shadow-lg">
+              <View className="h-20 w-20 rounded-3xl bg-iris-500/15 border border-iris-500/40 items-center justify-center mb-4 shadow-sm shadow-iris-500/30">
+                <Ionicons name="person-circle-outline" size={44} color="#C4B5FD" />
+              </View>
+              <Text className="text-white text-2xl font-black tracking-tight">Guest Account</Text>
+              <Text className="text-mist text-[13px] text-center mt-1.5 max-w-[270px] leading-5">
+                Sign in to manage your ticket reservations, access QR passes, and unlock fast 10-minute seat holds.
+              </Text>
 
-            <TouchableOpacity
-              onPress={() => router.push('/auth/login')}
-              activeOpacity={0.85}
-              className="mt-6 bg-violet-600 px-8 py-3.5 rounded-2xl w-full items-center shadow-lg shadow-violet-600/40">
-              <Text className="text-white font-extrabold text-sm">Sign In with Email / Phone</Text>
-            </TouchableOpacity>
+              {/* Quick 1-Tap Demo Button */}
+              <TouchableOpacity
+                onPress={handleQuickDemoLogin}
+                activeOpacity={0.85}
+                disabled={loading}
+                className="mt-6 bg-iris-500 border border-iris-400/30 py-3.5 px-6 rounded-2xl w-full flex-row items-center justify-center shadow-md shadow-iris-500/30 active:scale-[0.98]">
+                <Ionicons name="flash" size={16} color="#FFFFFF" style={{ marginRight: 8 }} />
+                <Text className="text-white font-bold text-sm">
+                  {loading ? 'Signing in…' : '1-Tap Demo Sign In (user@example.com)'}
+                </Text>
+              </TouchableOpacity>
 
-            <TouchableOpacity
-              onPress={() => router.push('/auth/register')}
-              activeOpacity={0.8}
-              className="mt-3 bg-slate-900 border border-slate-800 px-8 py-3.5 rounded-2xl w-full items-center">
-              <Text className="text-slate-200 font-bold text-sm">Create New Account (Sign Up)</Text>
-            </TouchableOpacity>
+              <View className="flex-row gap-3 w-full mt-3">
+                <TouchableOpacity
+                  onPress={() => router.push('/auth/login')}
+                  activeOpacity={0.8}
+                  className="flex-1 bg-card2 border border-line py-3 rounded-2xl items-center active:opacity-80">
+                  <Text className="text-white font-bold text-[13px]">Email Sign In</Text>
+                </TouchableOpacity>
 
-            {/* Quick 1-tap Social Auth on Profile page */}
-            <View className="w-full mt-2">
-              <SocialAuthButtons
-                onSuccess={() => {}}
-                onError={(msg) => Alert.alert('Auth Error', msg)}
-              />
+                <TouchableOpacity
+                  onPress={() => router.push('/auth/register')}
+                  activeOpacity={0.8}
+                  className="flex-1 bg-card2 border border-line py-3 rounded-2xl items-center active:opacity-80">
+                  <Text className="text-slate-300 font-semibold text-[13px]">Register</Text>
+                </TouchableOpacity>
+              </View>
+
+              <View className="w-full mt-5 pt-5 border-t border-line/80">
+                <SocialAuthButtons
+                  onSuccess={() => {}}
+                  onError={(msg) => Alert.alert('Sign-In Error', msg)}
+                />
+              </View>
             </View>
           </View>
         ) : (
-          <View>
-            {/* User Card */}
-            <View className="bg-slate-900 border border-slate-800 rounded-3xl p-5 items-center">
-              <View className="h-20 w-20 rounded-full bg-gradient-to-tr from-violet-600 to-fuchsia-600 items-center justify-center mb-3 border-2 border-violet-400/40">
-                <Text className="text-white font-black text-2xl">
-                  {user.name.split(' ').map((n) => n[0]).join('')}
-                </Text>
-              </View>
-
-              <Text className="text-white font-black text-xl">{user.name}</Text>
-              <Text className="text-slate-400 text-xs mt-0.5">{user.email}</Text>
-              {user.phone ? (
-                <View className="flex-row items-center mt-1">
-                  <Ionicons name="call-outline" size={12} color="#94a3b8" style={{ marginRight: 4 }} />
-                  <Text className="text-slate-400 text-xs">{user.phone}</Text>
+          /* Authenticated User Experience */
+          <View className="gap-5">
+            {/* User Profile Hero Card */}
+            <View className="bg-card border border-line rounded-3xl p-5 shadow-lg">
+              <View className="flex-row items-center">
+                <View className="h-16 w-16 rounded-2xl bg-iris-500 items-center justify-center mr-4 shadow-md shadow-iris-500/30">
+                  <Text className="text-white text-2xl font-black">
+                    {user.name ? user.name[0].toUpperCase() : 'U'}
+                  </Text>
                 </View>
-              ) : null}
 
-              <View className="mt-3 bg-violet-500/10 border border-violet-500/30 px-3 py-1 rounded-full">
-                <Text className="text-violet-300 font-bold text-[11px] uppercase tracking-wider">
-                  Verified Fan {user.role === 'ADMIN' ? '• Admin' : ''}
-                </Text>
+                <View className="flex-1">
+                  <View className="flex-row items-center">
+                    <Text className="text-white font-black text-xl tracking-tight mr-2" numberOfLines={1}>
+                      {user.name}
+                    </Text>
+                    <View className="bg-iris-500/20 border border-iris-500/40 px-2 py-0.5 rounded-full">
+                      <Text className="text-iris-300 font-bold text-[10px] uppercase tracking-wider">
+                        {user.role}
+                      </Text>
+                    </View>
+                  </View>
+                  <Text className="text-mist text-xs mt-1" numberOfLines={1}>
+                    {user.email || user.phone || 'Verified Account'}
+                  </Text>
+                </View>
               </View>
             </View>
 
-            {/* Stats Row */}
-            <View className="flex-row mt-4 space-x-3">
-              <View className="flex-1 bg-slate-900 border border-slate-800 rounded-2xl p-4 items-center mr-2">
-                <Text className="text-2xl font-black text-white">{stats.tickets}</Text>
-                <Text className="text-slate-400 text-xs font-semibold mt-1">Concert Passes</Text>
+            {/* Stats Bento Grid */}
+            <View className="flex-row gap-3">
+              <View className="flex-1 bg-card border border-line rounded-2xl p-4">
+                <View className="flex-row items-center justify-between mb-2">
+                  <Text className="text-dim text-[11px] font-bold uppercase tracking-wider">
+                    Total Passes
+                  </Text>
+                  <Ionicons name="ticket" size={16} color="#9282F4" />
+                </View>
+                <Text className="text-white font-black text-2xl">{stats.tickets}</Text>
+                <Text className="text-mist text-[11px] mt-0.5">In Wallet</Text>
               </View>
 
-              <View className="flex-1 bg-slate-900 border border-slate-800 rounded-2xl p-4 items-center">
-                <Text className="text-2xl font-black text-white">{stats.bookings}</Text>
-                <Text className="text-slate-400 text-xs font-semibold mt-1">Total Bookings</Text>
+              <View className="flex-1 bg-card border border-line rounded-2xl p-4">
+                <View className="flex-row items-center justify-between mb-2">
+                  <Text className="text-dim text-[11px] font-bold uppercase tracking-wider">
+                    Bookings
+                  </Text>
+                  <Ionicons name="receipt" size={16} color="#34D399" />
+                </View>
+                <Text className="text-white font-black text-2xl">{stats.bookings}</Text>
+                <Text className="text-mist text-[11px] mt-0.5">Completed</Text>
               </View>
             </View>
 
-            {/* Menu List */}
-            <View className="mt-6 bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden">
+            {/* Quick Actions List */}
+            <View className="bg-card border border-line rounded-3xl overflow-hidden shadow-sm">
               <TouchableOpacity
                 onPress={() => router.push('/(tabs)/two')}
-                className="p-4 flex-row items-center justify-between border-b border-slate-800">
+                activeOpacity={0.7}
+                className="p-4 flex-row items-center justify-between border-b border-line/70">
                 <View className="flex-row items-center">
-                  <View className="h-9 w-9 rounded-xl bg-violet-600/20 items-center justify-center mr-3">
-                    <Ionicons name="ticket" size={18} color="#a78bfa" />
+                  <View className="h-9 w-9 rounded-xl bg-iris-500/15 items-center justify-center mr-3">
+                    <Ionicons name="wallet-outline" size={18} color="#C4B5FD" />
                   </View>
-                  <Text className="text-white font-semibold text-sm">My Tickets & QR Passes</Text>
+                  <Text className="text-white font-bold text-sm">My Ticket Passes & Wallet</Text>
                 </View>
-                <Ionicons name="chevron-forward" size={18} color="#64748b" />
+                <Ionicons name="chevron-forward" size={16} color="#5D6A8C" />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => router.push('/live-hall')}
+                activeOpacity={0.7}
+                className="p-4 flex-row items-center justify-between border-b border-line/70">
+                <View className="flex-row items-center">
+                  <View className="h-9 w-9 rounded-xl bg-pink-500/15 items-center justify-center mr-3">
+                    <Ionicons name="radio-outline" size={18} color="#EC4899" />
+                  </View>
+                  <Text className="text-white font-bold text-sm">CT Live Concert Hall</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={16} color="#5D6A8C" />
               </TouchableOpacity>
 
               <TouchableOpacity
                 onPress={() => router.push('/modal')}
-                className="p-4 flex-row items-center justify-between border-b border-slate-800">
-                <View className="flex-row items-center">
-                  <View className="h-9 w-9 rounded-xl bg-emerald-600/20 items-center justify-center mr-3">
-                    <Ionicons name="shield-checkmark" size={18} color="#34d399" />
-                  </View>
-                  <Text className="text-white font-semibold text-sm">System & Ticketing Info</Text>
-                </View>
-                <Ionicons name="chevron-forward" size={18} color="#64748b" />
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                onPress={handleLogout}
-                disabled={loading}
+                activeOpacity={0.7}
                 className="p-4 flex-row items-center justify-between">
                 <View className="flex-row items-center">
-                  <View className="h-9 w-9 rounded-xl bg-rose-600/20 items-center justify-center mr-3">
-                    <Ionicons name="log-out" size={18} color="#f43f5e" />
+                  <View className="h-9 w-9 rounded-xl bg-amber-500/15 items-center justify-center mr-3">
+                    <Ionicons name="shield-checkmark-outline" size={18} color="#F5B04C" />
                   </View>
-                  <Text className="text-rose-400 font-semibold text-sm">Sign Out</Text>
+                  <Text className="text-white font-bold text-sm">Security & 10-Min Hold System</Text>
                 </View>
-                {loading ? <ActivityIndicator size="small" color="#f43f5e" /> : <Ionicons name="chevron-forward" size={18} color="#64748b" />}
+                <Ionicons name="chevron-forward" size={16} color="#5D6A8C" />
               </TouchableOpacity>
             </View>
+
+            {/* Sign Out Button */}
+            <TouchableOpacity
+              onPress={handleLogout}
+              activeOpacity={0.8}
+              className="mt-2 bg-rose-500/10 border border-rose-500/30 py-3.5 rounded-2xl items-center flex-row justify-center active:bg-rose-500/20">
+              <Ionicons name="log-out-outline" size={18} color="#FB7185" style={{ marginRight: 8 }} />
+              <Text className="text-rose-400 font-bold text-sm">Sign Out</Text>
+            </TouchableOpacity>
           </View>
         )}
       </ScrollView>

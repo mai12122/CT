@@ -134,12 +134,12 @@ export const SocialAuthButtons: React.FC<SocialAuthButtonsProps> = ({
     <View className="w-full">
       {/* Continue with Section */}
       <View className="items-center my-4">
-        <Text className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">
-          Continue with
+        <Text className="text-[11px] font-bold text-dim uppercase tracking-[0.14em] mb-3">
+          Or continue with
         </Text>
 
         {/* Social Icons Row */}
-        <View className="flex-row items-center justify-center space-x-3 gap-3 w-full">
+        <View className="flex-row items-center justify-center gap-3 w-full">
           {/* Google Icon Button */}
           <TouchableOpacity
             onPress={() => {
@@ -149,7 +149,7 @@ export const SocialAuthButtons: React.FC<SocialAuthButtonsProps> = ({
               setModalProvider('GOOGLE');
             }}
             activeOpacity={0.8}
-            className="flex-1 max-w-[150px] h-12 rounded-2xl bg-slate-900 border border-slate-800 active:border-blue-500/50 items-center justify-center shadow-md shadow-black/40">
+            className="flex-1 max-w-[150px] h-12 rounded-2xl bg-card border border-line items-center justify-center active:opacity-75">
             <GoogleLogo size={22} />
           </TouchableOpacity>
 
@@ -157,7 +157,7 @@ export const SocialAuthButtons: React.FC<SocialAuthButtonsProps> = ({
           <TouchableOpacity
             onPress={handleFacebookPress}
             activeOpacity={0.8}
-            className="flex-1 max-w-[150px] h-12 rounded-2xl bg-slate-900 border border-slate-800 active:border-blue-500/50 items-center justify-center shadow-md shadow-black/40">
+            className="flex-1 max-w-[150px] h-12 rounded-2xl bg-card border border-line items-center justify-center active:opacity-75">
             <Ionicons name="logo-facebook" size={24} color="#1877F2" />
           </TouchableOpacity>
         </View>
@@ -169,15 +169,15 @@ export const SocialAuthButtons: React.FC<SocialAuthButtonsProps> = ({
         transparent
         animationType="fade"
         onRequestClose={() => setModalProvider(null)}>
-        <View className="flex-1 bg-black/80 justify-end sm:justify-center items-center p-4">
+        <View className="flex-1 bg-night/90 justify-end items-center p-4">
           <View
             style={{ maxHeight: '85%' }}
-            className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl">
+            className="w-full max-w-md bg-card border border-line rounded-3xl p-6">
             {/* Modal Header */}
-            <View className="flex-row items-center justify-between pb-4 border-b border-slate-800">
+            <View className="flex-row items-center justify-between pb-4 border-b border-line">
               <View className="flex-row items-center">
                 {modalProvider === 'GOOGLE' ? (
-                  <View className="h-10 w-10 rounded-xl bg-white items-center justify-center mr-3 shadow-sm">
+                  <View className="h-10 w-10 rounded-xl bg-white items-center justify-center mr-3">
                     <GoogleLogo size={22} />
                   </View>
                 ) : (
@@ -188,19 +188,19 @@ export const SocialAuthButtons: React.FC<SocialAuthButtonsProps> = ({
                   </View>
                 )}
                 <View>
-                  <Text className="text-white font-extrabold text-base">
-                    {modalProvider === 'GOOGLE' ? 'Sign in with Google' : 'Sign in with Facebook'}
+                  <Text className="text-white font-bold text-base">
+                    {modalProvider === 'GOOGLE' ? 'Continue with Google' : 'Continue with Facebook'}
                   </Text>
-                  <Text className="text-slate-400 text-xs">
-                    to continue to Concert Pass App
+                  <Text className="text-mist text-xs">
+                    Choose an account to sign in
                   </Text>
                 </View>
               </View>
 
               <TouchableOpacity
                 onPress={() => setModalProvider(null)}
-                className="h-8 w-8 rounded-full bg-slate-800 items-center justify-center">
-                <Ionicons name="close" size={18} color="#94a3b8" />
+                className="h-8 w-8 rounded-full bg-card2 items-center justify-center">
+                <Ionicons name="close" size={17} color="#93A0BE" />
               </TouchableOpacity>
             </View>
 
@@ -211,7 +211,7 @@ export const SocialAuthButtons: React.FC<SocialAuthButtonsProps> = ({
                   color={modalProvider === 'GOOGLE' ? '#4285F4' : '#1877F2'}
                 />
                 <Text className="text-slate-300 text-sm font-semibold mt-4">
-                  Connecting to {modalProvider === 'GOOGLE' ? 'Google' : 'Facebook'}...
+                  Connecting to {modalProvider === 'GOOGLE' ? 'Google' : 'Facebook'}…
                 </Text>
               </View>
             ) : isCustomAccount ? (
@@ -225,7 +225,7 @@ export const SocialAuthButtons: React.FC<SocialAuthButtonsProps> = ({
                   onChangeText={setCustomName}
                   placeholder="e.g. Alex Rivera"
                   placeholderTextColor="#64748b"
-                  className="bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white text-sm mb-4"
+                  className="bg-abyss border border-line rounded-xl px-4 py-3 text-white text-sm mb-4"
                 />
 
                 <Text className="text-slate-300 text-xs font-bold uppercase tracking-wider mb-2">
@@ -242,7 +242,7 @@ export const SocialAuthButtons: React.FC<SocialAuthButtonsProps> = ({
                   placeholderTextColor="#64748b"
                   keyboardType="email-address"
                   autoCapitalize="none"
-                  className="bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white text-sm mb-5"
+                  className="bg-abyss border border-line rounded-xl px-4 py-3 text-white text-sm mb-5"
                 />
 
                 <TouchableOpacity
@@ -251,9 +251,7 @@ export const SocialAuthButtons: React.FC<SocialAuthButtonsProps> = ({
                     backgroundColor: modalProvider === 'GOOGLE' ? '#4285F4' : '#1877F2',
                   }}
                   className="rounded-xl py-3.5 items-center justify-center mb-3">
-                  <Text className="text-white font-bold text-sm">
-                    Continue as Verified User
-                  </Text>
+                  <Text className="text-white font-bold text-sm">Continue</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -279,12 +277,12 @@ export const SocialAuthButtons: React.FC<SocialAuthButtonsProps> = ({
                     key={acc.id}
                     onPress={() => handleSelectAccount(acc)}
                     activeOpacity={0.75}
-                    className="flex-row items-center p-3 mb-2.5 rounded-2xl bg-slate-950/70 border border-slate-800/80 active:border-violet-500/50">
-                    <View className="h-10 w-10 rounded-full bg-violet-600/20 border border-violet-500/30 items-center justify-center mr-3">
+                    className="flex-row items-center p-3 mb-2.5 rounded-2xl bg-abyss border border-line active:opacity-80">
+                    <View className="h-10 w-10 rounded-full bg-iris-500/10 border border-iris-500/30 items-center justify-center mr-3">
                       <Ionicons
                         name={modalProvider === 'GOOGLE' ? 'logo-google' : 'logo-facebook'}
                         size={18}
-                        color={modalProvider === 'GOOGLE' ? '#a78bfa' : '#38bdf8'}
+                        color="#9282F4"
                       />
                     </View>
                     <View className="flex-1">
@@ -299,9 +297,9 @@ export const SocialAuthButtons: React.FC<SocialAuthButtonsProps> = ({
                 <TouchableOpacity
                   onPress={() => setIsCustomAccount(true)}
                   activeOpacity={0.75}
-                  className="flex-row items-center p-3.5 mt-1 rounded-2xl border border-dashed border-slate-800 active:border-slate-700">
-                  <View className="h-8 w-8 rounded-full bg-slate-800 items-center justify-center mr-3">
-                    <Ionicons name="person-add-outline" size={16} color="#94a3b8" />
+                  className="flex-row items-center p-3.5 mt-1 rounded-2xl border border-dashed border-line active:opacity-80">
+                  <View className="h-8 w-8 rounded-full bg-card2 items-center justify-center mr-3">
+                    <Ionicons name="person-add-outline" size={15} color="#93A0BE" />
                   </View>
                   <Text className="text-slate-300 font-semibold text-xs flex-1">
                     Use another {modalProvider === 'GOOGLE' ? 'Google' : 'Facebook'} account
@@ -309,15 +307,15 @@ export const SocialAuthButtons: React.FC<SocialAuthButtonsProps> = ({
                   <Ionicons name="arrow-forward" size={14} color="#64748b" />
                 </TouchableOpacity>
 
-                <View className="mt-5 pt-3 border-t border-slate-800/60 flex-row items-center justify-center">
+                <View className="mt-5 pt-3 border-t border-line flex-row items-center justify-center">
                   <Ionicons
                     name="shield-checkmark"
                     size={14}
-                    color="#10b981"
+                    color="#10B981"
                     style={{ marginRight: 6 }}
                   />
-                  <Text className="text-slate-400 text-[11px]">
-                    Fast, secure, 1-tap encrypted authentication
+                  <Text className="text-dim text-[11px]">
+                    Handled securely by the provider
                   </Text>
                 </View>
               </ScrollView>

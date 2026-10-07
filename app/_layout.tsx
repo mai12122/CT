@@ -52,9 +52,13 @@ function RootLayoutNav() {
       <Stack
         screenOptions={{
           headerShown: false,
-          contentStyle: { backgroundColor: '#020617' },
+          contentStyle: { backgroundColor: '#0B1020' },
         }}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="live-hall"
+          options={{ headerShown: false, animation: 'slide_from_bottom' }}
+        />
         <Stack.Screen name="concert/[id]" options={{ headerShown: false }} />
         <Stack.Screen name="reservation/[id]" options={{ headerShown: false }} />
         <Stack.Screen name="booking-success/[id]" options={{ headerShown: false }} />

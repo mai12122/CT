@@ -100,7 +100,7 @@ export const PhoneAuthForm: React.FC<PhoneAuthFormProps> = ({
   };
 
   return (
-    <View className="space-y-4">
+    <View>
       {step === 'ENTER_PHONE' ? (
         <View>
           {mode === 'register' && (
@@ -108,18 +108,18 @@ export const PhoneAuthForm: React.FC<PhoneAuthFormProps> = ({
               <Text className="text-slate-300 text-xs font-semibold uppercase tracking-wider mb-2">
                 Full Name *
               </Text>
-              <View className="bg-slate-900/90 border border-slate-800 rounded-xl px-4 py-3.5 flex-row items-center">
+              <View className="bg-card border border-line rounded-xl px-4 py-3.5 flex-row items-center">
                 <Ionicons
                   name="person-outline"
                   size={18}
-                  color="#94a3b8"
+                  color="#5D6A8C"
                   style={{ marginRight: 10 }}
                 />
                 <TextInput
                   value={name}
                   onChangeText={setName}
                   placeholder="e.g. Sopheak Chan"
-                  placeholderTextColor="#64748b"
+                  placeholderTextColor="#5D6A8C"
                   className="flex-1 text-white text-base"
                 />
               </View>
@@ -131,24 +131,24 @@ export const PhoneAuthForm: React.FC<PhoneAuthFormProps> = ({
           </Text>
           <View className="flex-row items-center">
             {/* Cambodian Country Code Pill */}
-            <View className="bg-slate-900 border border-slate-800 rounded-xl px-3 py-3.5 mr-2 flex-row items-center">
+            <View className="bg-card border border-line rounded-xl px-3 py-3.5 mr-2 flex-row items-center">
               <Text className="text-base mr-1">🇰🇭</Text>
               <Text className="text-white font-bold text-base mr-1">{countryCode}</Text>
             </View>
 
             {/* Phone Input */}
-            <View className="flex-1 bg-slate-900/90 border border-slate-800 rounded-xl px-4 py-3.5 flex-row items-center">
+            <View className="flex-1 bg-card border border-line rounded-xl px-4 py-3.5 flex-row items-center">
               <Ionicons
                 name="call-outline"
                 size={18}
-                color="#94a3b8"
+                color="#5D6A8C"
                 style={{ marginRight: 10 }}
               />
               <TextInput
                 value={phoneNumber}
                 onChangeText={setPhoneNumber}
                 placeholder="012 345 678"
-                placeholderTextColor="#64748b"
+                placeholderTextColor="#5D6A8C"
                 keyboardType="phone-pad"
                 className="flex-1 text-white text-base"
               />
@@ -160,9 +160,9 @@ export const PhoneAuthForm: React.FC<PhoneAuthFormProps> = ({
             onPress={handleFillDemoPhone}
             activeOpacity={0.7}
             className="mt-3 flex-row items-center">
-            <Ionicons name="flash-outline" size={13} color="#a78bfa" style={{ marginRight: 4 }} />
-            <Text className="text-violet-400 text-xs font-semibold">
-              Fill Cambodian Demo Phone (🇰🇭 +855 12 345 678)
+            <Ionicons name="flash-outline" size={13} color="#9282F4" style={{ marginRight: 4 }} />
+            <Text className="text-iris-300 text-xs font-semibold">
+              Fill demo phone (+855 12 345 678)
             </Text>
           </TouchableOpacity>
 
@@ -171,7 +171,7 @@ export const PhoneAuthForm: React.FC<PhoneAuthFormProps> = ({
             onPress={handleSendOtp}
             disabled={loading}
             activeOpacity={0.8}
-            className="bg-violet-600 active:bg-violet-500 rounded-xl py-4 items-center justify-center mt-5 shadow-lg shadow-violet-600/40">
+            className="bg-iris-500 rounded-xl py-4 items-center justify-center mt-5 active:scale-[0.98] transition-transform duration-150">
             {loading ? (
               <ActivityIndicator color="#fff" />
             ) : (
@@ -184,7 +184,7 @@ export const PhoneAuthForm: React.FC<PhoneAuthFormProps> = ({
       ) : (
         /* STEP 2: VERIFY OTP */
         <View>
-          <View className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 mb-4">
+          <View className="bg-card border border-line rounded-2xl p-4 mb-4">
             <View className="flex-row items-center justify-between">
               <View className="flex-row items-center">
                 <Ionicons
@@ -196,7 +196,7 @@ export const PhoneAuthForm: React.FC<PhoneAuthFormProps> = ({
                 <Text className="text-white font-bold text-sm">Code sent to {fullPhone}</Text>
               </View>
               <TouchableOpacity onPress={() => setStep('ENTER_PHONE')}>
-                <Text className="text-violet-400 text-xs font-semibold">Edit</Text>
+                <Text className="text-iris-300 text-xs font-semibold">Edit</Text>
               </TouchableOpacity>
             </View>
             <Text className="text-slate-400 text-xs mt-1">
@@ -226,18 +226,18 @@ export const PhoneAuthForm: React.FC<PhoneAuthFormProps> = ({
           <Text className="text-slate-300 text-xs font-semibold uppercase tracking-wider mb-2">
             6-Digit Verification Code *
           </Text>
-          <View className="bg-slate-900/90 border border-slate-800 rounded-xl px-4 py-3.5 flex-row items-center">
+          <View className="bg-card border border-line rounded-xl px-4 py-3.5 flex-row items-center">
             <Ionicons
               name="chatbox-ellipses-outline"
               size={18}
-              color="#94a3b8"
+              color="#5D6A8C"
               style={{ marginRight: 10 }}
             />
             <TextInput
               value={otpCode}
               onChangeText={setOtpCode}
               placeholder="123456"
-              placeholderTextColor="#64748b"
+              placeholderTextColor="#5D6A8C"
               keyboardType="number-pad"
               maxLength={6}
               className="flex-1 text-white text-xl font-bold tracking-widest"
@@ -250,7 +250,7 @@ export const PhoneAuthForm: React.FC<PhoneAuthFormProps> = ({
               onPress={handleSendOtp}>
               <Text
                 className={`text-xs font-semibold ${
-                  resendTimer > 0 ? 'text-slate-500' : 'text-violet-400'
+                  resendTimer > 0 ? 'text-dim' : 'text-iris-300'
                 }`}>
                 {resendTimer > 0
                   ? `Resend code in ${resendTimer}s`
