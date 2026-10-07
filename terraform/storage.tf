@@ -1,15 +1,48 @@
-# S3 Media Assets Bucket (Posters and Seatmaps)
-resource "aws_s3_bucket" "media" {
-  bucket = "${var.project_name}-media-assets-prod"
+# ==============================================================================
+# STORAGE & CDN MODULE: S3 Private Bucket + CloudFront OAC
+# Fulfills Rule S2 (Zero Public Access) & Rule R3 (High-Speed Edge Delivery)
+# ==============================================================================
+
+resource "random_id" "bucket_suffix" {
+  byte_length = 4
+}
+
+# ------------------------------------------------------------------------------
+# 1. Private S3 Bucket with KMS Encryption
+# ------------------------------------------------------------------------------
+resource "aws_s3_bucket" "assets" {
+  bucket        = "bassac-live-assets-prod-${random_id.bucket_suffix.hex}"
+  force_destroy = false
 
   tags = {
-    Name = "${var.project_name}-media-assets"
+    Name = "bassac-live-assets-prod"
   }
 }
 
-# Security Rule S2: Storage is NOT public
-resource "aws_s3_bucket_public_access_block" "media_block" {
-  bucket = aws_s3_bucket.media.id
+# Rule S3: Server-Side Encryption with Customer Managed Key
+resource "aws_s3_bucket_server_side_encryption_configuration" "assets_crypto" {
+  bucket = aws_s3_bucket.assets.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = aws_kms_key.bassac_cmk.arn
+      sse_algorithm     = "aws:kms"
+    }
+  }
+}
+
+# Enable versioning for accidental deletion recovery
+resource "aws_s3_bucket_versioning" "assets_versioning" {
+  bucket = aws_s3_bucket.assets.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+# Rule S2: Block ALL Public Access (All 4 flags strictly true)
+resource "aws_s3_bucket_public_access_block" "assets_block" {
+  bucket = aws_s3_bucket.assets.id
 
   block_public_acls       = true
   block_public_policy     = true
@@ -17,44 +50,36 @@ resource "aws_s3_bucket_public_access_block" "media_block" {
   restrict_public_buckets = true
 }
 
-# Security Rule S3: Encrypted with Customer Managed Key (CMK)
-resource "aws_s3_bucket_server_side_encryption_configuration" "media_encryption" {
-  bucket = aws_s3_bucket.media.id
-
-  rule {
-    apply_server_side_encryption_by_default {
-      kms_master_key_id = aws_kms_key.ct_cmk.arn
-      sse_algorithm     = "aws:kms"
-    }
-  }
-}
-
-# CloudFront Origin Access Control (OAC)
+# ------------------------------------------------------------------------------
+# 2. CloudFront Origin Access Control (OAC)
+# ------------------------------------------------------------------------------
 resource "aws_cloudfront_origin_access_control" "oac" {
-  name                              = "${var.project_name}-oac"
-  description                       = "OAC for CT Live Media Assets"
+  name                              = "bassac-s3-oac"
+  description                       = "OAC for Bassac Live concert posters and seat maps"
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"
   signing_protocol                  = "sigv4"
 }
 
-# CloudFront Distribution (Fast Poster and Seat Map Loading - R3)
-resource "aws_cloudfront_distribution" "media_cdn" {
+# ------------------------------------------------------------------------------
+# 3. CloudFront Distribution (Rule R3: Low Latency Edge Delivery)
+# ------------------------------------------------------------------------------
+resource "aws_cloudfront_distribution" "cdn" {
   enabled             = true
   is_ipv6_enabled     = true
-  comment             = "CT Live CDN for posters and seatmaps"
+  comment             = "Bassac Live Global CDN for media assets"
   default_root_object = "index.html"
 
   origin {
-    domain_name              = aws_s3_bucket.media.bucket_regional_domain_name
-    origin_id                = "S3-${aws_s3_bucket.media.id}"
+    domain_name              = aws_s3_bucket.assets.bucket_regional_domain_name
+    origin_id                = "S3-BassacLive-Origin"
     origin_access_control_id = aws_cloudfront_origin_access_control.oac.id
   }
 
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD", "OPTIONS"]
     cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "S3-${aws_s3_bucket.media.id}"
+    target_origin_id = "S3-BassacLive-Origin"
 
     forwarded_values {
       query_string = false
@@ -65,8 +90,9 @@ resource "aws_cloudfront_distribution" "media_cdn" {
 
     viewer_protocol_policy = "redirect-to-https"
     min_ttl                = 0
-    default_ttl            = 86400    # 24 hours caching
-    max_ttl                = 604800   # 7 days
+    default_ttl            = 86400
+    max_ttl                = 31536000
+    compress               = true
   }
 
   restrictions {
@@ -80,31 +106,51 @@ resource "aws_cloudfront_distribution" "media_cdn" {
   }
 
   tags = {
-    Name = "${var.project_name}-media-cdn"
+    Name = "bassac-live-cdn"
+    Rule = "R3-FastPostersAndSeatmaps"
   }
 }
 
-# S3 Bucket Policy (Restricting GetObject solely to CloudFront OAC)
-resource "aws_s3_bucket_policy" "media_oac_policy" {
-  bucket = aws_s3_bucket.media.id
+# ------------------------------------------------------------------------------
+# 4. S3 Bucket Policy (Restricts Read Access strictly to CloudFront OAC)
+# ------------------------------------------------------------------------------
+resource "aws_s3_bucket_policy" "oac_policy" {
+  bucket = aws_s3_bucket.assets.id
 
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Sid       = "AllowCloudFrontOACReadOnly"
-        Effect    = "Allow"
+        Sid    = "AllowCloudFrontOACReadOnly"
+        Effect = "Allow"
         Principal = {
           Service = "cloudfront.amazonaws.com"
         }
         Action   = "s3:GetObject"
-        Resource = "${aws_s3_bucket.media.arn}/*"
+        Resource = "${aws_s3_bucket.assets.arn}/*"
         Condition = {
           StringEquals = {
-            "AWS:SourceArn" = aws_cloudfront_distribution.media_cdn.arn
+            "AWS:SourceArn" = aws_cloudfront_distribution.cdn.arn
+          }
+        }
+      },
+      {
+        Sid       = "DenyUnencryptedInTransit"
+        Effect    = "Deny"
+        Principal = "*"
+        Action    = "s3:*"
+        Resource = [
+          aws_s3_bucket.assets.arn,
+          "${aws_s3_bucket.assets.arn}/*"
+        ]
+        Condition = {
+          Bool = {
+            "aws:SecureTransport" = "false"
           }
         }
       }
     ]
   })
+
+  depends_on = [aws_s3_bucket_public_access_block.assets_block]
 }

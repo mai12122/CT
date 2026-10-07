@@ -42,6 +42,24 @@ yarn-error.*
 /ios
 /android
 
+# Terraform
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.*
+terraform/*.tfvars
+terraform/crash.log
+terraform/.terraform.lock.hcl
+
+# Environment files
+.env
+
+# Python & Test Cache
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Agents
+.agents/
 # local binaries
 bin/
 *.exe
