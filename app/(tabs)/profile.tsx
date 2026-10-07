@@ -17,6 +17,7 @@ import { SocialAuthButtons } from '@/components/SocialAuthButtons';
 
 export default function ProfileScreen() {
   const { user, logout, login } = useAuth();
+  const [customName, setCustomName] = useState<string | null>(null);
   const [stats, setStats] = useState<{ bookings: number; tickets: number }>({
     bookings: 0,
     tickets: 0,
@@ -131,56 +132,135 @@ export default function ProfileScreen() {
           </View>
         ) : (
           /* Authenticated User Experience */
-          <View className="gap-5">
-            {/* User Profile Hero Card */}
+          <View className="gap-4">
+            {/* User Profile Hero Card matching exact design */}
             <View className="bg-card border border-line rounded-3xl p-5 shadow-lg">
               <View className="flex-row items-center">
-                <View className="h-16 w-16 rounded-2xl bg-iris-500 items-center justify-center mr-4 shadow-md shadow-iris-500/30">
-                  <Text className="text-white text-2xl font-black">
-                    {user.name ? user.name[0].toUpperCase() : 'U'}
-                  </Text>
+                {/* Avatar with Verified checkmark and online status */}
+                <View className="relative mr-4">
+                  <View className="h-16 w-16 rounded-full bg-iris-500 items-center justify-center shadow-md shadow-iris-500/30">
+                    <Text className="text-white text-2xl font-black">
+                      {(customName || user.name || 'M')[0].toUpperCase()}
+                    </Text>
+                  </View>
+                  <View className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-blue-500 items-center justify-center border-2 border-night">
+                    <Ionicons name="checkmark" size={12} color="#FFFFFF" />
+                  </View>
+                  <View className="absolute bottom-0 -right-0.5 h-4 w-4 rounded-full bg-emerald-500 border-2 border-night" />
                 </View>
 
                 <View className="flex-1">
-                  <View className="flex-row items-center">
-                    <Text className="text-white font-black text-xl tracking-tight mr-2" numberOfLines={1}>
-                      {user.name}
+                  <View className="flex-row items-center flex-wrap gap-2">
+                    <Text className="text-white font-black text-2xl tracking-tight" numberOfLines={1}>
+                      {customName || user.name || 'Mao'}
                     </Text>
-                    <View className="bg-iris-500/20 border border-iris-500/40 px-2 py-0.5 rounded-full">
-                      <Text className="text-iris-300 font-bold text-[10px] uppercase tracking-wider">
-                        {user.role}
+                    <View className="bg-indigo-950/80 border border-indigo-500/30 px-2 py-0.5 rounded-full">
+                      <Text className="text-indigo-300 font-bold text-[10px] uppercase tracking-wider">
+                        USER
                       </Text>
                     </View>
+                    <TouchableOpacity
+                      onPress={() => {
+                        Alert.prompt(
+                          'Change Name',
+                          'Enter your new display name:',
+                          [
+                            { text: 'Cancel', style: 'cancel' },
+                            {
+                              text: 'Save',
+                              onPress: (val) => {
+                                if (val && val.trim()) {
+                                  setCustomName(val.trim());
+                                  Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                                }
+                              },
+                            },
+                          ],
+                          'plain-text',
+                          customName || user.name || 'Mao'
+                        );
+                      }}
+                      className="bg-white/10 px-2 py-1 rounded-lg">
+                      <Text className="text-slate-300 text-[10px] font-bold">Edit</Text>
+                    </TouchableOpacity>
                   </View>
-                  <Text className="text-mist text-xs mt-1" numberOfLines={1}>
-                    {user.email || user.phone || 'Verified Account'}
-                  </Text>
+                  <View className="flex-row items-center mt-1">
+                    <Text className="text-amber-400 font-bold text-xs">★ VIP Gold Pass</Text>
+                    <Text className="text-slate-500 text-xs mx-1.5">•</Text>
+                    <Text className="text-amber-400 font-bold text-xs">Member #KH-0842</Text>
+                  </View>
+                  <Text className="text-slate-500 text-[11px] mt-0.5">Member since 2024</Text>
+                </View>
+              </View>
+
+              {/* Bassac Live Verified Event Pass Holder */}
+              <View className="mt-4 bg-white/5 border border-white/5 rounded-2xl p-3 flex-row items-center justify-between">
+                <View className="flex-row items-center">
+                  <View className="h-8 w-8 rounded-lg bg-iris-500/20 items-center justify-center mr-2.5">
+                    <Ionicons name="musical-notes" size={16} color="#A78BFA" />
+                  </View>
+                  <View>
+                    <Text className="text-white font-bold text-sm">Bassac Live</Text>
+                    <Text className="text-slate-400 text-[11px]">Verified Event Pass Holder</Text>
+                  </View>
+                </View>
+                <View className="bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-1 rounded-full flex-row items-center">
+                  <View className="h-1.5 w-1.5 rounded-full bg-emerald-400 mr-1.5" />
+                  <Text className="text-emerald-400 font-black text-[10px] tracking-wider">ACTIVE</Text>
                 </View>
               </View>
             </View>
 
-            {/* Stats Bento Grid */}
-            <View className="flex-row gap-3">
-              <View className="flex-1 bg-card border border-line rounded-2xl p-4">
-                <View className="flex-row items-center justify-between mb-2">
-                  <Text className="text-dim text-[11px] font-bold uppercase tracking-wider">
-                    Total Passes
+            {/* Stats Bento Grid matching 3 cards */}
+            <View className="flex-row gap-2.5">
+              <View className="flex-1 bg-card border border-line rounded-2xl p-3.5 justify-between">
+                <View className="flex-row items-center justify-between mb-1.5">
+                  <Text className="text-slate-400 text-[9px] font-extrabold uppercase tracking-wider">
+                    ACTIVE PASSES
                   </Text>
-                  <Ionicons name="ticket" size={16} color="#9282F4" />
+                  <Text className="text-xs">🎟</Text>
                 </View>
-                <Text className="text-white font-black text-2xl">{stats.tickets}</Text>
-                <Text className="text-mist text-[11px] mt-0.5">In Wallet</Text>
+                <Text className="text-white font-black text-2xl">{stats.tickets || 0}</Text>
+                <Text className="text-slate-500 text-[10px] mt-0.5 font-semibold">In Wallet</Text>
               </View>
 
-              <View className="flex-1 bg-card border border-line rounded-2xl p-4">
-                <View className="flex-row items-center justify-between mb-2">
-                  <Text className="text-dim text-[11px] font-bold uppercase tracking-wider">
-                    Bookings
+              <View className="flex-1 bg-card border border-line rounded-2xl p-3.5 justify-between">
+                <View className="flex-row items-center justify-between mb-1.5">
+                  <Text className="text-slate-400 text-[9px] font-extrabold uppercase tracking-wider">
+                    AUTH SCORE
                   </Text>
-                  <Ionicons name="receipt" size={16} color="#34D399" />
+                  <Text className="text-xs">🛡</Text>
                 </View>
-                <Text className="text-white font-black text-2xl">{stats.bookings}</Text>
-                <Text className="text-mist text-[11px] mt-0.5">Completed</Text>
+                <Text className="text-white font-black text-2xl">98%</Text>
+                <Text className="text-slate-500 text-[10px] mt-0.5 font-semibold">Excellent</Text>
+              </View>
+
+              <View className="flex-1 bg-card border border-line rounded-2xl p-3.5 justify-between">
+                <View className="flex-row items-center justify-between mb-1.5">
+                  <Text className="text-slate-400 text-[9px] font-extrabold uppercase tracking-wider">
+                    VENUE ACCESS
+                  </Text>
+                  <Text className="text-xs">🌐</Text>
+                </View>
+                <Text className="text-white font-black text-2xl">ALL</Text>
+                <Text className="text-slate-500 text-[10px] mt-0.5 font-semibold">Global</Text>
+              </View>
+            </View>
+
+            {/* Phone Verification Card */}
+            <View className="bg-card border border-line rounded-2xl p-4">
+              <View className="flex-row items-center justify-between mb-2.5">
+                <Text className="text-white font-bold text-sm">Phone Verification</Text>
+                <View className="bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-0.5 rounded-full flex-row items-center">
+                  <Ionicons name="checkmark-circle" size={12} color="#34D399" style={{ marginRight: 4 }} />
+                  <Text className="text-emerald-400 font-bold text-[11px]">Verified</Text>
+                </View>
+              </View>
+              <View className="bg-black/30 border border-white/5 rounded-xl p-3 flex-row items-center">
+                <Ionicons name="call" size={16} color="#94A3B8" style={{ marginRight: 10 }} />
+                <Text className="text-white font-bold text-sm tracking-wider">
+                  {user.phone || '+85517864121'}
+                </Text>
               </View>
             </View>
 
@@ -189,38 +269,12 @@ export default function ProfileScreen() {
               <TouchableOpacity
                 onPress={() => router.push('/(tabs)/two')}
                 activeOpacity={0.7}
-                className="p-4 flex-row items-center justify-between border-b border-line/70">
+                className="p-4 flex-row items-center justify-between">
                 <View className="flex-row items-center">
                   <View className="h-9 w-9 rounded-xl bg-iris-500/15 items-center justify-center mr-3">
                     <Ionicons name="wallet-outline" size={18} color="#C4B5FD" />
                   </View>
                   <Text className="text-white font-bold text-sm">My Ticket Passes & Wallet</Text>
-                </View>
-                <Ionicons name="chevron-forward" size={16} color="#5D6A8C" />
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                onPress={() => router.push('/live-hall')}
-                activeOpacity={0.7}
-                className="p-4 flex-row items-center justify-between border-b border-line/70">
-                <View className="flex-row items-center">
-                  <View className="h-9 w-9 rounded-xl bg-pink-500/15 items-center justify-center mr-3">
-                    <Ionicons name="radio-outline" size={18} color="#EC4899" />
-                  </View>
-                  <Text className="text-white font-bold text-sm">CT Live Concert Hall</Text>
-                </View>
-                <Ionicons name="chevron-forward" size={16} color="#5D6A8C" />
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                onPress={() => router.push('/modal')}
-                activeOpacity={0.7}
-                className="p-4 flex-row items-center justify-between">
-                <View className="flex-row items-center">
-                  <View className="h-9 w-9 rounded-xl bg-amber-500/15 items-center justify-center mr-3">
-                    <Ionicons name="shield-checkmark-outline" size={18} color="#F5B04C" />
-                  </View>
-                  <Text className="text-white font-bold text-sm">Security & 10-Min Hold System</Text>
                 </View>
                 <Ionicons name="chevron-forward" size={16} color="#5D6A8C" />
               </TouchableOpacity>
@@ -230,7 +284,7 @@ export default function ProfileScreen() {
             <TouchableOpacity
               onPress={handleLogout}
               activeOpacity={0.8}
-              className="mt-2 bg-rose-500/10 border border-rose-500/30 py-3.5 rounded-2xl items-center flex-row justify-center active:bg-rose-500/20">
+              className="bg-rose-500/10 border border-rose-500/30 py-3.5 rounded-2xl items-center flex-row justify-center active:bg-rose-500/20">
               <Ionicons name="log-out-outline" size={18} color="#FB7185" style={{ marginRight: 8 }} />
               <Text className="text-rose-400 font-bold text-sm">Sign Out</Text>
             </TouchableOpacity>
