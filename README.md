@@ -79,6 +79,18 @@ You can use the seeded test user to test ticket booking immediately:
 
 ---
 
+## Ticket QR Entry Codes
+
+Ticket QR codes are issued by the authenticated ticket API and expire after five minutes. Configure a strong `QR_SECRET` in the backend `.env`; use the same secret on every backend instance and never commit it. For local development, generate one with:
+
+```bash
+node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"
+```
+
+Gate scanners should submit the decoded QR JSON to `POST /api/v1/tickets/scan` with an admin bearer token and `{ "qrPayload": "<decoded QR JSON>" }`. The API rejects invalid, expired, cancelled, unpaid, or previously redeemed passes and marks a valid pass as used.
+
+---
+
 ## ❓ Troubleshooting
 
 ### Port 5000 is already in use (`EADDRINUSE: 5000`):
@@ -114,4 +126,3 @@ Because `npm start` automatically starts the backend server, make sure you don't
 | **Launch Template** | **Standard Setup Blueprint** | The exact checklist/spec used whenever launching a new EC2 instance. |
 | **UserData Script** | **Morning Automated Checklist** | Boot script that clones `mai12122/CT`, sets env vars, runs `prisma db push`, and starts PM2. |
 | **Auto Scaling Group** | **On-Call Staff Manager** | Opens extra EC2 servers when lines get long (Sale Rush) and closes them when traffic cools. |
-

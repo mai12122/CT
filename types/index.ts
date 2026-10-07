@@ -63,7 +63,6 @@ export interface Ticket {
   seat?: string;
   price: number;
   status: 'VALID' | 'USED' | 'CANCELLED';
-  qrPayload: string;
   usedAt?: string;
   createdAt: string;
   bookingRef: string;

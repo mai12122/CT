@@ -35,4 +35,35 @@ export class TicketController {
       next(error);
     }
   }
+
+  static async getTicketQr(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+    try {
+      if (!req.user) throw new AppError('Unauthorized', 401);
+      const { id } = req.params;
+
+      const qr = await BookingService.getTicketQrPayload(id, req.user.userId);
+
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+      res.setHeader('Pragma', 'no-cache');
+      res.status(200).json({
+        success: true,
+        data: qr,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async scanTicketQr(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+    try {
+      const result = await BookingService.redeemTicketQrPayload(req.body.qrPayload);
+
+      res.status(200).json({
+        success: true,
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }

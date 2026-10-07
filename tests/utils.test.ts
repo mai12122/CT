@@ -2,8 +2,42 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { AppError } from "../server/utils/AppError";
 import { signAccessToken, verifyAccessToken } from "../server/utils/jwt";
+import {
+  generateTicketQRPayload,
+  TICKET_QR_TTL_MS,
+  verifyTicketQRPayload,
+} from "../server/utils/qr";
 
 describe("Unit Tests: Server Utilities", () => {
+  it("issues distinct ticket QR payloads that expire after five minutes", () => {
+    const ticket = {
+      id: "ticket-id",
+      ticketNumber: "TKT-GOLD-123",
+      bookingRef: "BK-123",
+      concertId: "concert-id",
+      concertTitle: "Live Concert",
+      categoryName: "Gold",
+      seat: "A-1",
+      userId: "user-id",
+    };
+    const issuedAt = new Date("2026-10-08T00:00:00.000Z");
+    const firstPayload = JSON.parse(generateTicketQRPayload(ticket, issuedAt));
+    const secondPayload = JSON.parse(generateTicketQRPayload(ticket, issuedAt));
+
+    assert.equal(Date.parse(firstPayload.expiresAt) - Date.parse(firstPayload.issuedAt), TICKET_QR_TTL_MS);
+    assert.notEqual(firstPayload.nonce, secondPayload.nonce);
+    assert.notEqual(firstPayload.signature, secondPayload.signature);
+    assert.equal(firstPayload.ticketId, ticket.id);
+    assert.equal(verifyTicketQRPayload(JSON.stringify(firstPayload), issuedAt)?.ticketId, ticket.id);
+    assert.equal(
+      verifyTicketQRPayload(JSON.stringify(firstPayload), new Date(issuedAt.getTime() + TICKET_QR_TTL_MS)),
+      null
+    );
+
+    firstPayload.ticketNumber = "TKT-FAKE";
+    assert.equal(verifyTicketQRPayload(JSON.stringify(firstPayload), issuedAt), null);
+  });
+
   it("AppError creates operational error with correct status codes", () => {
     const error404 = new AppError("Resource not found", 404);
     assert.equal(error404.message, "Resource not found");

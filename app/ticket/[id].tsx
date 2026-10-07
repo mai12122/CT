@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
+  AppState,
   Share,
   Alert,
   StatusBar,
@@ -22,6 +23,26 @@ export default function TicketDetailScreen() {
   const insets = useSafeAreaInsets();
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [loading, setLoading] = useState(true);
+  const [qr, setQr] = useState<{ payload: string; expiresAt: string } | null>(null);
+  const [qrLoading, setQrLoading] = useState(true);
+  const [qrError, setQrError] = useState<string | null>(null);
+  const [now, setNow] = useState(0);
+
+  const loadQr = useCallback(async () => {
+    if (!id) return;
+    setQrLoading(true);
+    try {
+      const data = await api.getTicketQr(id as string);
+      setQr(data);
+      setNow(Date.now());
+      setQrError(null);
+    } catch (err) {
+      setQr(null);
+      setQrError(err instanceof Error ? err.message : 'Could not refresh the entry code.');
+    } finally {
+      setQrLoading(false);
+    }
+  }, [id]);
 
   useEffect(() => {
     if (!id) return;
@@ -46,6 +67,35 @@ export default function TicketDetailScreen() {
       active = false;
     };
   }, [id]);
+
+  useEffect(() => {
+    const initialLoad = setTimeout(loadQr, 0);
+    return () => clearTimeout(initialLoad);
+  }, [loadQr]);
+
+  useEffect(() => {
+    if (!qr) return;
+    const expiresAt = Date.parse(qr.expiresAt);
+    const countdown = setInterval(() => setNow(Date.now()), 1000);
+    const refresh = setTimeout(loadQr, Math.max(0, expiresAt - Date.now()));
+    return () => {
+      clearInterval(countdown);
+      clearTimeout(refresh);
+    };
+  }, [qr, loadQr]);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state !== 'active') return;
+      const currentTime = Date.now();
+      setNow(currentTime);
+      if (!qr || Date.parse(qr.expiresAt) <= currentTime) {
+        loadQr();
+      }
+    });
+
+    return () => subscription.remove();
+  }, [qr, loadQr]);
 
   const handleShare = async () => {
     if (!ticket) return;
@@ -89,6 +139,8 @@ export default function TicketDetailScreen() {
   });
 
   const accentColor = ticket.category?.color || '#6C5CE7';
+  const qrSecondsRemaining = qr ? Math.max(0, Math.ceil((Date.parse(qr.expiresAt) - now) / 1000)) : 0;
+  const qrRotationCode = qr ? JSON.parse(qr.payload).nonce.slice(0, 6).toUpperCase() : '';
 
   return (
     <View className="flex-1 bg-night">
@@ -191,21 +243,50 @@ export default function TicketDetailScreen() {
             </View>
 
             {/* Large Scannable QR Code */}
-            <View className="p-4 bg-white rounded-3xl items-center shadow-xl my-2">
-              <QRCode
-                value={ticket.qrPayload || ticket.ticketNumber || ticket.id || 'VALID-TICKET'}
-                size={180}
-                color="#0B1020"
-                backgroundColor="#ffffff"
-              />
-            </View>
+            {qr && qrSecondsRemaining > 0 ? (
+              <>
+                <View className="p-4 bg-white rounded-3xl items-center shadow-xl my-2">
+                  <QRCode
+                    key={qr.payload}
+                    value={qr.payload}
+                    size={180}
+                    color="#0B1020"
+                    backgroundColor="#ffffff"
+                  />
+                </View>
+                <Text className="text-emerald-300 text-[11px] font-semibold mt-1">
+                  Refreshes in {Math.floor(qrSecondsRemaining / 60)}:
+                  {String(qrSecondsRemaining % 60).padStart(2, '0')}
+                </Text>
+                <Text className="text-mist text-[10px] font-mono mt-1">
+                  Code {qrRotationCode}
+                </Text>
+              </>
+            ) : (
+              <View className="h-[212px] w-[212px] bg-card border border-line rounded-3xl items-center justify-center my-2 px-5">
+                {qrLoading ? (
+                  <ActivityIndicator color="#9282F4" />
+                ) : (
+                  <>
+                    <Text className="text-white font-bold text-center">
+                      {qrError || 'Refreshing secure entry code…'}
+                    </Text>
+                    {qrError ? (
+                      <TouchableOpacity onPress={loadQr} className="mt-3 px-4 py-2 bg-iris-500 rounded-xl">
+                        <Text className="text-white font-bold text-xs">Try again</Text>
+                      </TouchableOpacity>
+                    ) : null}
+                  </>
+                )}
+              </View>
+            )}
 
             <Text className="text-iris-300 font-mono font-bold text-xs mt-3 tracking-widest uppercase">
               {ticket.ticketNumber}
             </Text>
 
             <Text className="text-mist text-[11px] text-center mt-2 max-w-[240px] leading-4">
-              Present this encrypted QR code at the turnstile gate for automated contactless admission.
+              This entry code changes every five minutes. Screenshots expire when the code refreshes.
             </Text>
           </View>
         </View>

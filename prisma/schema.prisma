@@ -170,7 +170,7 @@ model Ticket {
   categoryId   String
   seat         String?
   price        Float
-  qrPayload    String       @db.Text
+  qrPayload    String       @db.Text // Legacy field; live QR payloads are issued on demand.
   status       TicketStatus @default(VALID)
   usedAt       DateTime?
   createdAt    DateTime     @default(now())

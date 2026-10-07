@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import { prisma } from '../config/prisma';
 import { AppError } from '../utils/AppError';
-import { generateTicketQRPayload } from '../utils/qr';
+import { generateTicketQRPayload, TICKET_QR_TTL_MS, verifyTicketQRPayload } from '../utils/qr';
 import { logger } from '../utils/logger';
 
 interface ConfirmBookingInput {
@@ -99,17 +99,6 @@ export class BookingService {
         const ticketNumber = `TKT-${category.name.toUpperCase().substring(0, 4)}-${crypto.randomBytes(3).toString('hex').toUpperCase()}`;
         const tempId = crypto.randomUUID();
 
-        const qrPayload = generateTicketQRPayload({
-          id: tempId,
-          ticketNumber,
-          bookingRef,
-          concertId: concert.id,
-          concertTitle: concert.title,
-          categoryName: category.name,
-          seat,
-          userId,
-        });
-
         ticketRecords.push({
           id: tempId,
           ticketNumber,
@@ -118,7 +107,7 @@ export class BookingService {
           categoryId: category.id,
           seat,
           price: category.price,
-          qrPayload,
+          qrPayload: '',
           status: 'VALID' as const,
         });
       }
@@ -213,7 +202,6 @@ export class BookingService {
       seat: t.seat,
       price: t.price,
       status: t.status,
-      qrPayload: t.qrPayload,
       bookingRef: t.booking.bookingRef,
       createdAt: t.createdAt,
       user: t.user,
@@ -259,7 +247,6 @@ export class BookingService {
       seat: ticket.seat,
       price: ticket.price,
       status: ticket.status,
-      qrPayload: ticket.qrPayload,
       usedAt: ticket.usedAt,
       createdAt: ticket.createdAt,
       bookingRef: ticket.booking.bookingRef,
@@ -271,6 +258,111 @@ export class BookingService {
         description: ticket.category.description,
       },
       concert: ticket.booking.concert,
+    };
+  }
+
+  /**
+   * Issue a short-lived QR payload only when the authenticated owner requests it.
+   */
+  static async getTicketQrPayload(ticketId: string, userId: string) {
+    const ticket = await prisma.ticket.findUnique({
+      where: { id: ticketId },
+      include: {
+        category: true,
+        booking: {
+          include: {
+            concert: true,
+          },
+        },
+      },
+    });
+
+    if (!ticket) {
+      throw new AppError('Ticket not found', 404);
+    }
+
+    if (ticket.userId !== userId) {
+      throw new AppError('Unauthorized access to ticket', 403);
+    }
+
+    if (ticket.status !== 'VALID' || ticket.booking.status !== 'CONFIRMED' || ticket.booking.paymentStatus !== 'PAID') {
+      throw new AppError('This ticket is not eligible for entry', 409);
+    }
+
+    const now = new Date();
+    return {
+      payload: generateTicketQRPayload({
+        id: ticket.id,
+        ticketNumber: ticket.ticketNumber,
+        bookingRef: ticket.booking.bookingRef,
+        concertId: ticket.booking.concertId,
+        concertTitle: ticket.booking.concert.title,
+        categoryName: ticket.category.name,
+        seat: ticket.seat,
+        userId: ticket.userId,
+      }, now),
+      expiresAt: new Date(now.getTime() + TICKET_QR_TTL_MS).toISOString(),
+    };
+  }
+
+  /**
+   * Verify and atomically redeem a live QR code so it cannot be reused.
+   */
+  static async redeemTicketQrPayload(value: string) {
+    const payload = verifyTicketQRPayload(value);
+    if (!payload) {
+      throw new AppError('QR code is invalid or expired', 400);
+    }
+
+    const ticket = await prisma.ticket.findUnique({
+      where: { id: payload.ticketId },
+      include: {
+        category: true,
+        booking: { include: { concert: true } },
+        user: { select: { name: true } },
+      },
+    });
+
+    if (
+      !ticket ||
+      ticket.userId !== payload.holderId ||
+      ticket.ticketNumber !== payload.ticketNumber ||
+      ticket.booking.bookingRef !== payload.bookingRef ||
+      ticket.booking.concertId !== payload.concertId ||
+      ticket.category.name !== payload.category ||
+      ticket.seat !== payload.seat ||
+      ticket.status !== 'VALID' ||
+      ticket.booking.status !== 'CONFIRMED' ||
+      ticket.booking.paymentStatus !== 'PAID'
+    ) {
+      throw new AppError('Ticket is invalid or not eligible for entry', 409);
+    }
+
+    const usedAt = new Date();
+    const redeemed = await prisma.ticket.updateMany({
+      where: {
+        id: ticket.id,
+        userId: payload.holderId,
+        status: 'VALID',
+        usedAt: null,
+      },
+      data: {
+        status: 'USED',
+        usedAt,
+      },
+    });
+
+    if (redeemed.count !== 1) {
+      throw new AppError('Ticket has already been used or cancelled', 409);
+    }
+
+    return {
+      ticketNumber: ticket.ticketNumber,
+      bookingRef: ticket.booking.bookingRef,
+      ticketHolder: ticket.user.name,
+      concertTitle: ticket.booking.concert.title,
+      seat: ticket.seat,
+      usedAt: usedAt.toISOString(),
     };
   }
 }
