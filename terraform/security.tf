@@ -1,13 +1,13 @@
 # ==============================================================================
 # SECURITY GROUPS MODULE: 3-Tier Chained Firewalls
-# Flow: Internet (80/443) -> ALB SG -> App SG (8000) -> DB SG (5432 - Rule S4)
+# Flow: Internet (80/443) -> ALB SG -> App SG (3000) -> DB SG (5432 - Rule S4)
 # ==============================================================================
 
 # ------------------------------------------------------------------------------
 # 1. Application Load Balancer Security Group
 # ------------------------------------------------------------------------------
 resource "aws_security_group" "alb" {
-  name        = "bassac-alb-sg"
+  name        = "ct-alb-sg"
   description = "Public ingress for ALB over HTTP and HTTPS"
   vpc_id      = aws_vpc.main.id
 
@@ -36,7 +36,7 @@ resource "aws_security_group" "alb" {
   }
 
   tags = {
-    Name = "bassac-alb-sg"
+    Name = "ct-alb-sg"
   }
 }
 
@@ -44,14 +44,14 @@ resource "aws_security_group" "alb" {
 # 2. Application Tier Security Group
 # ------------------------------------------------------------------------------
 resource "aws_security_group" "app" {
-  name        = "bassac-app-sg"
-  description = "Allows ingress on port 8000 exclusively from ALB Security Group"
+  name        = "ct-app-sg"
+  description = "Allows ingress on port 3000 exclusively from ALB Security Group"
   vpc_id      = aws_vpc.main.id
 
   ingress {
-    description     = "Allow port 8000 only from ALB security group"
-    from_port       = 8000
-    to_port         = 8000
+    description     = "Allow port 3000 only from ALB security group"
+    from_port       = 3000
+    to_port         = 3000
     protocol        = "tcp"
     security_groups = [aws_security_group.alb.id]
   }
@@ -65,7 +65,7 @@ resource "aws_security_group" "app" {
   }
 
   tags = {
-    Name = "bassac-app-sg"
+    Name = "ct-app-sg"
   }
 }
 
@@ -73,7 +73,7 @@ resource "aws_security_group" "app" {
 # 3. Database Tier Security Group (Rule S4: DB accepts traffic strictly from App)
 # ------------------------------------------------------------------------------
 resource "aws_security_group" "db" {
-  name        = "bassac-db-sg"
+  name        = "ct-db-sg"
   description = "Enforces Rule S4: PostgreSQL access strictly from App SG"
   vpc_id      = aws_vpc.main.id
 
@@ -94,7 +94,7 @@ resource "aws_security_group" "db" {
   }
 
   tags = {
-    Name = "bassac-db-sg"
+    Name = "ct-db-sg"
     Rule = "S4-OnlyAppConnectsToDatabase"
   }
 }

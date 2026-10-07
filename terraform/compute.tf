@@ -7,7 +7,7 @@
 # 1. Application Load Balancer & Target Group
 # ------------------------------------------------------------------------------
 resource "aws_lb" "alb" {
-  name               = "bassac-live-alb"
+  name               = "ct-live-alb"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb.id]
@@ -16,13 +16,13 @@ resource "aws_lb" "alb" {
   enable_deletion_protection = true
 
   tags = {
-    Name = "bassac-live-alb"
+    Name = "ct-live-alb"
   }
 }
 
 resource "aws_lb_target_group" "tg" {
-  name     = "bassac-live-tg"
-  port     = 8000
+  name     = "ct-live-tg"
+  port     = 3000
   protocol = "HTTP"
   vpc_id   = aws_vpc.main.id
 
@@ -41,7 +41,7 @@ resource "aws_lb_target_group" "tg" {
   }
 
   tags = {
-    Name = "bassac-live-tg"
+    Name = "ct-live-tg"
   }
 }
 
@@ -105,7 +105,7 @@ data "aws_ami" "amazon_linux_2023" {
 }
 
 resource "aws_launch_template" "app_lt" {
-  name_prefix   = "bassac-app-lt-"
+  name_prefix   = "ct-app-lt-"
   image_id      = data.aws_ami.amazon_linux_2023.id
   instance_type = "t3.micro"
 
@@ -132,30 +132,42 @@ resource "aws_launch_template" "app_lt" {
     }
   }
 
+  # Boot script: installs Node, pulls the CT app from GitHub, writes .env
+  # (RDS endpoint + secrets), and starts the API on port 3000 with PM2.
+  # NOTE: Terraform fills in the ${var...} / ${aws_...} values before boot.
   user_data = base64encode(<<-EOF
     #!/bin/bash
-    cat << 'PYEOF' > /opt/server.py
-    from http.server import HTTPServer, BaseHTTPRequestHandler
-    import json
+    set -x
 
-    class Handler(BaseHTTPRequestHandler):
-        def do_GET(self):
-            self.send_response(200)
-            self.send_header('Content-Type', 'application/json')
-            self.end_headers()
-            if self.path == '/api/v1/health':
-                response = {"status": "HEALTHY"}
-            else:
-                response = {"message": "Bassac Live Ticketing Engine Active", "status": "HEALTHY"}
-            self.wfile.write(json.dumps(response).encode('utf-8'))
+    # 2 GB swap so npm install does not run out of memory on a 1 GB instance
+    fallocate -l 2G /swapfile
+    chmod 600 /swapfile
+    mkswap /swapfile
+    swapon /swapfile
 
-        def log_message(self, format, *args):
-            return
+    dnf install -y git nodejs20 nodejs20-npm
+    npm install -g pm2
+    export PATH="$PATH:$(npm prefix -g)/bin"
 
-    httpd = HTTPServer(('0.0.0.0', 8000), Handler)
-    httpd.serve_forever()
-    PYEOF
-    python3 /opt/server.py &
+    cd /home/ec2-user
+    git clone https://github.com/mai12122/CT.git
+    cd CT
+
+    cat > .env << 'ENVFILE'
+    PORT=3000
+    NODE_ENV=production
+    DATABASE_URL="postgresql://${var.db_username}:${var.db_password}@${aws_db_instance.postgres.address}:5432/${aws_db_instance.postgres.db_name}?schema=public&sslmode=require"
+    JWT_ACCESS_SECRET=${var.jwt_access_secret}
+    JWT_REFRESH_SECRET=${var.jwt_refresh_secret}
+    JWT_ACCESS_EXPIRES_IN=15m
+    JWT_REFRESH_EXPIRES_IN=7d
+    RESERVATION_EXPIRY_MINUTES=10
+    CORS_ORIGIN=*
+    ENVFILE
+
+    chown -R ec2-user:ec2-user /home/ec2-user/CT
+
+    sudo -u ec2-user -H env "PATH=$PATH" bash -c 'cd /home/ec2-user/CT && npm install --legacy-peer-deps && npx prisma generate && pm2 start ecosystem.config.js'
   EOF
   )
 
@@ -164,7 +176,7 @@ resource "aws_launch_template" "app_lt" {
   }
 
   tags = {
-    Name = "bassac-app-lt"
+    Name = "ct-app-lt"
   }
 }
 
@@ -172,7 +184,7 @@ resource "aws_launch_template" "app_lt" {
 # 3. Auto Scaling Group (Dual-AZ Compute Fleet)
 # ------------------------------------------------------------------------------
 resource "aws_autoscaling_group" "asg" {
-  name_prefix         = "bassac-live-asg-"
+  name_prefix         = "ct-live-asg-"
   vpc_zone_identifier = [aws_subnet.app_1a.id, aws_subnet.app_1b.id]
 
   min_size         = 2
@@ -186,12 +198,14 @@ resource "aws_autoscaling_group" "asg" {
     version = "$Latest"
   }
 
+  # Grace period raised: npm install + prisma generate takes several minutes
+  # on a t3.micro. Too short and the ASG kills instances before the app is up.
   health_check_type         = "ELB"
-  health_check_grace_period = 120
+  health_check_grace_period = 900
 
   tag {
     key                 = "Name"
-    value               = "bassac-app-node"
+    value               = "ct-app-node"
     propagate_at_launch = true
   }
 
@@ -204,7 +218,7 @@ resource "aws_autoscaling_group" "asg" {
 # 4. Dynamic Target Tracking Scaling Policy
 # ------------------------------------------------------------------------------
 resource "aws_autoscaling_policy" "target_tracking" {
-  name                   = "bassac-target-tracking-400req"
+  name                   = "ct-target-tracking-400req"
   autoscaling_group_name = aws_autoscaling_group.asg.name
   policy_type            = "TargetTrackingScaling"
 

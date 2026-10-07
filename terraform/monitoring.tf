@@ -7,11 +7,11 @@
 # 1. Urgent SNS Topic
 # ------------------------------------------------------------------------------
 resource "aws_sns_topic" "urgent_alerts" {
-  name              = "bassac-live-urgent-alerts"
+  name              = "ct-live-urgent-alerts"
   kms_master_key_id = aws_kms_key.bassac_cmk.id
 
   tags = {
-    Name = "bassac-live-urgent-alerts"
+    Name = "ct-live-urgent-alerts"
   }
 }
 

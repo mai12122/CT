@@ -4,17 +4,17 @@
 # ==============================================================================
 
 resource "aws_db_subnet_group" "db_subnets" {
-  name        = "bassac-live-db-subnet-group"
+  name        = "ct-live-db-subnet-group"
   description = "Isolated database subnets spanning AZ-a and AZ-b"
   subnet_ids  = [aws_subnet.db_1a.id, aws_subnet.db_1b.id]
 
   tags = {
-    Name = "bassac-live-db-subnet-group"
+    Name = "ct-live-db-subnet-group"
   }
 }
 
 resource "aws_db_instance" "postgres" {
-  identifier            = "bassac-live-db"
+  identifier            = "ct-live-db"
   engine                = "postgres"
   engine_version        = "16"
   instance_class        = "db.t4g.micro"
@@ -43,12 +43,12 @@ resource "aws_db_instance" "postgres" {
 
   # Operational Safeguards
   skip_final_snapshot       = false
-  final_snapshot_identifier = "bassac-live-db-final-snapshot"
+  final_snapshot_identifier = "ct-live-db-final-snapshot"
   backup_retention_period   = 7
   deletion_protection       = true
 
   tags = {
-    Name = "bassac-live-db"
+    Name = "ct-live-db"
     Rule = "S1-S4-ACID-MultiAZ"
   }
 }

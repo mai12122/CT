@@ -8,7 +8,7 @@ resource "aws_vpc" "main" {
   enable_dns_support   = true
 
   tags = {
-    Name = "bassac-live-vpc"
+    Name = "ct-live-vpc"
   }
 }
 
@@ -100,14 +100,14 @@ resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main.id
 
   tags = {
-    Name = "bassac-live-igw"
+    Name = "ct-live-igw"
   }
 }
 
 resource "aws_eip" "nat" {
   domain = "vpc"
   tags = {
-    Name = "bassac-nat-eip"
+    Name = "ct-nat-eip"
   }
 }
 
@@ -116,7 +116,7 @@ resource "aws_nat_gateway" "nat" {
   subnet_id     = aws_subnet.public_1a.id
 
   tags = {
-    Name = "bassac-nat-gw"
+    Name = "ct-nat-gw"
   }
 
   depends_on = [aws_internet_gateway.igw]

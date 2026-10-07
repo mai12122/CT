@@ -44,13 +44,13 @@ resource "aws_kms_key" "bassac_cmk" {
   })
 
   tags = {
-    Name = "bassac-live-cmk"
+    Name = "ct-live-cmk"
     Rule = "S3-CompanyKeyControlled"
   }
 }
 
 resource "aws_kms_alias" "bassac_cmk_alias" {
-  name          = "alias/bassac-live-key"
+  name          = "alias/ct-live-key"
   target_key_id = aws_kms_key.bassac_cmk.key_id
 }
 
@@ -58,7 +58,7 @@ resource "aws_kms_alias" "bassac_cmk_alias" {
 # 2. IAM Role & Instance Profile for EC2 Compute Fleet
 # ------------------------------------------------------------------------------
 resource "aws_iam_role" "app_role" {
-  name = "bassac-ec2-app-role"
+  name = "ct-ec2-app-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -74,7 +74,7 @@ resource "aws_iam_role" "app_role" {
   })
 
   tags = {
-    Name = "bassac-ec2-app-role"
+    Name = "ct-ec2-app-role"
   }
 }
 
@@ -106,6 +106,6 @@ resource "aws_iam_role_policy" "kms_decrypt_policy" {
 }
 
 resource "aws_iam_instance_profile" "app_profile" {
-  name = "bassac-ec2-app-profile"
+  name = "ct-ec2-app-profile"
   role = aws_iam_role.app_role.name
 }
