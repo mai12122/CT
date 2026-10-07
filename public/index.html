@@ -3168,10 +3168,11 @@
 
       // Initialize on Load
       window.addEventListener('DOMContentLoaded', () => {
-        initInitialQr();
-        syncUserUi();
-        loadLiveConcertsFromApi();
-      });
+  initInitialQr();
+  syncUserUi();
+  loadSavedTickets();
+  loadLiveConcertsFromApi();
+});
 
       // Load live PostgreSQL concerts from backend API if active
       async function loadLiveConcertsFromApi() {
@@ -3382,14 +3383,16 @@
           const ticketId = 'TKT-' + Math.random().toString(36).substring(2, 6).toUpperCase() + '-' + Math.floor(1000 + Math.random() * 9000);
 
           // Add New Ticket Stub to Wallet
-          addTicketStubToWallet({
-            id: ticketId,
-            artist: data.title,
-            tour: data.tour,
-            venue: data.venue,
-            tier: selectedTierName,
-            seat: `${selectedTierName} #${Math.floor(10 + Math.random() * 80)} · Gate 1`
-          });
+          const newTicket = {
+  id: ticketId,
+  artist: data.title,
+  tour: data.tour,
+  venue: data.venue,
+  tier: selectedTierName,
+  seat: `${selectedTierName} #${Math.floor(10 + Math.random() * 80)} · Gate 1`
+};
+saveTicketToStorage(newTicket);
+addTicketStubToWallet(newTicket);
 
           // Close Modal & Switch to Wallet Passes
           document.getElementById('reservationModal').classList.remove('active');
@@ -3559,7 +3562,27 @@
           seat: 'Fanpit Standing #042 · Gate 1'
         }
       };
+      const SAVED_TICKETS_KEY = 'ct_saved_tickets';
 
+function getSavedTickets() {
+  try {
+    return JSON.parse(localStorage.getItem(SAVED_TICKETS_KEY)) || [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveTicketToStorage(ticket) {
+  const list = getSavedTickets();
+  list.push(ticket);
+  try {
+    localStorage.setItem(SAVED_TICKETS_KEY, JSON.stringify(list));
+  } catch (e) {}
+}
+
+function loadSavedTickets() {
+  getSavedTickets().forEach(t => addTicketStubToWallet(t));
+}
       function openTicketQrById(ticketId) {
         const t = WALLET_TICKETS[ticketId] || {
           id: ticketId,
