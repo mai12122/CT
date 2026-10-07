@@ -59,3 +59,9 @@ export const confirmBookingSchema = z.object({
     paymentMethod: z.string().optional(),
   }),
 });
+
+export const scanTicketQrSchema = z.object({
+  body: z.object({
+    qrPayload: z.string().min(1, 'QR payload is required').max(2048, 'QR payload is too large'),
+  }),
+});

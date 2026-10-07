@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import QRCode from 'react-native-qrcode-svg';
 import * as Haptics from 'expo-haptics';
 import { api } from '@/services/api';
 import { useAuth } from '@/context/AuthContext';
@@ -199,17 +198,8 @@ export default function MyTicketsScreen() {
                         </View>
                       </View>
 
-                      {/* Scannable Micro QR Code Preview */}
-                      <View className="p-2.5 bg-white rounded-2xl items-center shadow-md">
-                        <QRCode
-                          value={ticket.qrPayload || ticket.ticketNumber || ticket.id || 'VALID-TICKET'}
-                          size={62}
-                          color="#0B1020"
-                          backgroundColor="#ffffff"
-                        />
-                        <Text className="text-[8px] font-black text-slate-800 mt-1 tracking-[0.14em] uppercase">
-                          Scan Gate
-                        </Text>
+                      <View className="h-14 w-14 bg-iris-500/15 border border-iris-500/30 rounded-2xl items-center justify-center">
+                        <Ionicons name="qr-code-outline" size={27} color="#C4B5FD" />
                       </View>
                     </View>
 

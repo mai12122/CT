@@ -63,8 +63,8 @@ export default function ModalScreen() {
               <Text className="text-white font-bold text-sm">Signed QR passes</Text>
             </View>
             <Text className="text-slate-300 text-xs leading-relaxed">
-              Each confirmed ticket gets a cryptographically signed QR code that gate scanners
-              verify in one scan. Copies and edits are rejected.
+              Each valid ticket gets a signed QR code that refreshes every five minutes. Gate staff
+              can redeem each code once; expired, altered, and already-used passes are rejected.
             </Text>
           </View>
         </View>

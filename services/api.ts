@@ -304,6 +304,34 @@ class ApiClient {
     const res = await this.request<{ success: boolean; data: any }>(`/tickets/${ticketId}`);
     return res.data;
   }
+
+  async getTicketQr(ticketId: string) {
+    const res = await this.request<{
+      success: boolean;
+      data: { payload: string; expiresAt: string };
+    }>(`/tickets/${ticketId}/qr?refresh=${Date.now()}`, {
+      cache: 'no-store',
+    });
+    return res.data;
+  }
+
+  async scanTicketQr(qrPayload: string) {
+    const res = await this.request<{
+      success: boolean;
+      data: {
+        ticketNumber: string;
+        bookingRef: string;
+        ticketHolder: string;
+        concertTitle: string;
+        seat: string | null;
+        usedAt: string;
+      };
+    }>('/tickets/scan', {
+      method: 'POST',
+      body: JSON.stringify({ qrPayload }),
+    });
+    return res.data;
+  }
 }
 
 export const api = new ApiClient();
