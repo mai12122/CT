@@ -1,8 +1,8 @@
 # Capstone Deliverable: Scenario 2 — Concert & Festival Ticketing
-**Client:** CT Live (Phnom Penh, Cambodia)  
-**Hall Capacity:** 2,000 seats  
-**Operations Manager:** Mr. Ratana  
-**Scenario Profile:** High-concurrency flash sale (10,000 users, 80% traffic in the first 5 minutes at 09:00)
+**Client:** Bassac Live, an event company in Phnom Penh  
+**Biggest Hall:** 2,000 seats  
+**Operations Manager Contact:** Mr. Ratana  
+**Scenario Profile:** High-concurrency flash sale (10,000 users for 2,000 tickets, 80% traffic in the first 5 minutes after 09:00)
 
 ---
 
@@ -44,11 +44,11 @@ flowchart TB
     end
 
     subgraph Storage_Security["Decoupled Storage & Security Services"]
-        S3["Amazon S3 Bucket\n(ct-live-media-assets)\nPrivate / Block Public Access = ON\nFiles: posters/*, seatmaps/*"]
+        S3["Amazon S3 Bucket\n(bassac-live-assets-prod)\nPrivate / Block Public Access = ON\nFiles: posters/*, seatmaps/*"]
         KMS["AWS KMS Customer-Managed Key (CMK)\n(SSE-KMS Encryption at Rest)"]
         CW["Amazon CloudWatch\n(Metrics: UnhealthyHosts, 5XX, RequestCount)"]
-        SNS["Amazon SNS Topic\n(ct-live-incident-alerts)"]
-        Manager["Mr. Ratana\n(Emergency Alert Email: ratana@ctlive.com.kh)"]
+        SNS["Amazon SNS Topic\n(bassac-live-urgent-alerts)"]
+        Manager["Mr. Ratana\n(Emergency Alert Email: ratana@bassaclive.com)"]
     end
 
     %% Traffic flows
@@ -93,7 +93,7 @@ flowchart TB
 
 | AWS Component | Concert Hall Analogy | What it Actually Does in Your App |
 | :--- | :--- | :--- |
-| **VPC (`ct-live-vpc`)** | **The Venue Perimeter** | High fence keeping all app servers and databases together in an isolated, secure virtual network. |
+| **VPC (`bassac-live-vpc`)** | **The Venue Perimeter** | High fence keeping all app servers and databases together in an isolated, secure virtual network. |
 | **Public Subnet** | **Front Gate / Parking Lot** | The only public area where fans arrive; hosts the internet-facing Application Load Balancer. |
 | **Private App Subnet** | **Backstage Staff Rooms** | Restricted area housing Node.js EC2 servers; fans cannot access these directly. |
 | **Private DB Subnet** | **The Vault / Cash Register** | Super-secure zone deep inside holding RDS PostgreSQL so raw data is protected. |
@@ -109,11 +109,11 @@ flowchart TB
 
 ### 1. Network & Routing Configuration
 
-* **VPC:** `10.0.0.0/16` (`vpc-ct-live-prod`).  
+* **VPC:** `10.0.0.0/16` (`bassac-live-vpc`).  
   * *Reason:* Provides 65,536 private IPs across multi-AZ tiers with non-overlapping RFC 1918 blocks.
-* **Internet Gateway:** Attached to VPC.  
+* **Internet Gateway:** Attached to VPC (`bassac-live-igw`).  
   * *Reason:* Enables public internet ingress solely for the Application Load Balancer.
-* **NAT Gateways (2 AZs):** One per public subnet (`nat-1a`, `nat-1b`).  
+* **NAT Gateways (2 AZs):** One per public subnet (`bassac-nat-1a`, `bassac-nat-1b`).  
   * *Reason:* Allows private EC2 instances to fetch OS/security patches without exposing them to incoming internet connections.
 * **Isolated DB Route Table:** No default route (`0.0.0.0/0`). Local routing only.  
   * *Reason:* Guarantees database tier is physically unroutable to/from the internet (**S1, S4**).
@@ -161,7 +161,7 @@ flowchart TB
         "Service": "cloudfront.amazonaws.com"
       },
       "Action": "s3:GetObject",
-      "Resource": "arn:aws:s3:::ct-live-media-assets/*",
+      "Resource": "arn:aws:s3:::bassac-live-assets-prod/*",
       "Condition": {
         "StringEquals": {
           "AWS:SourceArn": "arn:aws:cloudfront::123456789012:distribution/EDFDVBD632BHDS5"
@@ -173,7 +173,7 @@ flowchart TB
       "Effect": "Deny",
       "Principal": "*",
       "Action": "s3:PutObject",
-      "Resource": "arn:aws:s3:::ct-live-media-assets/*",
+      "Resource": "arn:aws:s3:::bassac-live-assets-prod/*",
       "Condition": {
         "StringNotEquals": {
           "s3:x-amz-server-side-encryption": "aws:kms"
@@ -188,7 +188,7 @@ flowchart TB
 ```json
 {
   "Version": "2012-10-17",
-  "Id": "ct-live-cmk-policy",
+  "Id": "bassac-live-cmk-policy",
   "Statement": [
     {
       "Sid": "EnableRootPermissions",
@@ -241,7 +241,7 @@ flowchart TB
       "Action": [
         "s3:GetObject"
       ],
-      "Resource": "arn:aws:s3:::ct-live-media-assets/*"
+      "Resource": "arn:aws:s3:::bassac-live-assets-prod/*"
     }
   ]
 }
@@ -263,13 +263,13 @@ flowchart TB
 
 ### 5. Storage, Encryption & Backups
 
-* **Object Storage:** Amazon S3 (`ct-live-media-assets`).  
+* **Object Storage:** Amazon S3 (`bassac-live-assets-prod`).  
   * `BlockPublicAcls = true`, `IgnorePublicAcls = true`, `BlockPublicPolicy = true`, `RestrictPublicBuckets = true`.
-  * *Encryption:* `aws:kms` using Customer-Managed Key `arn:aws:kms:ap-southeast-1:123456789012:key/ct-cmk-01`.
+  * *Encryption:* `aws:kms` using Customer-Managed Key `alias/bassac-live-key` (`aws_kms_key.bassac_cmk`).
 * **Database:** Amazon RDS PostgreSQL 16.  
   * *Multi-AZ Deployment:* Enabled (Standby in `ap-southeast-1b`, Primary in `ap-southeast-1a`).
-  * *Instance Class:* `db.t4g.medium` (2 vCPU, 4GB RAM), 100GB GP3 SSD (3,000 IOPS).
-  * *Storage Encryption:* Enabled using KMS Key.
+  * *Instance Class:** `db.t4g.medium` (2 vCPU, 4GB RAM), 100GB GP3 SSD (3,000 IOPS).
+  * *Storage Encryption:* Enabled using KMS Customer-Managed Key (`aws_kms_key.bassac_cmk`).
   * *Automated Backups:* 7-day retention with point-in-time recovery (PITR).
 
 ---
@@ -285,16 +285,16 @@ flowchart TB
 #### Alert 2: Site Failing (Manager Immediate Alert — R5)
 * **Metric:** `AWS/ApplicationELB` `UnHealthyHostCount` OR `HTTPCode_Target_5XX_Count`
 * **Threshold:** `UnHealthyHostCount >= 1` OR `Target_5XX_Count >= 10` for 1 evaluation period of 60 seconds.
-* **Action:** Triggers SNS Topic `arn:aws:sns:ap-southeast-1:123456789012:ct-live-incident-alerts`.
-* **Subscribers:** Email to `ratana@ctlive.com.kh`.
+* **Action:** Triggers SNS Topic `arn:aws:sns:ap-southeast-1:123456789012:bassac-live-urgent-alerts`.
+* **Subscribers:** Email to `ratana@bassaclive.com`.
 * *Reason:* Instant email notification to operations manager the moment any server health-check degrades (**R5**).
 
 ---
 
 ### 7. Resource Tags
 * `Environment`: `Production`
-* `Project`: `CTLive-Ticketing`
-* `Client`: `CTLive`
+* `Project`: `Bassac-Live-Ticketing`
+* `Client`: `Bassac-Live`
 * `ManagedBy`: `Terraform`
 * `Owner`: `Ratana-Operations`
 
@@ -319,7 +319,7 @@ flowchart TB
 |---|---|---|
 | **S1. Buyer names & phones not reachable from internet** | RDS lives in Isolated Subnets with route `10.0.0.0/16` only. No public IP address can ever be assigned. Security group blocks all traffic except from `sg-app`. | `aws_route_table.isolated_db`, `aws_security_group.db`. |
 | **S2. File storage is not public** | S3 bucket has all 4 Block Public Access flags activated. Bucket policy restricts `s3:GetObject` strictly to CloudFront OAC ARN. | `aws_s3_bucket_public_access_block`, S3 Bucket Policy. |
-| **S3. Files encrypted with company-controlled key** | S3 bucket and RDS storage use a Customer-Managed Key (CMK) in AWS KMS with rotation enabled. Bucket policy denies unencrypted uploads. | `aws_kms_key.ct_cmk`, `s3:x-amz-server-side-encryption`. |
+| **S3. Files encrypted with company-controlled key** | S3 bucket and RDS storage use a Customer-Managed Key (CMK) in AWS KMS with rotation enabled. Bucket policy denies unencrypted uploads. | `aws_kms_key.bassac_cmk`, `s3:x-amz-server-side-encryption`. |
 | **S4. Only application connects to orders database** | Database Security Group (`sg-db`) ingress specifies `security_groups = [aws_security_group.app.id]`. No CIDR IP ranges permitted. | `aws_security_group_rule.db_ingress_app`. |
 
 ---
@@ -340,7 +340,7 @@ If the remaining seats are less than the request, the database rejects the updat
 ---
 
 #### Q2: Where do posters live, and what happens to them if a server is replaced?
-**Answer:** Posters and seat maps live in a dedicated **Amazon S3 Object Storage Bucket** (`ct-live-media-assets`), cached globally across edge locations by **Amazon CloudFront**.  
+**Answer:** Posters and seat maps live in a dedicated **Amazon S3 Object Storage Bucket** (`bassac-live-assets-prod`), cached globally across edge locations by **Amazon CloudFront**.  
 *Server replacement impact:* **Zero impact.** Because posters are completely decoupled from EC2 instances, when an EC2 instance crashes, terminates, or is replaced by Auto Scaling, the poster files remain safe, intact, and continuously served directly from CloudFront edge caches.
 
 ---
@@ -349,13 +349,13 @@ If the remaining seats are less than the request, the database rejects the updat
 > **Dear Mr. Ratana,**  
 > Upgrading to "one bigger server" seems like the most straightforward solution, but in web architecture, vertical scaling creates a critical vulnerability known as a Single Point of Failure. When 10,000 fans hit a single server at 09:00 AM, the operating system's single network interface and connection backlog queue become a catastrophic bottleneck. If a single memory surge, operating system glitch, or database lock hangs that machine, 100% of your ticket sales die instantly—exactly as happened last year after 4 minutes. A bigger server merely becomes a more expensive single point of failure that can still crash without any backup to keep the sale alive.
 > 
-> Instead, high-concurrency event platforms survive flash sales through **horizontal redundancy and decoupled architecture**. By distributing your incoming traffic across multiple smaller, synchronized servers behind an Application Load Balancer across two independent data centers (Availability Zones), we ensure that if one server degrades or dies mid-sale, the load balancer automatically isolates it in seconds and routes your buyers to the healthy servers without losing a single order. Furthermore, offloading posters and seat maps to a Content Delivery Network (CloudFront) and isolating the database ensures that your servers do only one thing: process ticket purchases at maximum speed. This multi-server design gives CT Live 100% uptime, zero overselling, and automatic recovery.
+> Instead, high-concurrency event platforms survive flash sales through **horizontal redundancy and decoupled architecture**. By distributing your incoming traffic across multiple smaller, synchronized servers behind an Application Load Balancer across two independent data centers (Availability Zones), we ensure that if one server degrades or dies mid-sale, the load balancer automatically isolates it in seconds and routes your buyers to the healthy servers without losing a single order. Furthermore, offloading posters and seat maps to a Content Delivery Network (CloudFront) and isolating the database ensures that your servers do only one thing: process ticket purchases at maximum speed. This multi-server design gives Bassac Live 100% uptime, zero overselling, and automatic recovery.
 
 ---
 
 #### Q4: Fixed capacity or automatic scaling? The sale lasts five minutes, the year twelve months.
 **Answer:** A hybrid approach: **Scheduled Scaling (Pre-Warming) combined with Dynamic Auto Scaling**.  
-*Justification:* Dynamic Auto Scaling reacts to CloudWatch alarms with a 2-to-4 minute lag (time to evaluate alarms, boot instances, and pass health checks). Since 80% of CT Live's traffic crashes in during the **first 5 minutes after 09:00**, relying *solely* on reactive auto-scaling will cause the site to crash before new servers are ready.  
+*Justification:* Dynamic Auto Scaling reacts to CloudWatch alarms with a 2-to-4 minute lag (time to evaluate alarms, boot instances, and pass health checks). Since 80% of Bassac Live's traffic crashes in during the **first 5 minutes after 09:00**, relying *solely* on reactive auto-scaling will cause the site to crash before new servers are ready.  
 *Strategy:*  
 1. **15 Minutes Before Sale (08:45 AM):** AWS Scheduled Scaling increases desired instances from 2 to 4 pre-warmed instances.  
 2. **During the Rush (09:00 – 09:15 AM):** Dynamic Target Tracking scales up to 8 instances if demand peaks further.  
@@ -367,7 +367,7 @@ If the remaining seats are less than the request, the database rejects the updat
 **Answer:** Through **Amazon CloudFront Origin Access Control (OAC)**.  
 *Mechanism:*  
 1. The S3 bucket has **Block Public Access = ON**, preventing any direct internet access to `s3.amazonaws.com`.  
-2. The S3 Bucket Policy grants `s3:GetObject` permission **only** to the CloudFront service principal (`cloudfront.amazonaws.com`) and restricts it to the specific ARN of CT Live's CloudFront distribution.  
+2. The S3 Bucket Policy grants `s3:GetObject` permission **only** to the CloudFront service principal (`cloudfront.amazonaws.com`) and restricts it to the specific ARN of Bassac Live's CloudFront distribution.  
 3. When a customer's browser loads the event poster, the request hits CloudFront. CloudFront cryptographically signs the request using SigV4 and fetches the asset from S3 on the customer's behalf, caching it for all subsequent viewers. The bucket remains 100% private to the outside world.
 
 ---

@@ -12,7 +12,7 @@ if __name__ == "__main__":
     passed = 0
     failed = 0
     print("=" * 70)
-    print("  CT LIVE — IAC SECURITY COMPLIANCE & RULES VERIFICATION")
+    print("  BASSAC LIVE — IAC SECURITY COMPLIANCE & RULES VERIFICATION")
     print("=" * 70)
     for test in tests:
         try:
