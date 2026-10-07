@@ -2921,6 +2921,7 @@
                 value="17 864 121"
                 class="auth-input-field"
                 autocomplete="tel"
+                onkeydown="if(event.key==='Enter') handleSendPhoneOtp()"
               />
             </div>
             <div style="font-size: 11px; color: var(--text-muted); display: flex; justify-content: space-between;">
@@ -2941,6 +2942,7 @@
                 value="Mao"
                 class="auth-input-field"
                 autocomplete="name"
+                onkeydown="if(event.key==='Enter') handleSendPhoneOtp()"
               />
             </div>
           </div>
@@ -2999,6 +3001,7 @@
                 placeholder="······"
                 class="auth-input-field auth-otp-field"
                 autocomplete="one-time-code"
+                onkeydown="if(event.key==='Enter') handleVerifyPhoneOtp()"
               />
             </div>
 
@@ -3705,9 +3708,14 @@
       }
 
       function closeAuthModal(e) {
-        if (e && e.target !== e.currentTarget && !e.target.classList.contains('sheet-close-btn') && !e.target.closest('.sheet-close-btn')) return;
+        if (e && e.target && e.target !== e.currentTarget && !e.target.classList.contains('sheet-close-btn') && !e.target.closest('.sheet-close-btn')) return;
         const modal = document.getElementById('authModal');
         if (modal) modal.classList.remove('active');
+        const btn = document.getElementById('verifyOtpBtn');
+        if (btn) {
+          btn.disabled = false;
+          btn.innerText = 'Verify Code & Enter';
+        }
       }
 
       function switchAuthStep(step) {
@@ -3810,7 +3818,14 @@
         const nameInput = document.getElementById('authNameInput');
         const customName = (nameInput && nameInput.value.trim()) ? nameInput.value.trim() : 'Mao';
 
-        let verifiedUser = null;
+        let verifiedUser = {
+          id: 'usr-' + (activeAuthPhone || '+85517864121').replace(/\D/g, '').slice(-8),
+          name: customName,
+          phone: activeAuthPhone || '+85517864121',
+          email: (activeAuthPhone || '+85517864121').replace(/\D/g, '') + '@phone.concertpass.com',
+          authProvider: 'PHONE'
+        };
+
         try {
           const res = await fetch('/api/v1/auth/phone/verify-otp', {
             method: 'POST',
@@ -3825,19 +3840,7 @@
           if (json && json.data && json.data.user) {
             verifiedUser = json.data.user;
           }
-        } catch (err) {
-          // fallback
-        }
-
-        if (!verifiedUser) {
-          verifiedUser = {
-            id: 'usr-' + activeAuthPhone.replace(/\D/g, '').slice(-8),
-            name: customName,
-            phone: activeAuthPhone,
-            email: activeAuthPhone.replace(/\D/g, '') + '@phone.concertpass.com',
-            authProvider: 'PHONE'
-          };
-        }
+        } catch (err) {}
 
         currentUser = verifiedUser;
         try {
@@ -3849,14 +3852,21 @@
           btn.innerText = 'Verify Code & Enter';
         }
 
-        syncUserUi();
+        try {
+          syncUserUi();
+        } catch (err) {
+          console.warn('syncUserUi warning:', err);
+        }
+
         closeAuthModal();
-        showCelebrationToast('SIGNED IN · WELCOME ' + currentUser.name.toUpperCase());
+        switchNavTab('profile');
+        showCelebrationToast('SIGNED IN · WELCOME ' + (currentUser.name || 'USER').toUpperCase());
       }
 
       function loginDemoUserFromModal() {
         loginDemoUser();
         closeAuthModal();
+        switchNavTab('profile');
       }
 
       function toggleEditNameInput(show) {
@@ -3867,7 +3877,7 @@
           if (displayRow) displayRow.style.display = 'none';
           if (editRow) editRow.style.display = 'flex';
           if (input) {
-            input.value = currentUser ? currentUser.name : 'Mao';
+            input.value = currentUser ? (currentUser.name || 'Mao') : 'Mao';
             setTimeout(() => input.focus(), 60);
           }
         } else {
@@ -3905,14 +3915,19 @@
       function syncUserUi() {
         const inBlock = document.getElementById('profSignedInBlock');
         const outBlock = document.getElementById('profSignedOutBlock');
+        const authBtn = document.getElementById('authActionBtn');
+        const userPill = document.getElementById('userPillBox');
+
         if (currentUser) {
-          document.getElementById('authActionBtn').style.display = 'none';
-          document.getElementById('userPillBox').style.display = 'flex';
+          if (authBtn) authBtn.style.display = 'none';
+          if (userPill) userPill.style.display = 'flex';
           const userName = currentUser.name || 'Mao';
           const initial = userName.trim().charAt(0).toUpperCase() || 'M';
 
-          document.getElementById('userAvatarInitial').innerText = initial;
-          document.getElementById('userDisplayName').innerText = userName.split(' ')[0];
+          const avatarEl = document.getElementById('userAvatarInitial');
+          if (avatarEl) avatarEl.innerText = initial;
+          const displayEl = document.getElementById('userDisplayName');
+          if (displayEl) displayEl.innerText = userName.split(' ')[0];
 
           const profNameEl = document.getElementById('profUserName');
           if (profNameEl) profNameEl.innerText = userName;
@@ -3928,14 +3943,14 @@
 
           const passesEl = document.getElementById('profPassesCount');
           if (passesEl) {
-            passesEl.innerText = (typeof purchasedPasses !== 'undefined' && purchasedPasses.length > 0) ? purchasedPasses.length : 0;
+            passesEl.innerText = (typeof purchasedPasses !== 'undefined' && Array.isArray(purchasedPasses) && purchasedPasses.length > 0) ? purchasedPasses.length : 0;
           }
 
           if (inBlock) inBlock.style.display = 'block';
           if (outBlock) outBlock.style.display = 'none';
         } else {
-          document.getElementById('authActionBtn').style.display = 'flex';
-          document.getElementById('userPillBox').style.display = 'none';
+          if (authBtn) authBtn.style.display = 'flex';
+          if (userPill) userPill.style.display = 'none';
           if (inBlock) inBlock.style.display = 'none';
           if (outBlock) outBlock.style.display = 'block';
         }
