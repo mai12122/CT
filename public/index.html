@@ -1676,8 +1676,8 @@
           <!-- Right Action: User or Login -->
           <div class="navbar-actions">
             <div class="user-avatar-pill" id="userPillBox" style="display: none" onclick="switchNavTab('profile')">
-              <div class="user-avatar-circle" id="userAvatarInitial">A</div>
-              <span id="userDisplayName">Alex</span>
+              <div class="user-avatar-circle" id="userAvatarInitial">S</div>
+              <span id="userDisplayName">Sopheak</span>
             </div>
 
             <button class="btn-auth-action" id="authActionBtn" onclick="switchNavTab('profile')">
@@ -1692,20 +1692,20 @@
       <!-- ============================================================ -->
       <main id="tabShows" class="screen-panel active">
         <!-- Featured Headliner Hero Banner -->
-        <div class="hero-stage-card" onclick="openReservationModal('taylor-swift')">
+        <div class="hero-stage-card" onclick="openReservationModal('kh-concert-001')">
           <img
             class="hero-stage-bg"
             src="https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?auto=format&fit=crop&w=1600&q=80"
-            alt="Taylor Swift The Eras"
+            alt="VannDa Skull Tour Live"
           />
           <div class="hero-scrim-gradient"></div>
           <div class="hero-stage-content">
             <div class="hero-tag-row">
               <span class="hero-pill-badge" style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px 4px 6px;">
                 <img src="/logo.png" alt="CT Logo" style="height: 16px; width: auto; object-fit: contain;" />
-                CT OFFICIAL PASS
+                BASSAC LIVE OFFICIAL PASS
               </span>
-              <span class="hero-pill-badge">WORLD STADIUM TOUR</span>
+              <span class="hero-pill-badge">BORN IN BATTAMBANG TOUR</span>
               <span class="hero-pill-badge live-capacity">
                 <span class="audio-equalizer-bars" aria-hidden="true" style="color: #60A5FA; margin-right: 5px;">
                   <span class="eq-bar bar-1"></span>
@@ -1713,21 +1713,21 @@
                   <span class="eq-bar bar-3"></span>
                   <span class="eq-bar bar-4"></span>
                 </span>
-                60 Passes Remaining
+                730 Passes Remaining
               </span>
             </div>
-            <div class="hero-title-main">Taylor Swift</div>
-            <div class="hero-sub-tour">The Eras Stadium Experience</div>
+            <div class="hero-title-main">VannDa (វណ្ណដា)</div>
+            <div class="hero-sub-tour">Skull Tour: Born in Battambang Live</div>
             <div class="hero-meta-bar">
               <div class="hero-location-text">
                 <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                   <circle cx="12" cy="10" r="3"></circle>
                 </svg>
-                SoFi Stadium, Los Angeles, CA • NOV 14 • 07:30 PM
+                Bassac Live Main Hall (Diamond Island / Koh Pich), Phnom Penh • NOV 14 • 07:30 PM
               </div>
-              <button class="hero-action-btn">
-                Reserve Pass — From $95
+              <button class="hero-action-btn" onclick="event.stopPropagation(); openReservationModal('kh-concert-001')">
+                Reserve Pass — From $15
                 <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                   <line x1="7" y1="17" x2="17" y2="7"></line>
                   <polyline points="7 7 17 7 17 17"></polyline>
@@ -1748,7 +1748,7 @@
               type="text"
               id="globalSearchField"
               class="search-input-field"
-              placeholder="Search by artist, tour, or venue..."
+              placeholder="Search by Cambodian artist, venue, or province..."
               oninput="handleShowSearch(this.value)"
             />
           </div>
@@ -1756,34 +1756,34 @@
           <div class="city-pills-row">
             <button class="city-filter-btn active" onclick="filterByCity(this, 'All')">All Locations</button>
             <button class="city-filter-btn" onclick="filterByCity(this, 'Phnom Penh')">Phnom Penh</button>
-            <button class="city-filter-btn" onclick="filterByCity(this, 'Los Angeles')">Los Angeles</button>
-            <button class="city-filter-btn" onclick="filterByCity(this, 'London')">London</button>
-            <button class="city-filter-btn" onclick="filterByCity(this, 'New York')">New York</button>
-            <button class="city-filter-btn" onclick="filterByCity(this, 'Tokyo')">Tokyo</button>
+            <button class="city-filter-btn" onclick="filterByCity(this, 'Siem Reap')">Siem Reap</button>
+            <button class="city-filter-btn" onclick="filterByCity(this, 'Battambang')">Battambang</button>
+            <button class="city-filter-btn" onclick="filterByCity(this, 'Preah Sihanouk')">Preah Sihanouk</button>
+            <button class="city-filter-btn" onclick="filterByCity(this, 'Kampot')">Kampot</button>
           </div>
         </section>
 
         <!-- Shows Grid Header -->
         <div class="section-heading-row">
-          <h2 class="section-headline">Upcoming Live Concerts</h2>
-          <span class="section-meta-count" id="showsAvailableCount">4 Featured Events</span>
+          <h2 class="section-headline">Verified Cambodian Concerts & Tours</h2>
+          <span class="section-meta-count" id="showsAvailableCount">6 Live Events</span>
         </div>
 
         <!-- Concert Cards Grid -->
         <div class="concerts-responsive-grid" id="showsGridContainer">
-          <!-- Card 1: Taylor Swift -->
+          <!-- Card 1: VannDa (Phnom Penh) -->
           <div
             class="concert-card-shell"
-            data-city="Los Angeles"
-            data-artist="Taylor Swift The Eras"
-            onclick="openReservationModal('taylor-swift')"
+            data-city="Phnom Penh"
+            data-artist="VannDa វណ្ណដា Skull Tour Born in Battambang Live Bassac Live"
+            onclick="openReservationModal('kh-concert-001')"
           >
             <div class="concert-card-core">
               <div class="card-media-wrapper">
                 <img
                   class="card-media-img"
                   src="https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?auto=format&fit=crop&w=600&q=80"
-                  alt="Taylor Swift"
+                  alt="VannDa Live"
                 />
                 <div class="card-media-overlay"></div>
                 <div class="card-floating-badge">NOV 14 • 07:30 PM</div>
@@ -1794,47 +1794,47 @@
                     <span class="eq-bar bar-3"></span>
                     <span class="eq-bar bar-4"></span>
                   </span>
-                  60 Left
+                  730 Left
                 </div>
               </div>
               <div class="card-details-body">
-                <div class="card-date-badge">Los Angeles Stadium Tour</div>
-                <div class="card-artist-name">Taylor Swift</div>
-                <div class="card-tour-title">The Eras Stadium Experience</div>
+                <div class="card-date-badge">Phnom Penh Main Stage • Koh Pich</div>
+                <div class="card-artist-name">VannDa (វណ្ណដា)</div>
+                <div class="card-tour-title">Skull Tour: Born in Battambang Live</div>
                 <div class="card-venue-row">
                   <svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                     <circle cx="12" cy="10" r="3"></circle>
                   </svg>
-                  SoFi Stadium • Los Angeles, CA
+                  Bassac Live Main Hall • Phnom Penh
                 </div>
                 <div class="card-footer-strip">
                   <div class="card-tier-tags">
                     <span class="card-tag-pill">Fanpit</span>
                     <span class="card-tag-pill">Platinum</span>
                   </div>
-                  <div class="card-pricing-label"><span>From</span>$95</div>
+                  <div class="card-pricing-label"><span>From</span>$15</div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Card 2: Bassac Live Grand Opening -->
+          <!-- Card 2: Preap Sovath & G-Devith (Phnom Penh) -->
           <div
             class="concert-card-shell"
             data-city="Phnom Penh"
-            data-artist="CT Live Grand Opening Bassac Live"
-            onclick="openReservationModal('bassac-grand-opening')"
+            data-artist="Preap Sovath G-Devith ព្រាប សុវត្ថិ ជី ដេវីត Kings of Khmer Pop Hip-Hop Morodok Techo"
+            onclick="openReservationModal('kh-concert-002')"
           >
             <div class="concert-card-core">
               <div class="card-media-wrapper">
                 <img
                   class="card-media-img"
                   src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=600&q=80"
-                  alt="CT Live Grand Opening"
+                  alt="Preap Sovath & G-Devith"
                 />
                 <div class="card-media-overlay"></div>
-                <div class="card-floating-badge">DEC 31 • 08:00 PM</div>
+                <div class="card-floating-badge">DEC 05 • 07:00 PM</div>
                 <div class="card-capacity-indicator">
                   <span class="audio-equalizer-bars" aria-hidden="true" style="color: #60A5FA;">
                     <span class="eq-bar bar-1"></span>
@@ -1842,47 +1842,47 @@
                     <span class="eq-bar bar-3"></span>
                     <span class="eq-bar bar-4"></span>
                   </span>
-                  2,000 Capacity
+                  530 Left
                 </div>
               </div>
               <div class="card-details-body">
-                <div class="card-date-badge">Phnom Penh Main Stage</div>
-                <div class="card-artist-name">CT Live Grand Opening</div>
-                <div class="card-tour-title">Bassac Live Concert Hall Inauguration</div>
+                <div class="card-date-badge">National Stadium Arena</div>
+                <div class="card-artist-name">Preap Sovath & G-Devith</div>
+                <div class="card-tour-title">Kings of Khmer Pop & Hip-Hop Mega Live</div>
                 <div class="card-venue-row">
                   <svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                     <circle cx="12" cy="10" r="3"></circle>
                   </svg>
-                  Bassac Live Hall • Phnom Penh
+                  Morodok Techo Live Arena • Phnom Penh
                 </div>
                 <div class="card-footer-strip">
                   <div class="card-tier-tags">
-                    <span class="card-tag-pill">VIP Floor</span>
-                    <span class="card-tag-pill">Zone A/B</span>
+                    <span class="card-tag-pill">Fanpit</span>
+                    <span class="card-tag-pill">Platinum</span>
                   </div>
-                  <div class="card-pricing-label"><span>From</span>$25</div>
+                  <div class="card-pricing-label"><span>From</span>$10</div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Card 3: Coldplay -->
+          <!-- Card 3: Sinn Sisamouth Legacy Orchestra (Siem Reap) -->
           <div
             class="concert-card-shell"
-            data-city="London"
-            data-artist="Coldplay Music of Spheres"
-            onclick="openReservationModal('coldplay')"
+            data-city="Siem Reap"
+            data-artist="Sinn Sisamouth Meng Keo Pichenda Golden Era Angkor Symphony"
+            onclick="openReservationModal('kh-concert-003')"
           >
             <div class="concert-card-core">
               <div class="card-media-wrapper">
                 <img
                   class="card-media-img"
                   src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=600&q=80"
-                  alt="Coldplay"
+                  alt="Sinn Sisamouth Legacy"
                 />
                 <div class="card-media-overlay"></div>
-                <div class="card-floating-badge">OCT 25 • 06:00 PM</div>
+                <div class="card-floating-badge">OCT 25 • 06:30 PM</div>
                 <div class="card-capacity-indicator">
                   <span class="audio-equalizer-bars" aria-hidden="true" style="color: #60A5FA;">
                     <span class="eq-bar bar-1"></span>
@@ -1890,47 +1890,47 @@
                     <span class="eq-bar bar-3"></span>
                     <span class="eq-bar bar-4"></span>
                   </span>
-                  100 Left
+                  468 Left
                 </div>
               </div>
               <div class="card-details-body">
-                <div class="card-date-badge">London World Tour</div>
-                <div class="card-artist-name">Coldplay</div>
-                <div class="card-tour-title">Music of the Spheres Tour</div>
+                <div class="card-date-badge">Angkor Cultural Heritage</div>
+                <div class="card-artist-name">Sinn Sisamouth Legacy Orchestra</div>
+                <div class="card-tour-title">Golden Era Angkor Symphony & Acoustic Night</div>
                 <div class="card-venue-row">
                   <svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                     <circle cx="12" cy="10" r="3"></circle>
                   </svg>
-                  Wembley Stadium • London, UK
+                  Angkor Heritage Amphitheatre • Siem Reap
                 </div>
                 <div class="card-footer-strip">
                   <div class="card-tier-tags">
+                    <span class="card-tag-pill">Royal Circle</span>
                     <span class="card-tag-pill">Platinum</span>
-                    <span class="card-tag-pill">Gold</span>
                   </div>
-                  <div class="card-pricing-label"><span>From</span>$85</div>
+                  <div class="card-pricing-label"><span>From</span>$15</div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Card 4: Billie Eilish -->
+          <!-- Card 4: Tena x Sophia Kao x Suly Pheng (Battambang) -->
           <div
             class="concert-card-shell"
-            data-city="New York"
-            data-artist="Billie Eilish Hit Me Hard"
-            onclick="openReservationModal('billie-eilish')"
+            data-city="Battambang"
+            data-artist="Tena Sophia Kao Suly Pheng Sunset Acoustic R&B Sangke Riverfront"
+            onclick="openReservationModal('kh-concert-004')"
           >
             <div class="concert-card-core">
               <div class="card-media-wrapper">
                 <img
                   class="card-media-img"
                   src="https://images.unsplash.com/photo-1459749411175-04bf5292ceea?auto=format&fit=crop&w=600&q=80"
-                  alt="Billie Eilish"
+                  alt="Tena x Sophia Kao"
                 />
                 <div class="card-media-overlay"></div>
-                <div class="card-floating-badge">NOV 02 • 08:00 PM</div>
+                <div class="card-floating-badge">NOV 28 • 06:00 PM</div>
                 <div class="card-capacity-indicator">
                   <span class="audio-equalizer-bars" aria-hidden="true" style="color: #60A5FA;">
                     <span class="eq-bar bar-1"></span>
@@ -1938,26 +1938,122 @@
                     <span class="eq-bar bar-3"></span>
                     <span class="eq-bar bar-4"></span>
                   </span>
-                  150 Left
+                  470 Left
                 </div>
               </div>
               <div class="card-details-body">
-                <div class="card-date-badge">New York Arena</div>
-                <div class="card-artist-name">Billie Eilish</div>
-                <div class="card-tour-title">Hit Me Hard and Soft Tour</div>
+                <div class="card-date-badge">Sangke Riverfront Stage</div>
+                <div class="card-artist-name">Tena x Sophia Kao x Suly Pheng</div>
+                <div class="card-tour-title">Sunset Acoustic & R&B Riverfront Live</div>
                 <div class="card-venue-row">
                   <svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                     <circle cx="12" cy="10" r="3"></circle>
                   </svg>
-                  Madison Square Garden • New York, NY
+                  Sangke Riverfront Amphitheatre • Battambang
                 </div>
                 <div class="card-footer-strip">
                   <div class="card-tier-tags">
-                    <span class="card-tag-pill">Floor Pit</span>
-                    <span class="card-tag-pill">Tier 1</span>
+                    <span class="card-tag-pill">Fanpit</span>
+                    <span class="card-tag-pill">Platinum</span>
                   </div>
-                  <div class="card-pricing-label"><span>From</span>$80</div>
+                  <div class="card-pricing-label"><span>From</span>$8</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 5: Sai & SmallWorld SmallBand (Preah Sihanouk) -->
+          <div
+            class="concert-card-shell"
+            data-city="Preah Sihanouk"
+            data-artist="Sai សាយ SmallWorld SmallBand SWSB Coastal Beats Indie Rock Bay of Lights"
+            onclick="openReservationModal('kh-concert-005')"
+          >
+            <div class="concert-card-core">
+              <div class="card-media-wrapper">
+                <img
+                  class="card-media-img"
+                  src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=600&q=80"
+                  alt="Sai & SWSB"
+                />
+                <div class="card-media-overlay"></div>
+                <div class="card-floating-badge">DEC 20 • 05:30 PM</div>
+                <div class="card-capacity-indicator">
+                  <span class="audio-equalizer-bars" aria-hidden="true" style="color: #60A5FA;">
+                    <span class="eq-bar bar-1"></span>
+                    <span class="eq-bar bar-2"></span>
+                    <span class="eq-bar bar-3"></span>
+                    <span class="eq-bar bar-4"></span>
+                  </span>
+                  520 Left
+                </div>
+              </div>
+              <div class="card-details-body">
+                <div class="card-date-badge">Ocean Beachfront Stage</div>
+                <div class="card-artist-name">Sai & SmallWorld SmallBand (SWSB)</div>
+                <div class="card-tour-title">Coastal Beats & Indie Rock Festival</div>
+                <div class="card-venue-row">
+                  <svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                  </svg>
+                  Bay of Lights Ocean Arena • Preah Sihanouk
+                </div>
+                <div class="card-footer-strip">
+                  <div class="card-tier-tags">
+                    <span class="card-tag-pill">Beach Pit</span>
+                    <span class="card-tag-pill">VIP Deck</span>
+                  </div>
+                  <div class="card-pricing-label"><span>From</span>$10</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 6: RuthKo & KlapYaHandz All-Stars (Kampot) -->
+          <div
+            class="concert-card-shell"
+            data-city="Kampot"
+            data-artist="RuthKo KlapYaHandz All-Stars Bokor Mountain Mist Jam Hip-Hop"
+            onclick="openReservationModal('kh-concert-006')"
+          >
+            <div class="concert-card-core">
+              <div class="card-media-wrapper">
+                <img
+                  class="card-media-img"
+                  src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=600&q=80"
+                  alt="RuthKo & KlapYaHandz"
+                />
+                <div class="card-media-overlay"></div>
+                <div class="card-floating-badge">JAN 10 • 05:00 PM</div>
+                <div class="card-capacity-indicator">
+                  <span class="audio-equalizer-bars" aria-hidden="true" style="color: #60A5FA;">
+                    <span class="eq-bar bar-1"></span>
+                    <span class="eq-bar bar-2"></span>
+                    <span class="eq-bar bar-3"></span>
+                    <span class="eq-bar bar-4"></span>
+                  </span>
+                  415 Left
+                </div>
+              </div>
+              <div class="card-details-body">
+                <div class="card-date-badge">Bokor Mountain Plateau</div>
+                <div class="card-artist-name">RuthKo & KlapYaHandz All-Stars</div>
+                <div class="card-tour-title">Bokor Mountain Mist Jam & Hip-Hop Summit</div>
+                <div class="card-venue-row">
+                  <svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                  </svg>
+                  Bokor Plateau Mountain Amphitheatre • Kampot
+                </div>
+                <div class="card-footer-strip">
+                  <div class="card-tier-tags">
+                    <span class="card-tag-pill">Pit Pass</span>
+                    <span class="card-tag-pill">Platinum</span>
+                  </div>
+                  <div class="card-pricing-label"><span>From</span>$8</div>
                 </div>
               </div>
             </div>
@@ -2025,7 +2121,7 @@
               <div id="hallSelectedTierName" style="font-size: 18px; font-weight: 900; color: #FFFFFF; margin-top: 2px;">VIP FRONT FLOOR</div>
               <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Direct catwalk sightline, priority turnstile entrance</div>
             </div>
-            <button class="btn-auth-action" style="padding: 12px 24px;" onclick="openReservationModal('bassac-grand-opening')">
+            <button class="btn-auth-action" style="padding: 12px 24px;" onclick="openReservationModal('kh-concert-001')">
               Book Hall Passes — <span id="hallSelectedTierPrice">$45</span>
             </button>
           </div>
@@ -2050,15 +2146,15 @@
                     <span class="eq-bar bar-3"></span>
                     <span class="eq-bar bar-4"></span>
                   </span>
-                  VERIFIED DIGITAL PASS • TKT-FANP-0941
+                  VERIFIED DIGITAL PASS • TKT-VANNDA-FANPIT-001
                 </div>
-                <h3 class="stub-artist-title">Taylor Swift</h3>
-                <div class="stub-tour-name">The Eras Stadium Experience</div>
+                <h3 class="stub-artist-title">VannDa (វណ្ណដា)</h3>
+                <div class="stub-tour-name">Skull Tour: Born in Battambang Live</div>
                 <div style="font-size: 12px; color: var(--text-muted); margin-top: 8px;">
-                  SoFi Stadium • Los Angeles, CA • NOV 14 • 07:30 PM
+                  Bassac Live Main Hall • Koh Pich, Phnom Penh • NOV 14 • 07:30 PM
                 </div>
               </div>
-              <div class="stub-qr-code-box" id="ticketQr1" onclick="openEnlargedQrModal('Taylor Swift', 'The Eras Stadium Experience', 'TKT-FANP-0941')">
+              <div class="stub-qr-code-box" id="ticketQr1" onclick="openEnlargedQrModal('VannDa (វណ្ណដា)', 'Skull Tour: Born in Battambang Live', 'TKT-VANNDA-FANPIT-001')">
                 <div class="turnstile-laser-line"></div>
               </div>
             </div>
@@ -2070,9 +2166,9 @@
             <div class="stub-bottom-zone">
               <div class="stub-seat-specs">
                 <span class="stub-seat-label">Assigned Seat & Tier</span>
-                <span class="stub-seat-assigned">Fanpit Standing #042 · Gate 4</span>
+                <span class="stub-seat-assigned">Fanpit Standing #042 · Gate 1</span>
               </div>
-              <button class="stub-enlarge-btn" onclick="openEnlargedQrModal('Taylor Swift', 'The Eras Stadium Experience', 'TKT-FANP-0941')">
+              <button class="stub-enlarge-btn" onclick="openEnlargedQrModal('VannDa (វណ្ណដា)', 'Skull Tour: Born in Battambang Live', 'TKT-VANNDA-FANPIT-001')">
                 Enlarge Gate QR
               </button>
             </div>
@@ -2089,10 +2185,10 @@
             <img src="/logo.png" alt="CT Concert Ticketing" style="height: 64px; width: auto; object-fit: contain; filter: drop-shadow(0 6px 20px rgba(59, 130, 246, 0.4));" />
           </div>
           <div class="profile-header-user">
-            <div class="profile-large-avatar" id="profAvatarInitial">A</div>
+            <div class="profile-large-avatar" id="profAvatarInitial">S</div>
             <div>
-              <h2 style="font-size: 20px; font-weight: 900; color: #FFFFFF;" id="profUserName">Alex Kim</h2>
-              <div style="font-size: 13px; color: var(--text-secondary);" id="profUserEmail">alex.kim@example.com</div>
+              <h2 style="font-size: 20px; font-weight: 900; color: #FFFFFF;" id="profUserName">Sopheak Chan</h2>
+              <div style="font-size: 13px; color: var(--text-secondary);" id="profUserEmail">user@example.com</div>
             </div>
           </div>
 
@@ -2110,8 +2206,8 @@
           <!-- Fast 1-Tap Demo Switcher -->
           <div class="demo-login-box">
             <div style="font-size: 12px; font-weight: 800; color: #93C5FD; text-transform: uppercase;">1-Tap Verified Demo Account</div>
-            <div style="font-size: 12px; color: var(--text-secondary);">Instantly authenticate with pre-loaded payment profile and wallet passes.</div>
-            <button class="demo-btn-action" onclick="loginDemoUser()">Switch to Demo User (Alex Kim)</button>
+            <div style="font-size: 12px; color: var(--text-secondary);">Bassac Live verified ticketing account with instant VIP wallet access.</div>
+            <button class="demo-btn-action" onclick="loginDemoUser()">Switch to Demo User (Sopheak Chan)</button>
           </div>
 
           <!-- Phone OTP Login -->
@@ -2184,8 +2280,8 @@
 
         <div class="sheet-body-content">
           <div>
-            <h3 class="sheet-title-headline" id="sheetConcertTitle">Taylor Swift</h3>
-            <div class="sheet-tour-subtext" id="sheetConcertTour">The Eras Stadium Experience • SoFi Stadium</div>
+            <h3 class="sheet-title-headline" id="sheetConcertTitle">VannDa (វណ្ណដា)</h3>
+            <div class="sheet-tour-subtext" id="sheetConcertTour">Skull Tour: Born in Battambang Live • Bassac Live Main Hall</div>
           </div>
 
           <!-- 10-Minute Urgency Hold Timer -->
@@ -2197,44 +2293,55 @@
               </svg>
               <div>
                 <div class="urgency-label">10-Minute Reservation Hold</div>
-                <div style="font-size: 11px; color: var(--text-secondary);">High-demand release: locks seats against scalpers</div>
+                <div style="font-size: 11px; color: var(--text-secondary);">ACID transactional lock: prevents double booking during flash sales</div>
               </div>
             </div>
             <div class="urgency-timer-clock" id="holdClock">09:59</div>
           </div>
 
-          <!-- Tier Selectors -->
-          <div class="tier-selection-list">
-            <div class="tier-option-card selected" id="tierOption1" onclick="selectPassTier(1, 160, 'VIP CATWALK PASS')">
+          <!-- Dynamic Tier Selectors -->
+          <div class="tier-selection-list" id="sheetTierListContainer">
+            <div class="tier-option-card selected" id="tierOption0" onclick="selectPassTier(0, 45, 'Fanpit')">
               <div class="tier-left-info">
-                <span class="tier-name-label">VIP Catwalk & Standing Pit</span>
-                <span class="tier-perks-desc">Front-row stage access, priority gate entry lane</span>
+                <span class="tier-name-label">Fanpit Stage Catwalk</span>
+                <span class="tier-perks-desc">Front-row moshpit access, priority gate entry lane</span>
               </div>
               <div class="tier-pricing-right">
-                <div class="tier-price-amount">$160</div>
-                <div class="tier-seats-left">18 Left</div>
+                <div class="tier-price-amount">$45</div>
+                <div class="tier-seats-left">52 Left</div>
               </div>
             </div>
 
-            <div class="tier-option-card" id="tierOption2" onclick="selectPassTier(2, 110, 'PLATINUM SEATS')">
+            <div class="tier-option-card" id="tierOption1" onclick="selectPassTier(1, 35, 'Platinum')">
               <div class="tier-left-info">
                 <span class="tier-name-label">Platinum Reserved Center</span>
-                <span class="tier-perks-desc">Soundboard direct sightlines, private lounge bar</span>
+                <span class="tier-perks-desc">Soundboard direct sightlines, VIP concourse bar</span>
               </div>
               <div class="tier-pricing-right">
-                <div class="tier-price-amount">$110</div>
-                <div class="tier-seats-left">42 Left</div>
+                <div class="tier-price-amount">$35</div>
+                <div class="tier-seats-left">96 Left</div>
               </div>
             </div>
 
-            <div class="tier-option-card" id="tierOption3" onclick="selectPassTier(3, 75, 'GENERAL FLOOR')">
+            <div class="tier-option-card" id="tierOption2" onclick="selectPassTier(2, 25, 'Gold')">
               <div class="tier-left-info">
-                <span class="tier-name-label">General Admission Floor</span>
-                <span class="tier-perks-desc">Standing arena floor access</span>
+                <span class="tier-name-label">Gold Elevated Mid-Tier</span>
+                <span class="tier-perks-desc">Elevated clear acoustics, fast concession lanes</span>
               </div>
               <div class="tier-pricing-right">
-                <div class="tier-price-amount">$75</div>
-                <div class="tier-seats-left">Available</div>
+                <div class="tier-price-amount">$25</div>
+                <div class="tier-seats-left">155 Left</div>
+              </div>
+            </div>
+
+            <div class="tier-option-card" id="tierOption3" onclick="selectPassTier(3, 15, 'Silver')">
+              <div class="tier-left-info">
+                <span class="tier-name-label">Silver General Admission</span>
+                <span class="tier-perks-desc">General hall admission, panoramic lightshow view</span>
+              </div>
+              <div class="tier-pricing-right">
+                <div class="tier-price-amount">$15</div>
+                <div class="tier-seats-left">290 Left</div>
               </div>
             </div>
           </div>
@@ -2251,7 +2358,7 @@
 
           <!-- Primary Submit Button -->
           <button class="sheet-primary-submit-btn" id="confirmPassBtn" onclick="confirmPassReservation()">
-            Lock Pass & Checkout — <span id="sheetTotalPriceDisplay">$160</span>
+            Lock Pass & Checkout — <span id="sheetTotalPriceDisplay">$45</span>
           </button>
         </div>
       </div>
@@ -2269,8 +2376,8 @@
           </svg>
         </button>
 
-        <h3 style="font-size: 20px; font-weight: 900; color: #FFFFFF;" id="modalQrArtistName">Taylor Swift</h3>
-        <div style="font-size: 13px; color: var(--text-secondary);" id="modalQrTourSub">The Eras Stadium Experience</div>
+        <h3 style="font-size: 20px; font-weight: 900; color: #FFFFFF;" id="modalQrArtistName">VannDa (វណ្ណដា)</h3>
+        <div style="font-size: 13px; color: var(--text-secondary);" id="modalQrTourSub">Skull Tour: Born in Battambang Live</div>
 
         <div class="qr-white-frame">
           <div class="turnstile-laser-line" style="height: 3px;"></div>
@@ -2278,10 +2385,10 @@
         </div>
 
         <div style="font-size: 11px; font-weight: 800; color: #93C5FD; letter-spacing: 0.8px; text-transform: uppercase;" id="modalQrTicketIdLabel">
-          TKT-FANP-0941
+          TKT-VANNDA-FANPIT-001
         </div>
         <div style="font-size: 11px; color: var(--text-muted);">
-          Scan at venue turnstile gate. Screen brightness boosted for high-speed laser read.
+          Scan at Bassac Live turnstile gate. High-speed laser authenticated.
         </div>
       </div>
     </div>
@@ -2291,44 +2398,109 @@
       // APPLICATION STATE & INTERACTION ENGINE
       // ============================================================
       let currentUser = {
-        name: 'Alex Kim',
-        email: 'alex.kim@example.com'
+        name: 'Sopheak Chan',
+        email: 'user@example.com'
       };
 
       const CONCERT_DATABASE = {
-        'taylor-swift': {
-          title: 'Taylor Swift',
-          tour: 'The Eras Stadium Experience',
-          venue: 'SoFi Stadium • Los Angeles, CA',
+        'kh-concert-001': {
+          id: 'kh-concert-001',
+          title: 'VannDa (វណ្ណដា)',
+          tour: 'Skull Tour: Born in Battambang Live',
+          venue: 'Bassac Live Main Hall (Diamond Island / Koh Pich)',
+          city: 'Phnom Penh',
           banner: 'https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?auto=format&fit=crop&w=1200&q=80',
-          basePrice: 160
+          basePrice: 45,
+          categories: [
+            { id: 'cat-vd-01', name: 'Fanpit', price: 45, perks: 'Front Row Catwalk Access, Priority VIP Entry', seatsLeft: 52 },
+            { id: 'cat-vd-02', name: 'Platinum', price: 35, perks: 'Lower Tier Center Rows, VIP Concourse Bar', seatsLeft: 96 },
+            { id: 'cat-vd-03', name: 'Gold', price: 25, perks: 'Elevated Mid-Tier Seating, Clear Sightlines', seatsLeft: 155 },
+            { id: 'cat-vd-04', name: 'Silver', price: 15, perks: 'General Admission Seating, Delay Towers', seatsLeft: 290 }
+          ]
         },
-        'bassac-grand-opening': {
-          title: 'CT Live Grand Opening',
-          tour: 'Bassac Live Concert Hall Inauguration',
-          venue: 'Bassac Live Hall • Phnom Penh',
+        'kh-concert-002': {
+          id: 'kh-concert-002',
+          title: 'Preap Sovath & G-Devith',
+          tour: 'Kings of Khmer Pop & Hip-Hop Mega Live',
+          venue: 'Morodok Techo National Stadium Live Arena',
+          city: 'Phnom Penh',
           banner: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1200&q=80',
-          basePrice: 45
+          basePrice: 50,
+          categories: [
+            { id: 'cat-ps-01', name: 'Fanpit', price: 50, perks: 'Direct Pit Access, Synchronized LED Wristband', seatsLeft: 38 },
+            { id: 'cat-ps-02', name: 'Platinum', price: 35, perks: 'Level 2 Premium Concourse, Padded Seats', seatsLeft: 82 },
+            { id: 'cat-ps-03', name: 'Gold', price: 20, perks: 'Grandstand Center Tier View', seatsLeft: 160 },
+            { id: 'cat-ps-04', name: 'Silver', price: 10, perks: 'Upper Bowl Festival Atmosphere', seatsLeft: 250 }
+          ]
         },
-        'coldplay': {
-          title: 'Coldplay',
-          tour: 'Music of the Spheres Tour',
-          venue: 'Wembley Stadium • London, UK',
+        'kh-concert-003': {
+          id: 'kh-concert-003',
+          title: 'Sinn Sisamouth Legacy Orchestra',
+          tour: 'Golden Era Angkor Symphony',
+          venue: 'Angkor Heritage Cultural Amphitheatre',
+          city: 'Siem Reap',
           banner: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1200&q=80',
-          basePrice: 110
+          basePrice: 60,
+          categories: [
+            { id: 'cat-ss-01', name: 'Royal Circle', price: 60, perks: 'Front Orchestra Stalls, Commemorative Program', seatsLeft: 35 },
+            { id: 'cat-ss-02', name: 'Platinum', price: 40, perks: 'Mezzanine Center Acoustics, Fast Check-in', seatsLeft: 68 },
+            { id: 'cat-ss-03', name: 'Gold', price: 25, perks: 'Amphitheatre Terrace Tier', seatsLeft: 120 },
+            { id: 'cat-ss-04', name: 'Silver', price: 15, perks: 'Open Lawn Acoustic Projection', seatsLeft: 210 }
+          ]
         },
-        'billie-eilish': {
-          title: 'Billie Eilish',
-          tour: 'Hit Me Hard and Soft Tour',
-          venue: 'Madison Square Garden • New York, NY',
+        'kh-concert-004': {
+          id: 'kh-concert-004',
+          title: 'Tena x Sophia Kao x Suly Pheng',
+          tour: 'Sunset Acoustic & R&B Riverfront Live',
+          venue: 'Sangke Riverfront Amphitheatre',
+          city: 'Battambang',
           banner: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?auto=format&fit=crop&w=1200&q=80',
-          basePrice: 80
+          basePrice: 30,
+          categories: [
+            { id: 'cat-ts-01', name: 'Fanpit', price: 30, perks: 'Waterfront Stage Deck Access', seatsLeft: 28 },
+            { id: 'cat-ts-02', name: 'Platinum', price: 20, perks: 'Reserved Riverside Loungers', seatsLeft: 55 },
+            { id: 'cat-ts-03', name: 'Gold', price: 15, perks: 'Riverfront Steps Panoramic Sightlines', seatsLeft: 95 },
+            { id: 'cat-ts-04', name: 'Silver', price: 8, perks: 'Promenade General Admission', seatsLeft: 180 }
+          ]
+        },
+        'kh-concert-005': {
+          id: 'kh-concert-005',
+          title: 'Sai & SmallWorld SmallBand (SWSB)',
+          tour: 'Coastal Beats & Indie Rock Festival',
+          venue: 'Bay of Lights Ocean Arena',
+          city: 'Preah Sihanouk',
+          banner: 'https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?auto=format&fit=crop&w=1200&q=80',
+          basePrice: 35,
+          categories: [
+            { id: 'cat-sw-01', name: 'Beach Pit', price: 35, perks: 'Sand Front Mosh Pit, Waterproof Wristband', seatsLeft: 42 },
+            { id: 'cat-sw-02', name: 'VIP Deck', price: 25, perks: 'Elevated Oceanfront Platform & Bar', seatsLeft: 70 },
+            { id: 'cat-sw-03', name: 'Gold', price: 15, perks: 'Boardwalk Viewing Area', seatsLeft: 140 },
+            { id: 'cat-sw-04', name: 'General', price: 10, perks: 'Beach Lawn Festival Grounds', seatsLeft: 260 }
+          ]
+        },
+        'kh-concert-006': {
+          id: 'kh-concert-006',
+          title: 'RuthKo & KlapYaHandz All-Stars',
+          tour: 'Bokor Mountain Mist Jam & Hip-Hop Summit',
+          venue: 'Bokor Plateau Mountain Amphitheatre',
+          city: 'Kampot',
+          banner: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80',
+          basePrice: 28,
+          categories: [
+            { id: 'cat-rk-01', name: 'Pit Pass', price: 28, perks: 'Stage Center Mist Zone & VIP Heat Lamp Access', seatsLeft: 25 },
+            { id: 'cat-rk-02', name: 'Platinum', price: 20, perks: 'Covered Plateau Seating, Hot Tea Service', seatsLeft: 60 },
+            { id: 'cat-rk-03', name: 'Gold', price: 14, perks: 'Mountain Ridge Amphitheatre Terrace', seatsLeft: 110 },
+            { id: 'cat-rk-04', name: 'Silver', price: 8, perks: 'Pine Forest General Lawn', seatsLeft: 190 }
+          ]
         }
       };
 
-      let selectedConcertKey = 'taylor-swift';
-      let selectedTierPrice = 160;
-      let selectedTierName = 'VIP CATWALK PASS';
+      // Legacy compatibility alias
+      CONCERT_DATABASE['bassac-grand-opening'] = CONCERT_DATABASE['kh-concert-001'];
+
+      let selectedConcertKey = 'kh-concert-001';
+      let selectedTierPrice = 45;
+      let selectedTierName = 'Fanpit';
       let selectedQty = 1;
       let timerInterval = null;
 
@@ -2336,7 +2508,39 @@
       window.addEventListener('DOMContentLoaded', () => {
         initInitialQr();
         syncUserUi();
+        loadLiveConcertsFromApi();
       });
+
+      // Load live PostgreSQL concerts from backend API if active
+      async function loadLiveConcertsFromApi() {
+        try {
+          const res = await fetch('/api/v1/concerts');
+          if (res.ok) {
+            const json = await res.json();
+            if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+              json.data.forEach(c => {
+                if (CONCERT_DATABASE[c.id]) {
+                  CONCERT_DATABASE[c.id].title = c.artist || c.title;
+                  CONCERT_DATABASE[c.id].tour = c.title;
+                  CONCERT_DATABASE[c.id].venue = `${c.venue} • ${c.city}`;
+                  if (c.categories && c.categories.length > 0) {
+                    CONCERT_DATABASE[c.id].categories = c.categories.map(cat => ({
+                      id: cat.id,
+                      name: cat.name,
+                      price: cat.price,
+                      perks: Array.isArray(cat.perks) ? cat.perks.join(', ') : (cat.description || cat.name),
+                      seatsLeft: cat.available !== undefined ? cat.available : (cat.totalCapacity - (cat.soldCount || 0))
+                    }));
+                  }
+                }
+              });
+              console.log('⚡ Loaded live PostgreSQL Cambodian concerts from /api/v1/concerts');
+            }
+          }
+        } catch (e) {
+          console.info('Using pre-seeded Cambodian concert dataset:', e);
+        }
+      }
 
       function switchNavTab(tabId) {
         // Hide all screens
@@ -2395,7 +2599,7 @@
         let count = 0;
 
         cards.forEach(card => {
-          const text = card.getAttribute('data-artist').toLowerCase();
+          const text = (card.getAttribute('data-artist') || '').toLowerCase();
           if (text.includes(q)) {
             card.style.display = 'flex';
             count++;
@@ -2410,16 +2614,41 @@
       // Reservation Modal
       function openReservationModal(concertKey) {
         selectedConcertKey = concertKey;
-        const data = CONCERT_DATABASE[concertKey] || CONCERT_DATABASE['taylor-swift'];
+        const data = CONCERT_DATABASE[concertKey] || CONCERT_DATABASE['kh-concert-001'];
 
         document.getElementById('sheetConcertBanner').src = data.banner;
         document.getElementById('sheetConcertTitle').innerText = data.title;
         document.getElementById('sheetConcertTour').innerText = `${data.tour} • ${data.venue}`;
 
+        // Render Dynamic Tiers for selected concert
+        const tierListContainer = document.getElementById('sheetTierListContainer');
+        if (tierListContainer && data.categories && data.categories.length > 0) {
+          tierListContainer.innerHTML = data.categories.map((cat, idx) => `
+            <div class="tier-option-card ${idx === 0 ? 'selected' : ''}" id="tierOption${idx}" onclick="selectPassTier(${idx}, ${cat.price}, '${cat.name}')">
+              <div class="tier-left-info">
+                <span class="tier-name-label">${cat.name} Pass</span>
+                <span class="tier-perks-desc">${cat.perks}</span>
+              </div>
+              <div class="tier-pricing-right">
+                <div class="tier-price-amount">$${cat.price}</div>
+                <div class="tier-seats-left">${cat.seatsLeft !== undefined ? cat.seatsLeft + ' Left' : 'Available'}</div>
+              </div>
+            </div>
+          `).join('');
+
+          // Select first tier
+          const firstCat = data.categories[0];
+          selectedTierPrice = firstCat.price;
+          selectedTierName = firstCat.name;
+        } else {
+          selectedTierPrice = data.basePrice || 45;
+          selectedTierName = 'Fanpit';
+        }
+
         // Reset Stepper & Selection
         selectedQty = 1;
         document.getElementById('stepperQtyVal').innerText = '1';
-        selectPassTier(1, data.basePrice, 'VIP CATWALK PASS');
+        updateTotalPriceDisplay();
 
         // Start Countdown
         startHoldCountdown(600); // 10 minutes
@@ -2484,7 +2713,7 @@
           btn.disabled = false;
           btn.innerText = 'Lock Pass & Checkout';
 
-          const data = CONCERT_DATABASE[selectedConcertKey];
+          const data = CONCERT_DATABASE[selectedConcertKey] || CONCERT_DATABASE['kh-concert-001'];
           const ticketId = 'TKT-' + Math.random().toString(36).substring(2, 6).toUpperCase() + '-' + Math.floor(1000 + Math.random() * 9000);
 
           // Add New Ticket Stub to Wallet
@@ -2494,7 +2723,7 @@
             tour: data.tour,
             venue: data.venue,
             tier: selectedTierName,
-            seat: `${selectedTierName} #${Math.floor(10 + Math.random() * 80)} · Gate 2`
+            seat: `${selectedTierName} #${Math.floor(10 + Math.random() * 80)} · Gate 1`
           });
 
           // Close Modal & Switch to Wallet Passes
@@ -2666,7 +2895,7 @@
         if (target && window.QRCode) {
           target.innerHTML = '';
           new QRCode(target, {
-            text: JSON.stringify({ pass: 'TKT-FANP-0941', user: 'alex.kim@example.com' }),
+            text: JSON.stringify({ pass: 'TKT-VANNDA-FANPIT-001', user: 'user@example.com' }),
             width: 56,
             height: 56,
             colorDark: '#090A10',
@@ -2719,8 +2948,8 @@
 
       function loginDemoUser() {
         currentUser = {
-          name: 'Alex Kim',
-          email: 'alex.kim@example.com'
+          name: 'Sopheak Chan',
+          email: 'user@example.com'
         };
         syncUserUi();
         switchNavTab('shows');
