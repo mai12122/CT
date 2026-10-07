@@ -22,8 +22,13 @@ export function AppHeader({ right, showBack, onBack, title, subtitle }: AppHeade
 
   return (
     <View
-      style={{ paddingTop: insets.top + 8 }}
-      className="px-5 pb-3.5 flex-row items-center justify-between border-b border-line/80 bg-night/95 backdrop-blur-md">
+      style={{
+        paddingTop: insets.top + 8,
+        backgroundColor: 'rgba(11, 16, 32, 0.82)',
+        backdropFilter: 'blur(24px)',
+        WebkitBackdropFilter: 'blur(24px)',
+      } as any}
+      className="px-5 pb-3.5 flex-row items-center justify-between border-b border-line/60">
       <View className="flex-row items-center flex-1 mr-3">
         {showBack ? (
           <TouchableOpacity
@@ -50,16 +55,38 @@ export function AppHeader({ right, showBack, onBack, title, subtitle }: AppHeade
             onPress={() => router.push('/(tabs)')}
             className="flex-row items-center active:opacity-85">
             <View className="flex-row items-center gap-2.5">
-              <Image
-                source={require('@/assets/images/logo.png')}
-                style={{ width: 108, height: 32 }}
-                resizeMode="contain"
-              />
-              <View className="flex-row items-center bg-blue-500/10 border border-blue-500/30 px-2 py-0.5 rounded-full">
-                <View className="h-1.5 w-1.5 rounded-full bg-blue-500 mr-1.5" />
-                <Text className="text-blue-300 font-bold text-[9px] tracking-wider uppercase">
-                  LIVE PASSES
+              <View
+                style={{
+                  shadowColor: '#8b5cf6',
+                  shadowOffset: { width: 0, height: 0 },
+                  shadowOpacity: 0.6,
+                  shadowRadius: 10,
+                  elevation: 5,
+                }}
+                className="rounded-full border-[2px] border-iris-500/40">
+                <Image
+                  source={require('@/assets/images/logo.png')}
+                  style={{ width: 36, height: 36, borderRadius: 18, aspectRatio: 1 }}
+                  resizeMode="cover"
+                />
+              </View>
+              <View className="justify-center">
+                <Text className="text-white font-black text-base tracking-tight leading-5">
+                  Bassac Live
                 </Text>
+                <View className="flex-row items-center gap-1.5 mt-0.5">
+                  <View className="flex-row items-center bg-emerald-500/10 border border-emerald-500/30 px-1.5 py-0.5 rounded-full">
+                    <View className="h-1.5 w-1.5 rounded-full bg-emerald-400 mr-1" />
+                    <Text className="text-emerald-300 font-bold text-[8px] tracking-wider uppercase">
+                      PHNOM PENH
+                    </Text>
+                  </View>
+                  <View className="flex-row items-center bg-iris-500/10 border border-iris-500/30 px-1.5 py-0.5 rounded-full">
+                    <Text className="text-iris-300 font-bold text-[8px] tracking-wider uppercase">
+                      WORLDWIDE
+                    </Text>
+                  </View>
+                </View>
               </View>
             </View>
           </Pressable>
@@ -77,10 +104,14 @@ export function HeaderAvatar({ name, onPress }: { name: string; onPress: () => v
     <Pressable
       onPress={onPress}
       className="flex-row items-center bg-card border border-line rounded-full py-1.5 px-3 active:scale-95 transition-transform">
-      <View className="h-6 w-6 rounded-full bg-iris-500 items-center justify-center mr-2 shadow-sm shadow-iris-500/40">
-        <Text className="text-white text-xs font-bold">{name ? name[0].toUpperCase() : 'U'}</Text>
+      <View className="relative mr-2">
+        <View className="h-6 w-6 rounded-full bg-iris-500 border border-iris-400 items-center justify-center shadow-sm shadow-iris-500/40">
+          <Text className="text-white text-xs font-bold">{name ? name[0].toUpperCase() : 'U'}</Text>
+        </View>
+        <View className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-green-500 border-[1.5px] border-card" />
       </View>
-      <Text className="text-slate-200 text-xs font-semibold">{name ? name.split(' ')[0] : 'Account'}</Text>
+      <Text className="text-slate-200 text-xs font-semibold mr-1">{name ? name.split(' ')[0] : 'Account'}</Text>
+      <Ionicons name="chevron-down" size={12} color="#93A0BE" />
     </Pressable>
   );
 }
