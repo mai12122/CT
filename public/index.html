@@ -84,8 +84,8 @@
         top: 0;
         z-index: 1000;
         background: rgba(9, 10, 16, 0.92);
-        backdrop-filter: blur(24px);
-        -webkit-backdrop-filter: blur(24px);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
         border-bottom: 1px solid var(--border-hairline);
         margin: 0 -24px;
         padding: 16px 24px;
@@ -113,67 +113,26 @@
         text-decoration: none;
         cursor: pointer;
         user-select: none;
-        flex: 0 0 auto;
-        border: 0;
-        padding: 0;
-        color: inherit;
-        background: transparent;
-        text-align: left;
-      }
-
-      .brand-logo-frame {
-        display: grid;
-        width: 48px;
-        height: 48px;
-        flex: 0 0 48px;
-        aspect-ratio: 1 / 1;
-        place-items: center;
-        padding: 2px;
-        border: 1px solid rgba(96, 165, 250, 0.55);
-        border-radius: 50%;
-        background: linear-gradient(145deg, rgba(96, 165, 250, 0.8), rgba(139, 92, 246, 0.45));
-        box-shadow: 0 0 16px rgba(59, 130, 246, 0.18);
-        transition: transform 0.25s cubic-bezier(0.32, 0.72, 0, 1), box-shadow 0.25s ease,
-          border-color 0.25s ease;
       }
 
       .brand-logo-img {
-        display: block;
-        width: 100%;
-        height: 100%;
-        aspect-ratio: 1 / 1;
-        object-fit: cover;
-        object-position: center;
-        border: 2px solid var(--bg);
-        border-radius: 50%;
+        height: 48px;
+        width: auto;
+        max-width: 220px;
+        object-fit: contain;
+        border-radius: 8px;
+        filter: drop-shadow(0 2px 12px rgba(59, 130, 246, 0.35));
+        transition: transform 0.25s cubic-bezier(0.32, 0.72, 0, 1), filter 0.25s ease;
       }
 
-      .hero-brand-logo-frame {
-        width: 22px;
-        height: 22px;
-        flex: 0 0 22px;
-        padding: 1px;
-        box-shadow: 0 0 10px rgba(96, 165, 250, 0.28);
-      }
-
-      .brand-group:hover .brand-logo-frame,
-      .brand-group:focus-visible .brand-logo-frame {
+      .brand-group:hover .brand-logo-img {
         transform: scale(1.04);
-        border-color: rgba(196, 181, 253, 0.9);
-        box-shadow: 0 0 22px rgba(139, 92, 246, 0.48);
+        filter: drop-shadow(0 4px 20px rgba(147, 51, 234, 0.5));
       }
 
       @media (max-width: 640px) {
-        .brand-logo-frame {
-          width: 40px;
-          height: 40px;
-          flex-basis: 40px;
-        }
-
-        .hero-brand-logo-frame {
-          width: 22px;
-          height: 22px;
-          flex-basis: 22px;
+        .brand-logo-img {
+          height: 36px;
         }
       }
 
@@ -200,10 +159,6 @@
         display: flex;
         align-items: center;
         gap: 5px;
-      }
-
-      .brand-status-label {
-        white-space: nowrap;
       }
 
       .status-pulse-dot {
@@ -239,43 +194,26 @@
         color: var(--text-secondary);
         font-size: 13px;
         font-weight: 600;
-        padding: 9px 14px;
-        border: 1px solid transparent;
-        border-radius: 999px;
+        padding: 8px 14px;
+        border-radius: 10px;
         cursor: pointer;
-        transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease,
-          transform 0.2s ease;
+        transition: all 0.2s ease;
       }
 
       .nav-link-btn:hover {
         color: #FFFFFF;
-        background: rgba(255, 255, 255, 0.06);
-        border-color: rgba(255, 255, 255, 0.08);
-        transform: translateY(-1px);
+        background: rgba(255, 255, 255, 0.05);
       }
 
       .nav-link-btn.active {
         color: #FFFFFF;
-        background: rgba(59, 130, 246, 0.16);
-        border-color: rgba(96, 165, 250, 0.3);
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
-      }
-
-      .nav-link-btn:focus-visible,
-      .island-tab-btn:focus-visible,
-      .btn-auth-action:focus-visible,
-      .user-avatar-pill:focus-visible,
-      .demo-btn-action:focus-visible,
-      .stub-enlarge-btn:focus-visible {
-        outline: 2px solid #93C5FD;
-        outline-offset: 3px;
+        background: rgba(255, 255, 255, 0.08);
       }
 
       .navbar-actions {
         display: flex;
         align-items: center;
-        gap: 8px;
-        flex: 0 0 auto;
+        gap: 12px;
       }
 
       .btn-auth-action {
@@ -312,11 +250,6 @@
         font-weight: 700;
         cursor: pointer;
         transition: 0.2s;
-      }
-
-      .user-avatar-pill:hover {
-        background: rgba(255, 255, 255, 0.1);
-        border-color: rgba(255, 255, 255, 0.16);
       }
 
       .user-avatar-circle {
@@ -1270,74 +1203,16 @@
       /* 9. PROFILE & AUTH SCREEN                                     */
       /* ============================================================ */
       .profile-card-layout {
-        position: relative;
-        overflow: hidden;
-        background:
-          radial-gradient(ellipse at 15% 0%, rgba(59, 130, 246, 0.1), transparent 42%),
-          var(--surface);
+        background: var(--surface);
         border: 1px solid var(--card-border);
-        border-radius: 28px;
-        padding: 30px;
-        max-width: 900px;
+        border-radius: var(--radius-outer);
+        padding: 28px;
+        max-width: 600px;
         margin: 0 auto;
         width: 100%;
         display: flex;
         flex-direction: column;
-        gap: 22px;
-        box-shadow: 0 28px 80px rgba(0, 0, 0, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.035);
-      }
-
-      .profile-brand-lockup {
-        display: flex;
-        align-items: center;
-        gap: 13px;
-        padding-bottom: 20px;
-        border-bottom: 1px solid var(--border-hairline);
-      }
-
-      .profile-brand-logo-frame {
-        width: 58px;
-        height: 58px;
-        flex: 0 0 58px;
-      }
-
-      .profile-brand-name {
-        color: #FFFFFF;
-        font-size: 15px;
-        font-weight: 900;
-        letter-spacing: -0.3px;
-      }
-
-      .profile-brand-caption {
-        margin-top: 3px;
-        color: var(--text-muted);
-        font-size: 11px;
-        font-weight: 600;
-      }
-
-      .profile-verified-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        margin-left: auto;
-        padding: 6px 10px;
-        border: 1px solid rgba(16, 185, 129, 0.26);
-        border-radius: 999px;
-        background: rgba(16, 185, 129, 0.08);
-        color: #6EE7B7;
-        font-size: 9px;
-        font-weight: 900;
-        letter-spacing: 0.8px;
-        white-space: nowrap;
-      }
-
-      .profile-verified-pill::before {
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: #34D399;
-        box-shadow: 0 0 10px rgba(52, 211, 153, 0.7);
-        content: "";
+        gap: 24px;
       }
 
       .profile-header-user {
@@ -1346,135 +1221,33 @@
         gap: 16px;
       }
 
-      .profile-avatar-wrap {
-        position: relative;
-        flex: 0 0 auto;
-      }
-
       .profile-large-avatar {
-        width: 76px;
-        height: 76px;
-        aspect-ratio: 1 / 1;
+        width: 56px;
+        height: 56px;
         border-radius: 50%;
-        border: 1px solid rgba(147, 197, 253, 0.5);
-        background:
-          radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.3), transparent 32%),
-          linear-gradient(145deg, #3B82F6, #6D28D9);
+        background: #3B82F6;
         color: #FFFFFF;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 27px;
-        font-weight: 900;
-        box-shadow: 0 10px 28px rgba(59, 130, 246, 0.27);
-      }
-
-      .profile-online-indicator {
-        position: absolute;
-        right: 3px;
-        bottom: 3px;
-        width: 15px;
-        height: 15px;
-        border: 3px solid var(--surface);
-        border-radius: 50%;
-        background: #34D399;
-        box-shadow: 0 0 12px rgba(52, 211, 153, 0.45);
-      }
-
-      .profile-verified-check {
-        position: absolute;
-        top: -2px;
-        right: -3px;
-        width: 23px;
-        height: 23px;
-        display: grid;
-        place-items: center;
-        border: 2px solid var(--surface);
-        border-radius: 50%;
-        background: #2563EB;
-        color: #FFFFFF;
-        font-size: 13px;
-        font-weight: 900;
-      }
-
-      .profile-user-copy {
-        min-width: 0;
-        flex: 1;
-      }
-
-      .profile-user-copy h2 {
-        overflow: hidden;
-        color: #FFFFFF;
-        font-size: clamp(19px, 3vw, 24px);
-        font-weight: 900;
-        letter-spacing: -0.6px;
-        text-overflow: ellipsis;
-      }
-
-      .profile-user-email {
-        overflow: hidden;
-        margin-top: 4px;
-        color: var(--text-secondary);
-        font-size: 12px;
-        text-overflow: ellipsis;
-      }
-
-      .profile-member-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        margin-top: 10px;
-        padding: 6px 10px;
-        border: 1px solid rgba(245, 158, 11, 0.28);
-        border-radius: 999px;
-        background: rgba(245, 158, 11, 0.09);
-        color: #FCD34D;
-        font-size: 10px;
+        font-size: 22px;
         font-weight: 800;
-      }
-
-      .profile-user-meta {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px 18px;
-        margin-top: 13px;
-        color: var(--text-muted);
-        font-size: 11px;
-      }
-
-      .profile-user-meta span {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-      }
-
-      .profile-user-meta strong {
-        color: var(--text-secondary);
-        font-weight: 700;
       }
 
       .profile-stats-bento {
         display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: 1fr 1fr;
         gap: 12px;
       }
 
       .stat-mini-tile {
-        min-width: 0;
-        background: linear-gradient(145deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.018));
-        border: 1px solid var(--card-border);
-        border-radius: 18px;
-        padding: 17px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--border-hairline);
+        border-radius: 14px;
+        padding: 16px;
         display: flex;
         flex-direction: column;
         gap: 4px;
-        transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
-      }
-
-      .stat-mini-tile:hover {
-        transform: translateY(-2px);
-        border-color: rgba(96, 165, 250, 0.28);
-        background: rgba(59, 130, 246, 0.07);
       }
 
       .stat-num-val {
@@ -1490,235 +1263,42 @@
         text-transform: uppercase;
       }
 
-      .profile-tools-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 14px;
-      }
-
       /* Demo Login Quick Box */
       .demo-login-box {
-        min-width: 0;
-        background: linear-gradient(145deg, rgba(59, 130, 246, 0.09), rgba(59, 130, 246, 0.035));
-        border: 1px solid rgba(96, 165, 250, 0.2);
-        border-radius: 18px;
-        padding: 18px;
+        background: rgba(59, 130, 246, 0.06);
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        border-radius: 14px;
+        padding: 16px;
         display: flex;
         flex-direction: column;
         gap: 10px;
       }
 
-      .profile-panel-heading {
-        color: #FFFFFF;
-        font-size: 12px;
-        font-weight: 800;
-        letter-spacing: 0.1px;
-      }
-
-      .profile-panel-copy {
-        color: var(--text-secondary);
-        font-size: 11px;
-        line-height: 1.6;
-      }
-
       .demo-btn-action {
-        margin-top: auto;
-        background: linear-gradient(105deg, #3B82F6, #5B55D6);
+        background: #3B82F6;
         color: #FFFFFF;
         border: none;
         border-radius: 999px;
-        padding: 11px 14px;
+        padding: 10px;
         font-size: 13px;
         font-weight: 700;
         cursor: pointer;
-        transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+        transition: 0.2s;
       }
 
       .demo-btn-action:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 8px 20px rgba(59, 130, 246, 0.25);
-        filter: brightness(1.08);
+        background: #2563EB;
       }
 
       /* Phone OTP Login */
       .phone-auth-container {
-        min-width: 0;
-        background: rgba(255, 255, 255, 0.025);
-        border: 1px solid var(--card-border);
-        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--border-hairline);
+        border-radius: 14px;
         padding: 18px;
         display: flex;
         flex-direction: column;
         gap: 10px;
-      }
-
-      .phone-input-label {
-        color: var(--text-secondary);
-        font-size: 10px;
-        font-weight: 800;
-        letter-spacing: 0.7px;
-        text-transform: uppercase;
-      }
-
-      .phone-input-row {
-        display: flex;
-        align-items: stretch;
-        gap: 8px;
-      }
-
-      .phone-country-code,
-      .phone-number-input {
-        min-height: 44px;
-        border: 1px solid var(--card-border);
-        border-radius: 11px;
-        background: rgba(0, 0, 0, 0.24);
-        color: #FFFFFF;
-        font: inherit;
-      }
-
-      .phone-country-code {
-        display: flex;
-        align-items: center;
-        flex: 0 0 auto;
-        gap: 6px;
-        padding: 0 12px;
-        color: #E2E8F0;
-        font-size: 12px;
-        font-weight: 800;
-      }
-
-      .phone-number-input {
-        width: 100%;
-        min-width: 0;
-        padding: 0 12px;
-        font-size: 13px;
-        outline: none;
-        transition: border-color 0.2s ease, box-shadow 0.2s ease;
-      }
-
-      .phone-number-input:focus {
-        border-color: rgba(96, 165, 250, 0.65);
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
-      }
-
-      .phone-number-input::placeholder {
-        color: var(--text-dim);
-      }
-
-      .phone-verify-button {
-        width: 100%;
-        justify-content: center;
-        margin-top: 2px;
-      }
-
-      @media (max-width: 768px) {
-        .top-navbar {
-          padding-top: 12px;
-          padding-bottom: 12px;
-        }
-
-        .navbar-inner {
-          gap: 10px;
-        }
-
-        .brand-group {
-          min-width: 0;
-          gap: 8px;
-        }
-
-        .brand-status-badge {
-          padding: 3px 7px;
-          font-size: 8px;
-          letter-spacing: 0.45px;
-        }
-
-        .navbar-actions {
-          gap: 6px;
-        }
-
-        .btn-auth-action {
-          padding: 8px 13px;
-        }
-
-        .profile-card-layout {
-          padding: 24px;
-          gap: 18px;
-        }
-      }
-
-      @media (max-width: 560px) {
-        .profile-card-layout {
-          padding: 19px;
-          border-radius: 23px;
-        }
-
-        .profile-brand-logo-frame {
-          width: 50px;
-          height: 50px;
-          flex-basis: 50px;
-        }
-
-        .profile-verified-pill {
-          padding: 6px 8px;
-          font-size: 8px;
-        }
-
-        .profile-large-avatar {
-          width: 64px;
-          height: 64px;
-          font-size: 23px;
-        }
-
-        .profile-stats-bento {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-
-        .profile-tools-grid {
-          grid-template-columns: 1fr;
-        }
-      }
-
-      @media (max-width: 400px) {
-        .brand-status-badge {
-          gap: 0;
-          padding: 4px 6px;
-          font-size: 7px;
-          letter-spacing: 0;
-        }
-
-        .brand-status-badge .status-pulse-dot {
-          margin-right: 5px;
-        }
-
-        .brand-status-label {
-          position: static;
-          width: auto;
-          height: auto;
-          overflow: visible;
-          clip: auto;
-          white-space: nowrap;
-        }
-
-        .user-avatar-pill {
-          padding-right: 7px;
-        }
-
-        .user-avatar-name {
-          display: none;
-        }
-
-        .profile-verified-pill {
-          font-size: 0;
-        }
-
-        .profile-user-meta {
-          flex-direction: column;
-          gap: 6px;
-        }
-
-        .profile-stats-bento {
-          grid-template-columns: 1fr;
-        }
       }
 
       /* ============================================================ */
@@ -1763,16 +1343,11 @@
         cursor: pointer;
         padding: 6px 12px;
         border-radius: 999px;
-        border: 1px solid transparent;
-        transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease,
-          transform 0.2s ease;
+        transition: all 0.2s;
       }
 
       .island-tab-btn.active {
         color: #FFFFFF;
-        background: rgba(59, 130, 246, 0.15);
-        border-color: rgba(96, 165, 250, 0.27);
-        transform: translateY(-1px);
       }
 
       .island-tab-btn svg {
@@ -2003,19 +1578,17 @@
       <!-- ============================================================ -->
       <header class="top-navbar">
         <div class="navbar-inner">
-          <button type="button" class="brand-group" aria-label="Bassac Live home" onclick="switchNavTab('shows')">
-            <span class="brand-logo-frame">
-              <img src="/logo.png" alt="" class="brand-logo-img" />
-            </span>
+          <div class="brand-group" onclick="switchNavTab('shows')">
+            <img src="/logo.png" alt="CT Concert Ticketing" class="brand-logo-img" />
             <div class="brand-status-badge">
               <span class="status-pulse-dot"></span>
-              <span class="brand-status-label">PHNOM PENH & WORLDWIDE</span>
+              PHNOM PENH & WORLDWIDE
             </div>
-          </button>
+          </div>
 
           <!-- Desktop Navigation -->
           <nav class="desktop-nav-links">
-            <button class="nav-link-btn active" id="deskNavShows" aria-current="page" onclick="switchNavTab('shows')">
+            <button class="nav-link-btn active" id="deskNavShows" onclick="switchNavTab('shows')">
               Shows & Tours
             </button>
             <button class="nav-link-btn" id="deskNavHall" onclick="switchNavTab('hall')">
@@ -2031,10 +1604,10 @@
 
           <!-- Right Action: User or Login -->
           <div class="navbar-actions">
-            <button type="button" class="user-avatar-pill" id="userPillBox" aria-label="Open account profile" style="display: none" onclick="switchNavTab('profile')">
+            <div class="user-avatar-pill" id="userPillBox" style="display: none" onclick="switchNavTab('profile')">
               <div class="user-avatar-circle" id="userAvatarInitial">S</div>
-              <span class="user-avatar-name" id="userDisplayName">Sopheak</span>
-            </button>
+              <span id="userDisplayName">Sopheak</span>
+            </div>
 
             <button class="btn-auth-action" id="authActionBtn" onclick="switchNavTab('profile')">
               Sign In
@@ -2058,9 +1631,7 @@
           <div class="hero-stage-content">
             <div class="hero-tag-row">
               <span class="hero-pill-badge" style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px 4px 6px;">
-                <span class="brand-logo-frame hero-brand-logo-frame">
-                  <img src="/logo.png" alt="" class="brand-logo-img" />
-                </span>
+                <img src="/logo.png" alt="CT Logo" style="height: 16px; width: auto; object-fit: contain;" />
                 BASSAC LIVE OFFICIAL PASS
               </span>
               <span class="hero-pill-badge">BORN IN BATTAMBANG TOUR</span>
@@ -2542,34 +2113,14 @@
       <!-- ============================================================ -->
       <section id="tabProfile" class="screen-panel">
         <div class="profile-card-layout">
-          <div class="profile-brand-lockup">
-            <span class="brand-logo-frame profile-brand-logo-frame">
-              <img src="/logo.png" alt="" class="brand-logo-img" />
-            </span>
-            <div>
-              <div class="profile-brand-name">Bassac Live</div>
-              <div class="profile-brand-caption">ACCOUNT &amp; VERIFIED WALLET</div>
-            </div>
-            <span class="profile-verified-pill">VERIFIED ACCOUNT</span>
+          <div style="display: flex; justify-content: center; padding-bottom: 12px;">
+            <img src="/logo.png" alt="CT Concert Ticketing" style="height: 64px; width: auto; object-fit: contain; filter: drop-shadow(0 6px 20px rgba(59, 130, 246, 0.4));" />
           </div>
-
           <div class="profile-header-user">
-            <div class="profile-avatar-wrap">
-              <div class="profile-large-avatar" id="profAvatarInitial" aria-label="Account avatar">S</div>
-              <span class="profile-online-indicator" aria-label="Online"></span>
-              <span class="profile-verified-check" aria-label="Verified">&#10003;</span>
-            </div>
-            <div class="profile-user-copy">
-              <h2 id="profUserName">Sopheak Chan</h2>
-              <div class="profile-user-email" id="profUserEmail">user@example.com</div>
-              <div class="profile-member-badge">
-                <span aria-hidden="true">&#9733;</span>
-                VIP Gold Pass <span aria-hidden="true">•</span> Member #KH-0842
-              </div>
-              <div class="profile-user-meta">
-                <span><strong>Member since</strong> 2024</span>
-                <span><strong>Phone</strong> <span id="profUserPhone">+855 12 345 678</span></span>
-              </div>
+            <div class="profile-large-avatar" id="profAvatarInitial">S</div>
+            <div>
+              <h2 style="font-size: 20px; font-weight: 900; color: #FFFFFF;" id="profUserName">Sopheak Chan</h2>
+              <div style="font-size: 13px; color: var(--text-secondary);" id="profUserEmail">user@example.com</div>
             </div>
           </div>
 
@@ -2582,47 +2133,23 @@
               <span class="stat-num-val">100%</span>
               <span class="stat-label-text">Authenticity Score</span>
             </div>
-            <div class="stat-mini-tile">
-              <span class="stat-num-val">ALL</span>
-              <span class="stat-label-text">Venue Access · Global</span>
-            </div>
           </div>
 
-          <div class="profile-tools-grid">
-            <!-- Fast 1-Tap Demo Switcher -->
-            <div class="demo-login-box">
-              <div class="profile-panel-heading">1-Tap Demo Switcher</div>
-              <div class="profile-panel-copy">Preview the Bassac Live verified ticketing account and VIP wallet.</div>
-              <button class="demo-btn-action" id="demoSwitcherBtn" onclick="loginDemoUser()">
-                Switch to Demo User · Sopheak Chan
-              </button>
-            </div>
-
-            <!-- Phone OTP Login -->
-            <form class="phone-auth-container" onsubmit="verifyPhoneLogin(event)">
-              <label class="profile-panel-heading" for="phoneAuthInput">Cambodian phone SMS verification</label>
-              <div class="phone-input-row">
-                <span class="phone-country-code" aria-label="Cambodia country calling code">🇰🇭 +855</span>
-                <input
-                  type="tel"
-                  inputmode="numeric"
-                  autocomplete="tel-national"
-                  id="phoneAuthInput"
-                  class="phone-number-input"
-                  value="12 345 678"
-                  placeholder="12 345 678"
-                  maxlength="18"
-                  oninput="this.setCustomValidity('')"
-                  aria-describedby="phoneAuthHint"
-                  required
-                />
-              </div>
-              <div class="profile-panel-copy" id="phoneAuthHint">Enter your Cambodian number without the +855 country code.</div>
-              <button class="btn-auth-action phone-verify-button" type="submit">Verify via SMS</button>
-            </form>
+          <!-- Fast 1-Tap Demo Switcher -->
+          <div class="demo-login-box">
+            <div style="font-size: 12px; font-weight: 800; color: #93C5FD; text-transform: uppercase;">1-Tap Verified Demo Account</div>
+            <div style="font-size: 12px; color: var(--text-secondary);">Bassac Live verified ticketing account with instant VIP wallet access.</div>
+            <button class="demo-btn-action" onclick="loginDemoUser()">Switch to Demo User (Sopheak Chan)</button>
           </div>
 
-          <button class="stub-enlarge-btn" style="align-self: flex-start; border-color: rgba(244,63,94,0.3); color: #f43f5e;" onclick="logoutUser()">
+          <!-- Phone OTP Login -->
+          <div class="phone-auth-container">
+            <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; color: #FFFFFF;">Cambodian Phone SMS OTP</div>
+            <input type="text" id="phoneAuthInput" value="+855 12 345 678" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-hairline); border-radius: 8px; padding: 10px; color: #fff; font-size: 13px;" />
+            <button class="btn-auth-action" onclick="verifyPhoneLogin()" style="width: 100%; justify-content: center;">Verify via SMS</button>
+          </div>
+
+          <button class="stub-enlarge-btn" style="border-color: rgba(244,63,94,0.3); color: #f43f5e;" onclick="logoutUser()">
             Sign Out
           </button>
         </div>
@@ -2632,7 +2159,7 @@
       <!-- MOBILE FLOATING ISLAND BOTTOM BAR                            -->
       <!-- ============================================================ -->
       <nav class="mobile-island-tabs">
-        <button class="island-tab-btn active" id="mobTabShows" aria-current="page" onclick="switchNavTab('shows')">
+        <button class="island-tab-btn active" id="mobTabShows" onclick="switchNavTab('shows')">
           <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M9 18V5l12-2v13"></path>
             <circle cx="6" cy="18" r="3"></circle>
@@ -2774,8 +2301,7 @@
       // ============================================================
       let currentUser = {
         name: 'Sopheak Chan',
-        email: 'user@example.com',
-        phone: '+855 12 345 678'
+        email: 'user@example.com'
       };
 
       const CONCERT_DATABASE = {
@@ -2933,23 +2459,11 @@
 
         // Activate desktop link
         const deskLink = document.getElementById('deskNav' + capitalize(tabId));
-        if (deskLink) {
-          deskLink.classList.add('active');
-          deskLink.setAttribute('aria-current', 'page');
-        }
-        document.querySelectorAll('.nav-link-btn').forEach(b => {
-          if (b !== deskLink) b.removeAttribute('aria-current');
-        });
+        if (deskLink) deskLink.classList.add('active');
 
         // Activate mobile link
         const mobLink = document.getElementById('mobTab' + capitalize(tabId));
-        if (mobLink) {
-          mobLink.classList.add('active');
-          mobLink.setAttribute('aria-current', 'page');
-        }
-        document.querySelectorAll('.island-tab-btn').forEach(b => {
-          if (b !== mobLink) b.removeAttribute('aria-current');
-        });
+        if (mobLink) mobLink.classList.add('active');
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
@@ -3289,11 +2803,9 @@
           document.getElementById('userPillBox').style.display = 'flex';
           document.getElementById('userAvatarInitial').innerText = currentUser.name.charAt(0);
           document.getElementById('userDisplayName').innerText = currentUser.name.split(' ')[0];
-          document.getElementById('userPillBox').setAttribute('aria-label', `Open ${currentUser.name}'s account profile`);
           document.getElementById('profUserName').innerText = currentUser.name;
           document.getElementById('profUserEmail').innerText = currentUser.email;
           document.getElementById('profAvatarInitial').innerText = currentUser.name.charAt(0);
-          document.getElementById('profUserPhone').innerText = currentUser.phone || 'Not added';
         } else {
           document.getElementById('authActionBtn').style.display = 'flex';
           document.getElementById('userPillBox').style.display = 'none';
@@ -3303,30 +2815,17 @@
       function loginDemoUser() {
         currentUser = {
           name: 'Sopheak Chan',
-          email: 'user@example.com',
-          phone: '+855 12 345 678'
+          email: 'user@example.com'
         };
         syncUserUi();
         switchNavTab('shows');
       }
 
-      function verifyPhoneLogin(event) {
-        event.preventDefault();
-        const phoneDigits = document.getElementById('phoneAuthInput').value.replace(/\D/g, '').replace(/^0+/, '');
-        if (phoneDigits.length < 8 || phoneDigits.length > 9) {
-          document.getElementById('phoneAuthInput').setCustomValidity('Enter a valid Cambodian phone number with 8 or 9 digits.');
-          document.getElementById('phoneAuthInput').reportValidity();
-          return;
-        }
-        document.getElementById('phoneAuthInput').setCustomValidity('');
-        const formattedPhone = phoneDigits.length === 8
-          ? `${phoneDigits.slice(0, 2)} ${phoneDigits.slice(2, 5)} ${phoneDigits.slice(5)}`
-          : `${phoneDigits.slice(0, 3)} ${phoneDigits.slice(3, 6)} ${phoneDigits.slice(6)}`;
-        const phone = `+855 ${formattedPhone}`;
+      function verifyPhoneLogin() {
+        const phone = document.getElementById('phoneAuthInput').value.trim();
         currentUser = {
-          name: 'Cambodia Fan (' + phoneDigits.slice(-4) + ')',
-          email: phoneDigits + '@phone.concertpass.com',
-          phone
+          name: 'Cambodia Fan (' + phone.slice(-4) + ')',
+          email: phone.replace(/\D/g, '') + '@phone.concertpass.com'
         };
         syncUserUi();
         switchNavTab('shows');
