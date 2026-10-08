@@ -192,23 +192,6 @@ export default function ProfileScreen() {
                   <Text className="text-slate-500 text-[11px] mt-0.5">Member since 2024</Text>
                 </View>
               </View>
-
-              {/* Bassac Live Verified Event Pass Holder */}
-              <View className="mt-4 bg-white/5 border border-white/5 rounded-2xl p-3 flex-row items-center justify-between">
-                <View className="flex-row items-center">
-                  <View className="h-8 w-8 rounded-lg bg-iris-500/20 items-center justify-center mr-2.5">
-                    <Ionicons name="musical-notes" size={16} color="#A78BFA" />
-                  </View>
-                  <View>
-                    <Text className="text-white font-bold text-sm">Bassac Live</Text>
-                    <Text className="text-slate-400 text-[11px]">Verified Event Pass Holder</Text>
-                  </View>
-                </View>
-                <View className="bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-1 rounded-full flex-row items-center">
-                  <View className="h-1.5 w-1.5 rounded-full bg-emerald-400 mr-1.5" />
-                  <Text className="text-emerald-400 font-black text-[10px] tracking-wider">ACTIVE</Text>
-                </View>
-              </View>
             </View>
 
             {/* Stats Bento Grid matching 3 cards */}
@@ -218,7 +201,7 @@ export default function ProfileScreen() {
                   <Text className="text-slate-400 text-[9px] font-extrabold uppercase tracking-wider">
                     ACTIVE PASSES
                   </Text>
-                  <Text className="text-xs">🎟</Text>
+                  <Ionicons name="ticket-outline" size={14} color="#60A5FA" />
                 </View>
                 <Text className="text-white font-black text-2xl">{stats.tickets || 0}</Text>
                 <Text className="text-slate-500 text-[10px] mt-0.5 font-semibold">In Wallet</Text>
@@ -229,7 +212,7 @@ export default function ProfileScreen() {
                   <Text className="text-slate-400 text-[9px] font-extrabold uppercase tracking-wider">
                     AUTH SCORE
                   </Text>
-                  <Text className="text-xs">🛡</Text>
+                  <Ionicons name="shield-checkmark-outline" size={14} color="#34D399" />
                 </View>
                 <Text className="text-white font-black text-2xl">98%</Text>
                 <Text className="text-slate-500 text-[10px] mt-0.5 font-semibold">Excellent</Text>
@@ -240,7 +223,7 @@ export default function ProfileScreen() {
                   <Text className="text-slate-400 text-[9px] font-extrabold uppercase tracking-wider">
                     VENUE ACCESS
                   </Text>
-                  <Text className="text-xs">🌐</Text>
+                  <Ionicons name="globe-outline" size={14} color="#FBBF24" />
                 </View>
                 <Text className="text-white font-black text-2xl">ALL</Text>
                 <Text className="text-slate-500 text-[10px] mt-0.5 font-semibold">Global</Text>

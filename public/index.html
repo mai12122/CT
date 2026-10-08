@@ -17,6 +17,8 @@
       href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <style>
       :root {
         --bg: #090A10;
@@ -116,23 +118,25 @@
       }
 
       .brand-logo-img {
-        height: 48px;
-        width: auto;
-        max-width: 220px;
-        object-fit: contain;
-        border-radius: 8px;
-        filter: drop-shadow(0 2px 12px rgba(59, 130, 246, 0.35));
-        transition: transform 0.25s cubic-bezier(0.32, 0.72, 0, 1), filter 0.25s ease;
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        border-radius: 50%;
+        object-fit: cover;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5), 0 4px 16px rgba(59, 130, 246, 0.4);
+        transition: transform 0.25s cubic-bezier(0.32, 0.72, 0, 1), box-shadow 0.25s ease;
       }
 
       .brand-group:hover .brand-logo-img {
-        transform: scale(1.04);
-        filter: drop-shadow(0 4px 20px rgba(147, 51, 234, 0.5));
+        transform: scale(1.08) rotate(4deg);
+        box-shadow: 0 0 0 2.5px rgba(147, 51, 234, 0.75), 0 6px 24px rgba(147, 51, 234, 0.6);
       }
 
       @media (max-width: 640px) {
         .brand-logo-img {
-          height: 36px;
+          width: 38px;
+          height: 38px;
+          min-width: 38px;
         }
       }
 
@@ -1399,31 +1403,6 @@
         margin-top: 2px;
       }
 
-      /* Venue Subcard */
-      .prof-venue-subcard {
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        border-radius: 16px;
-        padding: 12px 14px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-      }
-
-      .prof-active-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        background: rgba(16, 185, 129, 0.15);
-        border: 1px solid rgba(16, 185, 129, 0.35);
-        color: #34D399;
-        font-size: 10px;
-        font-weight: 800;
-        letter-spacing: 0.8px;
-        padding: 4px 10px;
-        border-radius: 999px;
-      }
-
       .active-dot-green {
         width: 6px;
         height: 6px;
@@ -1999,11 +1978,7 @@
       <header class="top-navbar">
         <div class="navbar-inner">
           <div class="brand-group" onclick="switchNavTab('shows')">
-            <img src="/logo.png" alt="CT Concert Ticketing" class="brand-logo-img" />
-            <div class="brand-status-badge">
-              <span class="status-pulse-dot"></span>
-              PHNOM PENH & WORLDWIDE
-            </div>
+            <img src="/logo-round.png" alt="CT Concert Ticketing" class="brand-logo-img" />
           </div>
 
           <!-- Desktop Navigation -->
@@ -2051,7 +2026,7 @@
           <div class="hero-stage-content">
             <div class="hero-tag-row">
               <span class="hero-pill-badge" style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px 4px 6px;">
-                <img src="/logo.png" alt="CT Logo" style="height: 16px; width: auto; object-fit: contain;" />
+                <img src="/logo-round.png" alt="CT Logo" style="height: 18px; width: 18px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.5);" />
                 BASSAC LIVE OFFICIAL PASS
               </span>
               <span class="hero-pill-badge">BORN IN BATTAMBANG TOUR</span>
@@ -2589,15 +2564,23 @@
                     <button
                       type="button"
                       class="prof-name-edit-btn"
-                      style="padding: 6px 8px;"
+                      style="padding: 6px 8px; display: inline-flex; align-items: center; justify-content: center;"
                       onclick="toggleEditNameInput(false)"
                     >
-                      ✕
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                      </svg>
                     </button>
                   </div>
 
                   <div class="prof-sub-meta">
-                    <span class="prof-vip-tag">★ VIP Gold Pass</span>
+                    <span class="prof-vip-tag" style="display: inline-flex; align-items: center; gap: 4px;">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                      </svg>
+                      VIP Gold Pass
+                    </span>
                     <span style="color: #64748B;">•</span>
                     <span class="prof-member-id" id="profMemberId">Member #KH-0842</span>
                   </div>
@@ -2605,20 +2588,6 @@
                 </div>
               </div>
 
-              <!-- Venue Subcard -->
-              <div class="prof-venue-subcard">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                  <img src="/logo.png" alt="CT Logo" style="height: 24px; width: auto; object-fit: contain;" />
-                  <div>
-                    <div style="font-size: 13px; font-weight: 800; color: #FFFFFF;">Bassac Live</div>
-                    <div style="font-size: 11px; color: #94A3B8;">Verified Event Pass Holder</div>
-                  </div>
-                </div>
-                <div class="prof-active-pill">
-                  <span class="active-dot-green"></span>
-                  ACTIVE
-                </div>
-              </div>
             </div>
 
             <!-- 2. Bento Stats 3-Grid -->
@@ -2626,7 +2595,12 @@
               <div class="stat-box-modern">
                 <div class="stat-box-header">
                   <span>ACTIVE PASSES</span>
-                  <span>🎟</span>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"></path>
+                    <path d="M13 5v2"></path>
+                    <path d="M13 11v2"></path>
+                    <path d="M13 17v2"></path>
+                  </svg>
                 </div>
                 <div class="stat-box-value" id="profPassesCount">0</div>
                 <div class="stat-box-sub">In Wallet</div>
@@ -2635,7 +2609,10 @@
               <div class="stat-box-modern">
                 <div class="stat-box-header">
                   <span>AUTHENTICITY SCORE</span>
-                  <span style="color: #10B981;">🛡</span>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path>
+                    <path d="m9 12 2 2 4-4"></path>
+                  </svg>
                 </div>
                 <div class="stat-box-value">98%</div>
                 <div class="stat-box-sub">Excellent</div>
@@ -2644,7 +2621,11 @@
               <div class="stat-box-modern">
                 <div class="stat-box-header">
                   <span>VENUE ACCESS</span>
-                  <span style="color: #F59E0B;">🌐</span>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+                    <path d="M2 12h20"></path>
+                  </svg>
                 </div>
                 <div class="stat-box-value">ALL</div>
                 <div class="stat-box-sub">Global</div>
@@ -2911,7 +2892,9 @@
             </label>
             <div class="auth-phone-input-wrap">
               <div class="cambodia-flag-tag">
-                <span style="font-size: 14px;">🇰🇭</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                </svg>
                 <span style="font-size: 13px; font-weight: 800; color: #FFFFFF;">+855</span>
               </div>
               <input
@@ -2964,10 +2947,13 @@
             <button
               type="button"
               class="demo-btn-action"
-              style="width: 100%; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); color: #93C5FD;"
+              style="width: 100%; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); color: #93C5FD; display: inline-flex; align-items: center; justify-content: center; gap: 7px;"
               onclick="loginDemoUserFromModal()"
             >
-              ⚡ 1-Tap Verified Account (Mao)
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+              </svg>
+              1-Tap Verified Account (Mao)
             </button>
           </div>
         </div>
@@ -3011,7 +2997,12 @@
                 onclick="autoFillOtpCode()"
                 style="cursor: pointer; display: inline-flex; align-items: center; gap: 6px; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: #34D399; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 6px;"
               >
-                <span>⚡ Dev Test Code:</span>
+                <span style="display: inline-flex; align-items: center; gap: 4px;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                  </svg>
+                  Dev Test Code:
+                </span>
                 <span id="authDevOtpVal">123456</span>
                 <span style="text-decoration: underline; font-size: 10px;">(Click to Fill)</span>
               </div>
@@ -3038,9 +3029,13 @@
             <button
               type="button"
               onclick="switchAuthStep('phone')"
-              style="background: none; border: none; color: var(--text-muted); cursor: pointer;"
+              style="background: none; border: none; color: var(--text-muted); cursor: pointer; display: inline-flex; align-items: center; gap: 5px;"
             >
-              ← Back
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+              </svg>
+              Back
             </button>
           </div>
         </div>
@@ -3168,11 +3163,14 @@
 
       // Initialize on Load
       window.addEventListener('DOMContentLoaded', () => {
-  initInitialQr();
-  syncUserUi();
-  loadSavedTickets();
-  loadLiveConcertsFromApi();
-});
+        initInitialQr();
+        syncUserUi();
+        loadSavedTickets();
+        loadLiveConcertsFromApi();
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+          window.lucide.createIcons();
+        }
+      });
 
       // Load live PostgreSQL concerts from backend API if active
       async function loadLiveConcertsFromApi() {
@@ -3197,7 +3195,7 @@
                   }
                 }
               });
-              console.log('⚡ Loaded live PostgreSQL Cambodian concerts from /api/v1/concerts');
+              console.log('[CT Live] Loaded live PostgreSQL Cambodian concerts from /api/v1/concerts');
             }
           }
         } catch (e) {

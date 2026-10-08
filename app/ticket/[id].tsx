@@ -102,7 +102,7 @@ export default function TicketDetailScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     try {
       await Share.share({
-        message: `🎟️ Concert Pass for ${ticket.concert?.artist} - ${ticket.concert?.title}\nTicket ID: ${ticket.ticketNumber}\nSeat: ${ticket.seat || 'General Admission'}\nVenue: ${ticket.concert?.venue}, ${ticket.concert?.city}`,
+        message: `Concert Pass for ${ticket.concert?.artist} - ${ticket.concert?.title}\nTicket ID: ${ticket.ticketNumber}\nSeat: ${ticket.seat || 'General Admission'}\nVenue: ${ticket.concert?.venue}, ${ticket.concert?.city}`,
       });
     } catch {
       // ignore
