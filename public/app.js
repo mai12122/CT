@@ -1,14 +1,10 @@
       // ============================================================
       // APPLICATION STATE & INTERACTION ENGINE
       // ============================================================
-      let currentUser = {
-        name: 'Mao',
-        phone: '+85517864121',
-        email: '85517864121@phone.concertpass.com',
-        authProvider: 'PHONE'
-      };
+      let currentUser = null;
+      let pendingReservation = null;
       try {
-        const savedUser = sessionStorage.getItem('ct_user');
+        const savedUser = sessionStorage.getItem('ct_user') || localStorage.getItem('ct_user');
         if (savedUser) {
           currentUser = JSON.parse(savedUser);
         }
@@ -542,7 +538,25 @@
 
       function updateTotalPriceDisplay() {
         const total = selectedTierPrice * selectedQty;
-        document.getElementById('sheetTotalPriceDisplay').innerText = `$${total}`;
+        const totalEl = document.getElementById('sheetTotalPriceDisplay');
+        if (totalEl) totalEl.innerText = `$${total}`;
+
+        const authNotice = document.getElementById('sheetAuthRequiredNotice');
+        const btn = document.getElementById('confirmPassBtn');
+
+        if (!currentUser) {
+          if (authNotice) authNotice.style.display = 'flex';
+          if (btn) {
+            btn.classList.add('needs-auth');
+            btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Sign In to Lock Pass — <span id="sheetTotalPriceDisplay">$${total}</span>`;
+          }
+        } else {
+          if (authNotice) authNotice.style.display = 'none';
+          if (btn) {
+            btn.classList.remove('needs-auth');
+            btn.innerHTML = `Lock Pass & Checkout — <span id="sheetTotalPriceDisplay">$${total}</span>`;
+          }
+        }
       }
 
       function startHoldCountdown(durationSeconds) {
@@ -564,39 +578,67 @@
         timerInterval = setInterval(tick, 1000);
       }
 
-      // Confirm Pass Reservation & Add to Wallet
+      // Confirm Pass Reservation & Add to Wallet (Requires Authentication)
       function confirmPassReservation() {
+        if (!currentUser) {
+          pendingReservation = {
+            concertKey: selectedConcertKey,
+            tierPrice: selectedTierPrice,
+            tierName: selectedTierName,
+            qty: selectedQty
+          };
+          showCelebrationToast('SIGN IN REQUIRED · Please verify phone to buy ticket');
+          openAuthModal({
+            title: 'Sign In to Buy Ticket',
+            subtitle: `Sign in with your Cambodian mobile number to lock your ${selectedTierName} pass.`
+          });
+          return;
+        }
+
+        executeReservationCheckout();
+      }
+
+      function executeReservationCheckout() {
         const btn = document.getElementById('confirmPassBtn');
-        btn.disabled = true;
-        btn.innerText = 'Securing ACID Ticket Lock...';
+        if (btn) {
+          btn.disabled = true;
+          btn.innerText = 'Securing ACID Ticket Lock...';
+        }
 
         setTimeout(() => {
-          btn.disabled = false;
-          btn.innerText = 'Lock Pass & Checkout';
+          if (btn) {
+            btn.disabled = false;
+          }
 
           const data = CONCERT_DATABASE[selectedConcertKey] || CONCERT_DATABASE['kh-concert-001'];
           const ticketId = 'TKT-' + Math.random().toString(36).substring(2, 6).toUpperCase() + '-' + Math.floor(1000 + Math.random() * 9000);
 
-          // Add New Ticket Stub to Wallet
+          // Add New Ticket Stub to Wallet linked to authenticated user
           const newTicket = {
-  id: ticketId,
-  artist: data.title,
-  tour: data.tour,
-  venue: data.venue,
-  tier: selectedTierName,
-  seat: `${selectedTierName} #${Math.floor(10 + Math.random() * 80)} · Gate 1`
-};
-saveTicketToStorage(newTicket);
-addTicketStubToWallet(newTicket);
+            id: ticketId,
+            artist: data.title,
+            tour: data.tour,
+            venue: data.venue,
+            tier: selectedTierName,
+            seat: `${selectedTierName} #${Math.floor(10 + Math.random() * 80)} · Gate 1`,
+            userId: currentUser ? currentUser.id : 'usr-guest',
+            attendee: currentUser ? currentUser.name : 'Mao',
+            phone: currentUser ? currentUser.phone : '+85517864121'
+          };
+          saveTicketToStorage(newTicket);
+          addTicketStubToWallet(newTicket);
 
           // Close Modal & Switch to Wallet Passes
-          document.getElementById('reservationModal').classList.remove('active');
+          const modal = document.getElementById('reservationModal');
+          if (modal) modal.classList.remove('active');
           if (timerInterval) clearInterval(timerInterval);
 
+          updateTotalPriceDisplay();
           switchNavTab('tickets');
 
           // Trigger Festival Confetti Celebration & Toast
           triggerFestivalConfetti();
+          showCelebrationToast(`PASS LOCKED FOR ${(currentUser?.name || 'YOU').toUpperCase()}`);
         }, 600);
       }
 
@@ -626,6 +668,11 @@ addTicketStubToWallet(newTicket);
               <div style="font-size: 12px; color: var(--text-muted); margin-top: 8px;">
                 ${t.venue}
               </div>
+              ${t.attendee ? `
+              <div style="font-size: 11px; font-weight: 700; color: #93C5FD; margin-top: 6px; display: flex; align-items: center; gap: 5px;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                Pass Holder: ${t.attendee} (${t.phone || ''})
+              </div>` : ''}
             </div>
             <div class="stub-qr-code-box" id="qr-${t.id}" onclick="openTicketQrById('${t.id}')" title="Tap to enlarge Gate QR code">
               <div class="turnstile-laser-line"></div>
@@ -915,11 +962,27 @@ function loadSavedTickets() {
         }
       });
 
-      function openAuthModal() {
+      function openAuthModal(options) {
         const modal = document.getElementById('authModal');
         if (modal) {
           switchAuthStep('phone');
           modal.classList.add('active');
+
+          const titleEl = document.getElementById('authModalTitle');
+          const subEl = document.getElementById('authModalSubtitle');
+
+          if (options && options.title && titleEl) {
+            titleEl.innerText = options.title;
+          } else if (titleEl) {
+            titleEl.innerText = 'Sign In with Phone';
+          }
+
+          if (options && options.subtitle && subEl) {
+            subEl.innerText = options.subtitle;
+          } else if (subEl) {
+            subEl.innerText = 'Instant SMS verification for Cambodian concertgoers & VIP turnstile gate passes.';
+          }
+
           const input = document.getElementById('authPhoneInput');
           if (input) setTimeout(() => input.focus(), 150);
         }
@@ -1063,6 +1126,7 @@ function loadSavedTickets() {
         currentUser = verifiedUser;
         try {
           sessionStorage.setItem('ct_user', JSON.stringify(currentUser));
+          localStorage.setItem('ct_user', JSON.stringify(currentUser));
         } catch (e) {}
 
         if (btn) {
@@ -1072,19 +1136,42 @@ function loadSavedTickets() {
 
         try {
           syncUserUi();
+          updateTotalPriceDisplay();
         } catch (err) {
           console.warn('syncUserUi warning:', err);
         }
 
         closeAuthModal();
-        switchNavTab('profile');
-        showCelebrationToast('SIGNED IN · WELCOME ' + (currentUser.name || 'USER').toUpperCase());
+
+        // If there was a ticket reservation waiting for sign-in, automatically finish it!
+        if (pendingReservation) {
+          const pr = pendingReservation;
+          pendingReservation = null;
+          selectedConcertKey = pr.concertKey;
+          selectedTierPrice = pr.tierPrice;
+          selectedTierName = pr.tierName;
+          selectedQty = pr.qty;
+          executeReservationCheckout();
+        } else {
+          switchNavTab('profile');
+          showCelebrationToast('SIGNED IN · WELCOME ' + (currentUser.name || 'USER').toUpperCase());
+        }
       }
 
       function loginDemoUserFromModal() {
         loginDemoUser();
         closeAuthModal();
-        switchNavTab('profile');
+        if (pendingReservation) {
+          const pr = pendingReservation;
+          pendingReservation = null;
+          selectedConcertKey = pr.concertKey;
+          selectedTierPrice = pr.tierPrice;
+          selectedTierName = pr.tierName;
+          selectedQty = pr.qty;
+          executeReservationCheckout();
+        } else {
+          switchNavTab('profile');
+        }
       }
 
       function toggleEditNameInput(show) {
@@ -1135,10 +1222,12 @@ function loadSavedTickets() {
         const outBlock = document.getElementById('profSignedOutBlock');
         const authBtn = document.getElementById('authActionBtn');
         const userPill = document.getElementById('userPillBox');
+        const walletNotice = document.getElementById('walletSignedOutNotice');
 
         if (currentUser) {
           if (authBtn) authBtn.style.display = 'none';
           if (userPill) userPill.style.display = 'flex';
+          if (walletNotice) walletNotice.style.display = 'none';
           const userName = currentUser.name || 'Mao';
           const initial = userName.trim().charAt(0).toUpperCase() || 'M';
 
@@ -1161,7 +1250,8 @@ function loadSavedTickets() {
 
           const passesEl = document.getElementById('profPassesCount');
           if (passesEl) {
-            passesEl.innerText = (typeof purchasedPasses !== 'undefined' && Array.isArray(purchasedPasses) && purchasedPasses.length > 0) ? purchasedPasses.length : 0;
+            const saved = getSavedTickets();
+            passesEl.innerText = saved.length + 1;
           }
 
           if (inBlock) inBlock.style.display = 'block';
@@ -1169,6 +1259,7 @@ function loadSavedTickets() {
         } else {
           if (authBtn) authBtn.style.display = 'flex';
           if (userPill) userPill.style.display = 'none';
+          if (walletNotice) walletNotice.style.display = 'flex';
           if (inBlock) inBlock.style.display = 'none';
           if (outBlock) outBlock.style.display = 'block';
         }
@@ -1183,16 +1274,21 @@ function loadSavedTickets() {
         };
         try {
           sessionStorage.setItem('ct_user', JSON.stringify(currentUser));
+          localStorage.setItem('ct_user', JSON.stringify(currentUser));
         } catch (e) {}
         syncUserUi();
+        updateTotalPriceDisplay();
         showCelebrationToast('SIGNED IN AS MAO');
       }
 
       function logoutUser() {
         currentUser = null;
+        pendingReservation = null;
         try {
           sessionStorage.removeItem('ct_user');
+          localStorage.removeItem('ct_user');
         } catch (e) {}
         syncUserUi();
+        updateTotalPriceDisplay();
         showCelebrationToast('SIGNED OUT');
       }

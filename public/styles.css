@@ -1376,6 +1376,31 @@
         background: #F1F5F9;
       }
 
+      .sheet-primary-submit-btn.needs-auth {
+        background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+        color: #FFFFFF;
+        box-shadow: 0 4px 16px rgba(37, 99, 235, 0.35);
+      }
+
+      .sheet-primary-submit-btn.needs-auth:hover {
+        background: linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%);
+        box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5);
+      }
+
+      .sheet-auth-notice {
+        background: rgba(245, 158, 11, 0.09);
+        border: 1px solid rgba(245, 158, 11, 0.28);
+        border-radius: 12px;
+        padding: 10px 14px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #FDE68A;
+        line-height: 1.4;
+      }
+
       /* ============================================================ */
       /* 7. PHNOM PENH BASSAC LIVE HALL (2,000 SEATS) MAP SCREEN      */
       /* ============================================================ */

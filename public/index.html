@@ -555,6 +555,20 @@
       <!-- TAB 3: MY PASSES (APPLE WALLET / PHYSICAL STUB TICKETS)      -->
       <!-- ============================================================ -->
       <section id="tabTickets" class="screen-panel">
+        <!-- Signed-Out Wallet Notice -->
+        <div id="walletSignedOutNotice" style="display: none; background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.25); border-radius: 16px; padding: 14px 18px; margin-bottom: 16px; align-items: center; justify-content: space-between; gap: 12px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="2" style="flex-shrink:0;">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.4;">
+              <strong style="color: #FFFFFF;">Guest Session:</strong> Sign in with your phone to sync your passes and get turnstile gate access.
+            </div>
+          </div>
+          <button class="btn-auth-action" style="padding: 6px 14px; font-size: 12px; flex-shrink: 0;" onclick="openAuthModal()">Sign In</button>
+        </div>
+
         <div class="tickets-stubs-column" id="walletPassesContainer">
           <!-- Active Ticket Stub 1 -->
           <div class="ticket-pass-physical-stub">
@@ -865,6 +879,16 @@
             <div class="urgency-timer-clock" id="holdClock">09:59</div>
           </div>
 
+          <!-- Sign-In Requirement Notice (shown only when signed out) -->
+          <div class="sheet-auth-notice" id="sheetAuthRequiredNotice" style="display: none; margin-top: 12px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2.2" style="flex-shrink: 0;">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+            <div>
+              <strong style="color: #FBBF24;">Sign-In Required:</strong> Mobile number verification is required before checkout to prevent scalper bots.
+            </div>
+          </div>
+
           <!-- Dynamic Tier Selectors -->
           <div class="tier-selection-list" id="sheetTierListContainer">
             <div class="tier-option-card selected" id="tierOption0" onclick="selectPassTier(0, 45, 'Fanpit')">
@@ -975,8 +999,8 @@
               <line x1="12" y1="18" x2="12.01" y2="18"></line>
             </svg>
           </div>
-          <h3 style="font-size: 20px; font-weight: 900; color: #FFFFFF; letter-spacing: -0.3px;">Sign In with Phone</h3>
-          <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px; line-height: 1.4;">
+          <h3 style="font-size: 20px; font-weight: 900; color: #FFFFFF; letter-spacing: -0.3px;" id="authModalTitle">Sign In with Phone</h3>
+          <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px; line-height: 1.4;" id="authModalSubtitle">
             Instant SMS verification for Cambodian concertgoers & VIP turnstile gate passes.
           </p>
         </div>
