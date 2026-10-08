@@ -16,6 +16,7 @@ env:
   NODE_ENV: "test"
   JWT_ACCESS_SECRET: "ci_test_jwt_access_super_secret_12345"
   JWT_REFRESH_SECRET: "ci_test_jwt_refresh_super_secret_12345"
+  QR_SECRET: "ci_test_qr_secret_super_secret_12345"
   RESERVATION_EXPIRY_MINUTES: "10"
   PORT: "5000"
 
@@ -140,6 +141,14 @@ jobs:
 
       - name: ⚙️ Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
+
+      - name: 📥 Download Build Artifact (dist)
+        if: matrix.target == 'frontend'
+        uses: actions/download-artifact@v4
+        with:
+          name: expo-web-dist
+          path: dist
+        continue-on-error: true
 
       - name: 📦 Build Container Image
         run: |

@@ -18,7 +18,9 @@ export interface TicketQRPayload {
 export const TICKET_QR_TTL_MS = 5 * 60 * 1000;
 
 const getQrSecret = (): string => {
-  const secret = process.env.QR_SECRET;
+  const secret =
+    process.env.QR_SECRET ||
+    (process.env.NODE_ENV === 'test' ? 'ci_test_qr_secret_super_secret_12345' : undefined);
   if (!secret) {
     throw new Error('QR_SECRET must be configured before issuing or verifying ticket QR codes');
   }

@@ -8,6 +8,10 @@ import {
   verifyTicketQRPayload,
 } from "../server/utils/qr";
 
+if (!process.env.QR_SECRET) {
+  process.env.QR_SECRET = "ci_test_qr_secret_super_secret_12345";
+}
+
 describe("Unit Tests: Server Utilities", () => {
   it("issues distinct ticket QR payloads that expire after five minutes", () => {
     const ticket = {
