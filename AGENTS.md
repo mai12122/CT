@@ -15,13 +15,15 @@ Use `bunx` instead of `npx` if the project uses bun (`bun.lock` present).
 ```bash
 npx expo install <package>  # ALWAYS use instead of npm/yarn/pnpm/bun add — resolves SDK-compatible versions
 npx expo start              # start the dev server
+npm test                    # run app & API unit/integration tests
+npm run test:iac            # run Terraform IaC security compliance tests (python terraform/tests/test_iac.py)
 npx expo lint               # lint
 npx tsc --noEmit            # typecheck
 npx expo-doctor             # diagnose dependency and config issues
 npx expo install --fix      # fix incompatible package versions
 ```
 
-Run lint and typecheck before declaring any task done.
+Run tests, lint, and typecheck before declaring any task done.
 
 ## Navigation & Routing
 

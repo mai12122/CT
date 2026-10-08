@@ -55,7 +55,7 @@
               Shows & Tours
             </button>
             <button class="nav-link-btn" id="deskNavHall" onclick="switchNavTab('hall')">
-              Bassac Live Hall (2,000)
+              CT Live Hall (2,000)
             </button>
             <button class="nav-link-btn" id="deskNavTickets" onclick="switchNavTab('tickets')">
               My Passes
@@ -198,7 +198,7 @@
           <div
             class="concert-card-shell"
             data-city="Phnom Penh"
-            data-artist="VannDa វណ្ណដា Skull Tour Born in Battambang Live Bassac Live"
+            data-artist="VannDa វណ្ណដា Skull Tour Born in Battambang Live CT Live"
             onclick="openReservationModal('kh-concert-001')"
           >
             <div class="concert-card-core">
@@ -229,7 +229,7 @@
                     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                     <circle cx="12" cy="10" r="3"></circle>
                   </svg>
-                  Bassac Live Main Hall • Phnom Penh
+                  CT Live Main Hall • Phnom Penh
                 </div>
                 <div class="card-footer-strip">
                   <div class="card-tier-tags">
@@ -485,13 +485,15 @@
       </main>
 
       <!-- ============================================================ -->
-      <!-- TAB 2: BASSAC LIVE HALL (2,000 SEATS) MAP                    -->
+      <!-- ============================================================ -->
+      <!-- TAB 2: CT LIVE HALL (2,000 SEATS) 3D ARENA MAP               -->
       <!-- ============================================================ -->
       <section id="tabHall" class="screen-panel">
         <div class="hall-container-card">
+          <!-- Normal Header -->
           <div class="hall-header-info">
             <div>
-              <h2 class="hall-venue-title">Bassac Live Main Concert Hall</h2>
+              <h2 class="hall-venue-title">CT Live Main Concert Hall</h2>
               <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">
                 Phnom Penh Premier Amphitheater • Target Capacity: 2,000 Seats
               </div>
@@ -507,44 +509,178 @@
             </span>
           </div>
 
-          <!-- Interactive SVG Seating Map -->
-          <div class="stage-map-svg-frame">
-            <svg viewBox="0 0 700 420" width="100%" height="auto" style="max-width: 650px;">
-              <!-- Stage Area -->
-              <rect x="220" y="20" width="260" height="48" rx="10" fill="#1E293B" stroke="rgba(255,255,255,0.15)" stroke-width="2" />
-              <text x="350" y="50" fill="#FFFFFF" font-size="14" font-weight="900" text-anchor="middle" letter-spacing="2">MAIN STAGE</text>
+          <!-- ONLY THIS IS 3D: The Amphitheater Stage & Tiers Arena -->
+          <div class="hall-stage-3d-wrapper">
+            <!-- 3D Perspective Control Toolbar -->
+            <div class="hall-3d-toolbar">
+              <div class="hall-3d-modes">
+                <button class="hall-mode-btn active" id="btnModeIso" onclick="switchHall3DView('iso')">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                  3D Isometric
+                </button>
+                <button class="hall-mode-btn" id="btnModeFront" onclick="switchHall3DView('front')">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  Stage Level
+                </button>
+              </div>
+              <span style="font-size: 11px; color: var(--text-muted); display: inline-flex; align-items: center; gap: 6px;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                Click any tier slab to select
+              </span>
+            </div>
 
-              <!-- VIP Standing Catwalk (Front Floor) -->
-              <g class="hall-zone-pill" onclick="quickSelectHallTier('VIP Floor', 45)">
-                <path d="M 180,90 L 520,90 L 550,160 L 150,160 Z" fill="rgba(59, 130, 246, 0.25)" stroke="#3B82F6" stroke-width="2" />
-                <text x="350" y="125" fill="#FFFFFF" font-size="13" font-weight="800" text-anchor="middle">VIP FRONT FLOOR (300 Cap)</text>
-                <text x="350" y="145" fill="#93C5FD" font-size="11" font-weight="600" text-anchor="middle">$45 / Ticket</text>
-              </g>
+            <!-- Interactive 3D Arena Viewport -->
+            <div class="hall-arena-3d-viewport" id="hallArenaViewport">
+              <!-- Animated Stage Spotlight Beams -->
+              <div class="stage-spotlight-beam beam-left"></div>
+              <div class="stage-spotlight-beam beam-right"></div>
+              <div class="stage-arena-ambient-glow"></div>
+              <div class="stage-arena-laser-grid"></div>
 
-              <!-- Tier A (Orchestra Center) -->
-              <g class="hall-zone-pill" onclick="quickSelectHallTier('Zone A Center', 35)">
-                <path d="M 140,180 L 560,180 L 600,265 L 100,265 Z" fill="rgba(255, 255, 255, 0.08)" stroke="rgba(255, 255, 255, 0.2)" stroke-width="2" />
-                <text x="350" y="215" fill="#FFFFFF" font-size="13" font-weight="800" text-anchor="middle">ZONE A — ORCHESTRA (900 Seats)</text>
-                <text x="350" y="235" fill="#CBD5E1" font-size="11" font-weight="600" text-anchor="middle">$35 / Ticket</text>
-              </g>
+              <!-- 3D Transform Assembly -->
+              <div class="hall-stage-3d-assembly view-iso" id="hallStageAssembly">
+                
+                <!-- 3D Elevated Main Stage -->
+                <div class="stage-deck-3d-block">
+                  <!-- Stage Left Speaker Array Stack -->
+                  <div class="speaker-tower-3d left-stack">
+                    <div class="speaker-grill">
+                      <div class="speaker-cone"></div>
+                      <div class="speaker-cone"></div>
+                      <div class="speaker-cone"></div>
+                    </div>
+                    <div class="speaker-vu-meter">
+                      <span class="vu-bar v1"></span>
+                      <span class="vu-bar v2"></span>
+                      <span class="vu-bar v3"></span>
+                      <span class="vu-bar v4"></span>
+                    </div>
+                  </div>
 
-              <!-- Tier B (Balcony) -->
-              <g class="hall-zone-pill" onclick="quickSelectHallTier('Zone B Balcony', 25)">
-                <path d="M 90,285 L 610,285 L 650,380 L 50,380 Z" fill="rgba(255, 255, 255, 0.04)" stroke="rgba(255, 255, 255, 0.12)" stroke-width="2" />
-                <text x="350" y="325" fill="#FFFFFF" font-size="13" font-weight="800" text-anchor="middle">ZONE B — BALCONY MEZZANINE (800 Seats)</text>
-                <text x="350" y="345" fill="#94A3B8" font-size="11" font-weight="600" text-anchor="middle">$25 / Ticket</text>
-              </g>
-            </svg>
+                  <!-- Center Stage Podium -->
+                  <div class="stage-platform-core">
+                    <div class="stage-top-face">
+                      <div class="stage-overhead-truss"></div>
+                      <div class="stage-neon-contour"></div>
+                      <div class="stage-performer-spot"></div>
+                      <div class="stage-title-emblem">
+                        <span class="stage-sparkle-dot"></span>
+                        <span class="stage-title-text">MAIN STAGE</span>
+                        <span class="stage-sparkle-dot"></span>
+                      </div>
+                      <div class="stage-audio-monitors">
+                        <span class="mon-wedge"></span>
+                        <span class="mon-wedge"></span>
+                      </div>
+                    </div>
+                    <!-- 3D Slab Front Apron Depth -->
+                    <div class="stage-front-riser">
+                      <span class="stage-front-neon-bar"></span>
+                    </div>
+                    <!-- Catwalk Thrust jutting forward -->
+                    <div class="stage-catwalk-thrust">
+                      <span class="catwalk-edge-light"></span>
+                    </div>
+                  </div>
+
+                  <!-- Stage Right Speaker Array Stack -->
+                  <div class="speaker-tower-3d right-stack">
+                    <div class="speaker-grill">
+                      <div class="speaker-cone"></div>
+                      <div class="speaker-cone"></div>
+                      <div class="speaker-cone"></div>
+                    </div>
+                    <div class="speaker-vu-meter">
+                      <span class="vu-bar v4"></span>
+                      <span class="vu-bar v2"></span>
+                      <span class="vu-bar v3"></span>
+                      <span class="vu-bar v1"></span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- TIER 1: VIP FRONT FLOOR (300 CAP) -->
+                <div class="tier-slab-3d tier-vip active" id="tierSlabVip" onclick="selectHallTier3D('vip')">
+                  <div class="tier-top-face">
+                    <div class="tier-halo-glow"></div>
+                    <div class="tier-seating-grid-texture vip-pit-texture"></div>
+                    <div class="tier-info-header">
+                      <div class="tier-title-row">
+                        <span class="tier-badge-icon">👑</span>
+                        <span class="tier-title-name">VIP FRONT FLOOR (300 Cap)</span>
+                        <span class="tier-active-pill">SELECTED</span>
+                      </div>
+                      <div class="tier-pricing-row">
+                        <span class="tier-price-tag">$45 / Ticket</span>
+                        <span class="tier-seats-status">🔥 48 Left · Catwalk Sightline</span>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Front depth face creating true 3D slab thickness -->
+                  <div class="tier-front-face">
+                    <span class="tier-depth-neon-strip"></span>
+                  </div>
+                </div>
+
+                <!-- TIER 2: ZONE A — ORCHESTRA (900 SEATS) -->
+                <div class="tier-slab-3d tier-orchestra" id="tierSlabOrchestra" onclick="selectHallTier3D('orchestra')">
+                  <div class="tier-top-face">
+                    <div class="tier-halo-glow"></div>
+                    <div class="tier-seating-grid-texture orchestra-rows-texture"></div>
+                    <div class="tier-info-header">
+                      <div class="tier-title-row">
+                        <span class="tier-badge-icon">🎼</span>
+                        <span class="tier-title-name">ZONE A — ORCHESTRA (900 Seats)</span>
+                        <span class="tier-active-pill">SELECT</span>
+                      </div>
+                      <div class="tier-pricing-row">
+                        <span class="tier-price-tag">$35 / Ticket</span>
+                        <span class="tier-seats-status">🎵 182 Left · Direct Center Sound</span>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Front depth face -->
+                  <div class="tier-front-face">
+                    <span class="tier-depth-neon-strip"></span>
+                  </div>
+                </div>
+
+                <!-- TIER 3: ZONE B — BALCONY MEZZANINE (800 SEATS) -->
+                <div class="tier-slab-3d tier-balcony" id="tierSlabBalcony" onclick="selectHallTier3D('balcony')">
+                  <div class="tier-top-face">
+                    <div class="tier-halo-glow"></div>
+                    <div class="tier-seating-grid-texture balcony-rows-texture"></div>
+                    <div class="tier-info-header">
+                      <div class="tier-title-row">
+                        <span class="tier-badge-icon">🏛️</span>
+                        <span class="tier-title-name">ZONE B — BALCONY MEZZANINE (800 Seats)</span>
+                        <span class="tier-active-pill">SELECT</span>
+                      </div>
+                      <div class="tier-pricing-row">
+                        <span class="tier-price-tag">$25 / Ticket</span>
+                        <span class="tier-seats-status">✨ 340 Left · Panoramic Amphitheater</span>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Front depth face -->
+                  <div class="tier-front-face">
+                    <span class="tier-depth-neon-strip"></span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
           </div>
 
-          <!-- Quick Reserve Card from Seating Map -->
+          <!-- Quick Reserve Card from Seating Map (NORMAL!) -->
           <div style="background: var(--card-core); border-radius: 16px; padding: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
             <div>
               <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: #93C5FD;">Selected Hall Zone</div>
               <div id="hallSelectedTierName" style="font-size: 18px; font-weight: 900; color: #FFFFFF; margin-top: 2px;">VIP FRONT FLOOR</div>
-              <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Direct catwalk sightline, priority turnstile entrance</div>
+              <div id="hallSelectedTierDesc" style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Direct catwalk sightline, priority turnstile entrance</div>
             </div>
-            <button class="btn-auth-action" style="padding: 12px 24px;" onclick="openReservationModal('kh-concert-001')">
+            <button class="btn-auth-action" style="padding: 12px 24px;" onclick="openReservationFromHall()">
               Book Hall Passes — <span id="hallSelectedTierPrice">$45</span>
             </button>
           </div>
@@ -588,7 +724,7 @@
                 <h3 class="stub-artist-title">VannDa (វណ្ណដា)</h3>
                 <div class="stub-tour-name">Skull Tour: Born in Battambang Live</div>
                 <div style="font-size: 12px; color: var(--text-muted); margin-top: 8px;">
-                  Bassac Live Main Hall • Koh Pich, Phnom Penh • NOV 14 • 07:30 PM
+                  CT Live Main Hall • Koh Pich, Phnom Penh • NOV 14 • 07:30 PM
                 </div>
               </div>
               <div class="stub-qr-code-box" id="ticketQr1" onclick="viewActivePassQr()" title="Tap to enlarge Gate QR code">
@@ -861,7 +997,7 @@
         <div class="sheet-body-content">
           <div>
             <h3 class="sheet-title-headline" id="sheetConcertTitle">VannDa (វណ្ណដា)</h3>
-            <div class="sheet-tour-subtext" id="sheetConcertTour">Skull Tour: Born in Battambang Live • Bassac Live Main Hall</div>
+            <div class="sheet-tour-subtext" id="sheetConcertTour">Skull Tour: Born in Battambang Live • CT Live Main Hall</div>
           </div>
 
           <!-- 10-Minute Urgency Hold Timer -->
@@ -976,7 +1112,7 @@
           TKT-VANNDA-FANPIT-001
         </div>
         <div style="font-size: 11px; color: var(--text-muted);">
-          Scan at Bassac Live turnstile gate. High-speed laser authenticated.
+          Scan at CT Live turnstile gate. High-speed laser authenticated.
         </div>
       </div>
     </div>

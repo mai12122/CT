@@ -15,7 +15,7 @@
           id: 'kh-concert-001',
           title: 'VannDa (វណ្ណដា)',
           tour: 'Skull Tour: Born in Battambang Live',
-          venue: 'Bassac Live Main Hall (Diamond Island / Koh Pich)',
+          venue: 'CT Live Main Hall (Diamond Island / Koh Pich)',
           city: 'Phnom Penh',
           banner: 'https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?auto=format&fit=crop&w=1200&q=80',
           basePrice: 45,
@@ -103,7 +103,8 @@
         }
       };
 
-      // Legacy compatibility alias
+      // Compatibility aliases
+      CONCERT_DATABASE['ct-grand-opening'] = CONCERT_DATABASE['kh-concert-001'];
       CONCERT_DATABASE['bassac-grand-opening'] = CONCERT_DATABASE['kh-concert-001'];
 
       let selectedConcertKey = 'kh-concert-001';
@@ -178,7 +179,7 @@
           counter: 'Step 4 of 4 • Turnstile Gate QR Pass',
           icon: 'qr-code',
           title: 'Step 4: Flash Your Dynamic Turnstile Pass',
-          dialogue: 'Boom! Your official pass is immediately generated in your CT Wallet with dynamic HMAC security. At Bassac Live Main Hall or Koh Pich, simply scan your phone screen at the turnstiles and enjoy the show!',
+          dialogue: 'Boom! Your official pass is immediately generated in your CT Wallet with dynamic HMAC security. At CT Live Main Hall or Koh Pich, simply scan your phone screen at the turnstiles and enjoy the show!',
           speechText: 'Step four: Your ticket is instantly saved in your wallet with dynamic QR code protection. Scan at the gate and enjoy the concert!',
           featureIcon: 'qr-code',
           featureTitle: 'Dynamic HMAC Security',
@@ -360,6 +361,7 @@
         loadSavedTickets();
         loadLiveConcertsFromApi();
         goToHamsterStep(0);
+        init3DArenaTilt();
         if (window.lucide && typeof window.lucide.createIcons === 'function') {
           window.lucide.createIcons();
         }
@@ -411,6 +413,11 @@
         }
         if (tabId === 'tickets') {
           initInitialQr();
+        }
+        if (tabId === 'hall') {
+          if (typeof selectHallTier3D === 'function') {
+            selectHallTier3D(activeHallTierKey || 'vip');
+          }
         }
 
         // Activate desktop link
@@ -789,9 +796,143 @@
         }, 3600);
       }
 
-      function quickSelectHallTier(name, price) {
-        document.getElementById('hallSelectedTierName').innerText = name.toUpperCase();
-        document.getElementById('hallSelectedTierPrice').innerText = `$${price}`;
+      // ============================================================
+      // 3D CT LIVE ARENA MODEL & SPATIAL INTERACTION ENGINE
+      // ============================================================
+      const HALL_TIERS_DATA = {
+        vip: {
+          key: 'vip',
+          name: 'VIP FRONT FLOOR',
+          price: 45,
+          desc: 'Direct catwalk sightline, priority turnstile entrance',
+          capacity: 300,
+          remaining: 48,
+          bookedPercent: 84,
+          perks: ['⚡ ACID Lock Protected', '🎟️ Live Dynamic QR Pass', '🚪 Koh Pich Gate 1 Access'],
+          catIndex: 0
+        },
+        orchestra: {
+          key: 'orchestra',
+          name: 'ZONE A — ORCHESTRA',
+          price: 35,
+          desc: 'Centered acoustic sweet spot, stadium raked sightline',
+          capacity: 900,
+          remaining: 182,
+          bookedPercent: 80,
+          perks: ['⚡ ACID Lock Protected', '🎼 Central Sound Sweetspot', '🚪 Level 1 Concourse Entry'],
+          catIndex: 1
+        },
+        balcony: {
+          key: 'balcony',
+          name: 'ZONE B — BALCONY MEZZANINE',
+          price: 25,
+          desc: 'Panoramic amphitheater view, elevated mezzanine acoustics',
+          capacity: 800,
+          remaining: 340,
+          bookedPercent: 58,
+          perks: ['⚡ ACID Lock Protected', '✨ Panoramic Grandstand View', '🚪 Level 2 Mezzanine Ramp'],
+          catIndex: 2
+        }
+      };
+
+      let activeHallTierKey = 'vip';
+
+      function selectHallTier3D(tierKey) {
+        const tier = HALL_TIERS_DATA[tierKey] || HALL_TIERS_DATA.vip;
+        activeHallTierKey = tierKey;
+
+        // Update 3D Slabs Active Classes
+        ['vip', 'orchestra', 'balcony'].forEach(k => {
+          const slabId = 'tierSlab' + capitalize(k);
+          const slab = document.getElementById(slabId);
+          if (slab) {
+            const isActive = (k === tierKey);
+            slab.classList.toggle('active', isActive);
+            const pill = slab.querySelector('.tier-active-pill');
+            if (pill) pill.innerText = isActive ? 'SELECTED' : 'SELECT';
+          }
+        });
+
+        // Update Selected Zone Details Card
+        const nameEl = document.getElementById('hallSelectedTierName');
+        if (nameEl) nameEl.innerText = tier.name;
+
+        const priceEl = document.getElementById('hallSelectedTierPrice');
+        if (priceEl) priceEl.innerText = `$${tier.price}`;
+
+        const descEl = document.getElementById('hallSelectedTierDesc');
+        if (descEl) descEl.innerText = tier.desc;
+
+        const remEl = document.getElementById('hallCapacityRemaining');
+        if (remEl) remEl.innerText = `${tier.remaining} Passes Remaining`;
+
+        const pctEl = document.getElementById('hallCapacityPercent');
+        if (pctEl) pctEl.innerText = `${tier.bookedPercent}% Booked`;
+
+        const fillEl = document.getElementById('hallCapacityBarFill');
+        if (fillEl) fillEl.style.width = `${tier.bookedPercent}%`;
+
+        const perksEl = document.getElementById('hallSelectedTierPerks');
+        if (perksEl) {
+          perksEl.innerHTML = tier.perks.map(p => `<span class="zone-perk-tag">${p}</span>`).join('');
+        }
+      }
+
+      function switchHall3DView(viewMode) {
+        const assembly = document.getElementById('hallStageAssembly');
+        if (!assembly) return;
+
+        assembly.classList.remove('view-iso', 'view-front');
+        assembly.classList.add(`view-${viewMode}`);
+
+        ['Iso', 'Front'].forEach(m => {
+          const btn = document.getElementById(`btnMode${m}`);
+          if (btn) btn.classList.toggle('active', m.toLowerCase() === viewMode.toLowerCase());
+        });
+      }
+
+      function openReservationFromHall() {
+        openReservationModal('kh-concert-001');
+        const tier = HALL_TIERS_DATA[activeHallTierKey];
+        if (tier && typeof selectPassTier === 'function') {
+          setTimeout(() => {
+            selectPassTier(tier.catIndex, tier.price, tier.name.split(' ')[0]);
+          }, 60);
+        }
+      }
+
+      function init3DArenaTilt() {
+        const viewport = document.getElementById('hallArenaViewport');
+        const assembly = document.getElementById('hallStageAssembly');
+        if (!viewport || !assembly) return;
+
+        let bounds = null;
+        const updateBounds = () => { bounds = viewport.getBoundingClientRect(); };
+        window.addEventListener('resize', updateBounds);
+
+        // Subtle internal tilt on the 3D stage arena only (never touches outer card!)
+        viewport.addEventListener('mousemove', (e) => {
+          if (!bounds) updateBounds();
+          const mouseX = e.clientX - bounds.left;
+          const mouseY = e.clientY - bounds.top;
+          const centerX = bounds.width / 2;
+          const centerY = bounds.height / 2;
+
+          const rotX = ((mouseY - centerY) / centerY) * -4.5;
+          const rotY = ((mouseX - centerX) / centerX) * 4.5;
+
+          if (assembly.classList.contains('view-iso')) {
+            assembly.style.transform = `rotateX(${(50 + rotX).toFixed(2)}deg) rotateZ(${(-6 + rotY * 0.5).toFixed(2)}deg) translateY(-20px)`;
+          } else if (assembly.classList.contains('view-front')) {
+            assembly.style.transform = `rotateX(${(24 + rotX).toFixed(2)}deg) rotateZ(${(rotY * 0.5).toFixed(2)}deg) translateY(-8px)`;
+          } else if (assembly.classList.contains('view-top')) {
+            assembly.style.transform = `rotateX(${(rotX * 0.5).toFixed(2)}deg) rotateZ(${(rotY * 0.5).toFixed(2)}deg)`;
+          }
+        });
+
+        viewport.addEventListener('mouseleave', () => {
+          assembly.style.transform = '';
+        });
       }
 
       // Verified Wallet Tickets Registry
@@ -800,7 +941,7 @@
           id: 'TKT-VANNDA-FANPIT-001',
           artist: 'VannDa (វណ្ណដា)',
           tour: 'Skull Tour: Born in Battambang Live',
-          venue: 'Bassac Live Main Hall • Koh Pich, Phnom Penh • NOV 14 • 07:30 PM',
+          venue: 'CT Live Main Hall • Koh Pich, Phnom Penh • NOV 14 • 07:30 PM',
           seat: 'Fanpit Standing #042 · Gate 1'
         }
       };

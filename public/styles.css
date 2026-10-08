@@ -1402,7 +1402,7 @@
       }
 
       /* ============================================================ */
-      /* 7. PHNOM PENH BASSAC LIVE HALL (2,000 SEATS) MAP SCREEN      */
+      /* 7. PHNOM PENH CT LIVE HALL (2,000 SEATS) MAP SCREEN          */
       /* ============================================================ */
       .hall-container-card {
         background: var(--surface);
@@ -1411,7 +1411,7 @@
         padding: 24px;
         display: flex;
         flex-direction: column;
-        gap: 24px;
+        gap: 22px;
       }
 
       .hall-header-info {
@@ -1440,23 +1440,640 @@
         border-radius: 999px;
       }
 
-      .stage-map-svg-frame {
+      /* 3D Amphitheater Seating Arena Wrapper (Only this section is 3D) */
+      .hall-stage-3d-wrapper {
         width: 100%;
-        background: #0B0E17;
-        border: 1px solid var(--border-hairline);
-        border-radius: 18px;
-        padding: 24px 12px;
         display: flex;
-        justify-content: center;
+        flex-direction: column;
+        gap: 12px;
       }
 
-      .hall-zone-pill {
+      /* 3D View Toolbar */
+      .hall-3d-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 8px 12px;
+        background: rgba(11, 14, 24, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        backdrop-filter: blur(10px);
+      }
+
+      .hall-3d-modes {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+
+      .hall-mode-btn {
+        background: transparent;
+        border: 1px solid transparent;
+        color: var(--text-secondary);
+        font-size: 11px;
+        font-weight: 800;
+        padding: 6px 12px;
+        border-radius: 10px;
         cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+      }
+
+      .hall-mode-btn:hover {
+        color: #FFFFFF;
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      .hall-mode-btn.active {
+        background: rgba(59, 130, 246, 0.2);
+        border-color: rgba(59, 130, 246, 0.45);
+        color: #93C5FD;
+        box-shadow: 0 0 12px rgba(59, 130, 246, 0.25);
+      }
+
+      /* 3D Arena Viewport */
+      .hall-arena-3d-viewport {
+        width: 100%;
+        min-height: 460px;
+        background: radial-gradient(circle at 50% 12%, #182038 0%, #0B0E18 55%, #05060B 100%);
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        border-radius: 20px;
+        position: relative;
+        overflow: hidden;
+        perspective: 1100px;
+        perspective-origin: 50% 30%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 50px 16px 40px;
+        box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.85);
+        transform: translateZ(20px);
+      }
+
+      /* Animated Spotlight Cones */
+      .stage-spotlight-beam {
+        position: absolute;
+        top: -60px;
+        width: 220px;
+        height: 600px;
+        pointer-events: none;
+        opacity: 0.28;
+        transform-origin: top center;
+        mix-blend-mode: screen;
+        z-index: 1;
+      }
+
+      .stage-spotlight-beam.beam-left {
+        left: 20%;
+        background: linear-gradient(170deg, rgba(59, 130, 246, 0.8) 0%, rgba(96, 165, 250, 0.15) 50%, transparent 80%);
+        animation: spotlightSweepLeft 7s ease-in-out infinite alternate;
+      }
+
+      .stage-spotlight-beam.beam-right {
+        right: 20%;
+        background: linear-gradient(190deg, rgba(168, 85, 247, 0.8) 0%, rgba(192, 132, 252, 0.15) 50%, transparent 80%);
+        animation: spotlightSweepRight 7.5s ease-in-out infinite alternate;
+      }
+
+      @keyframes spotlightSweepLeft {
+        0% { transform: rotate(-18deg) scaleX(0.85); opacity: 0.22; }
+        50% { transform: rotate(-2deg) scaleX(1.15); opacity: 0.38; }
+        100% { transform: rotate(14deg) scaleX(0.9); opacity: 0.25; }
+      }
+
+      @keyframes spotlightSweepRight {
+        0% { transform: rotate(18deg) scaleX(0.85); opacity: 0.24; }
+        50% { transform: rotate(3deg) scaleX(1.15); opacity: 0.38; }
+        100% { transform: rotate(-14deg) scaleX(0.9); opacity: 0.22; }
+      }
+
+      .stage-arena-ambient-glow {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 380px;
+        height: 180px;
+        background: radial-gradient(ellipse at 50% 30%, rgba(59, 130, 246, 0.35) 0%, transparent 75%);
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      .stage-arena-laser-grid {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 65%;
+        background-image: 
+          linear-gradient(to right, rgba(59, 130, 246, 0.05) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
+        background-size: 40px 40px;
+        mask-image: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+        -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+        pointer-events: none;
+      }
+
+      /* 3D Amphitheater Assembly */
+      .hall-stage-3d-assembly {
+        transform-style: preserve-3d;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+        width: 100%;
+        max-width: 620px;
+        transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        position: relative;
+        z-index: 5;
+      }
+
+      .hall-stage-3d-assembly.view-iso {
+        transform: rotateX(50deg) rotateZ(-6deg) translateY(-20px);
+      }
+
+      .hall-stage-3d-assembly.view-front {
+        transform: rotateX(24deg) rotateZ(0deg) translateY(-8px);
+      }
+
+      /* 3D Main Stage Structure */
+      .stage-deck-3d-block {
+        transform-style: preserve-3d;
+        transform: translateZ(36px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        margin-bottom: 6px;
+        position: relative;
+      }
+
+      .stage-platform-core {
+        width: 290px;
+        position: relative;
+        transform-style: preserve-3d;
+      }
+
+      .stage-top-face {
+        background: linear-gradient(180deg, #1A2238 0%, #101626 100%);
+        border: 2px solid rgba(96, 165, 250, 0.6);
+        border-radius: 12px;
+        padding: 12px 18px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        box-shadow: 
+          0 0 26px rgba(59, 130, 246, 0.45),
+          inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      }
+
+      .stage-neon-contour {
+        position: absolute;
+        inset: 3px;
+        border: 1px dashed rgba(96, 165, 250, 0.4);
+        border-radius: 8px;
+        pointer-events: none;
+      }
+
+      .stage-title-emblem {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .stage-title-text {
+        color: #FFFFFF;
+        font-size: 13px;
+        font-weight: 900;
+        letter-spacing: 2.2px;
+        text-shadow: 0 0 10px rgba(96, 165, 250, 0.8);
+      }
+
+      .stage-sparkle-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: #60A5FA;
+        box-shadow: 0 0 8px #60A5FA;
+      }
+
+      .stage-audio-monitors {
+        display: flex;
+        gap: 12px;
+        margin-top: 5px;
+      }
+
+      .mon-wedge {
+        width: 18px;
+        height: 5px;
+        background: #334155;
+        border-radius: 2px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+      }
+
+      /* Stage Front Riser Depth Face */
+      .stage-front-riser {
+        position: absolute;
+        bottom: -9px;
+        left: 6px;
+        right: 6px;
+        height: 10px;
+        background: #0B0E17;
+        border-radius: 0 0 8px 8px;
+        border: 1px solid rgba(59, 130, 246, 0.4);
+        border-top: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.8);
+      }
+
+      .stage-front-neon-bar {
+        width: 60%;
+        height: 2px;
+        background: #60A5FA;
+        box-shadow: 0 0 8px #60A5FA;
+        border-radius: 999px;
+      }
+
+      /* Stage Catwalk Projection */
+      .stage-catwalk-thrust {
+        position: absolute;
+        bottom: -22px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 44px;
+        height: 16px;
+        background: linear-gradient(180deg, #1E293B, #0F172A);
+        border: 1px solid #3B82F6;
+        border-top: none;
+        border-radius: 0 0 6px 6px;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        z-index: 6;
+      }
+
+      .catwalk-edge-light {
+        position: absolute;
+        bottom: 2px;
+        left: 4px;
+        right: 4px;
+        height: 2px;
+        background: #93C5FD;
+        box-shadow: 0 0 6px #93C5FD;
+      }
+
+      /* Line Array Speakers Towers */
+      .speaker-tower-3d {
+        width: 22px;
+        height: 62px;
+        background: #0B0F19;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 6px;
+        padding: 4px 3px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.7);
+        transform-style: preserve-3d;
+        transform: translateZ(10px);
+      }
+
+      .speaker-grill {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        align-items: center;
+      }
+
+      .speaker-cone {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #1E293B;
+        border: 1px solid #475569;
+        box-shadow: inset 0 0 4px #000;
+      }
+
+      .speaker-vu-meter {
+        display: flex;
+        gap: 2px;
+        align-items: flex-end;
+        height: 10px;
+      }
+
+      .vu-bar {
+        width: 2px;
+        background: #34D399;
+        border-radius: 1px;
+      }
+
+      .vu-bar.v1 { height: 4px; animation: vuPulse 1s infinite alternate; }
+      .vu-bar.v2 { height: 8px; animation: vuPulse 0.7s infinite alternate 0.2s; }
+      .vu-bar.v3 { height: 6px; animation: vuPulse 0.9s infinite alternate 0.4s; }
+      .vu-bar.v4 { height: 9px; background: #60A5FA; animation: vuPulse 0.8s infinite alternate 0.1s; }
+
+      @keyframes vuPulse {
+        0% { transform: scaleY(0.4); opacity: 0.6; }
+        100% { transform: scaleY(1.1); opacity: 1; }
+      }
+
+      /* 3D Tier Extruded Slabs */
+      .tier-slab-3d {
+        position: relative;
+        cursor: pointer;
+        transform-style: preserve-3d;
+        transition: transform 0.3s cubic-bezier(0.2, 0.85, 0.3, 1), box-shadow 0.3s ease;
+        will-change: transform;
+      }
+
+      .tier-slab-3d.tier-vip {
+        width: 76%;
+        max-width: 480px;
+        transform: translateZ(24px);
+      }
+
+      .tier-slab-3d.tier-orchestra {
+        width: 88%;
+        max-width: 550px;
+        transform: translateZ(16px);
+      }
+
+      .tier-slab-3d.tier-balcony {
+        width: 98%;
+        max-width: 610px;
+        transform: translateZ(8px);
+      }
+
+      .tier-slab-3d:hover {
+        filter: brightness(1.15);
+      }
+
+      .tier-slab-3d.tier-vip:hover {
+        transform: translateZ(32px) scale(1.02);
+      }
+
+      .tier-slab-3d.tier-orchestra:hover {
+        transform: translateZ(24px) scale(1.02);
+      }
+
+      .tier-slab-3d.tier-balcony:hover {
+        transform: translateZ(18px) scale(1.02);
+      }
+
+      /* Active Selected Tier State */
+      .tier-slab-3d.tier-vip.active {
+        transform: translateZ(36px) scale(1.03);
+      }
+
+      .tier-slab-3d.tier-orchestra.active {
+        transform: translateZ(30px) scale(1.03);
+      }
+
+      .tier-slab-3d.tier-balcony.active {
+        transform: translateZ(24px) scale(1.03);
+      }
+
+      /* Top Faces of 3D Slabs */
+      .tier-top-face {
+        position: relative;
+        padding: 14px 20px;
+        border-radius: 14px;
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+      }
+
+      /* Front Face Extrusion creating true 3D thickness */
+      .tier-front-face {
+        position: absolute;
+        bottom: -8px;
+        left: 8px;
+        right: 8px;
+        height: 9px;
+        border-radius: 0 0 10px 10px;
+        transition: all 0.3s ease;
+      }
+
+      .tier-depth-neon-strip {
+        display: block;
+        width: 80%;
+        height: 2px;
+        margin: 2px auto 0;
+        border-radius: 999px;
+        opacity: 0.8;
+      }
+
+      /* VIP Theme (Electric Blue / Cyan) */
+      .tier-slab-3d.tier-vip .tier-top-face {
+        background: linear-gradient(135deg, rgba(30, 58, 138, 0.45) 0%, rgba(14, 116, 144, 0.35) 100%);
+        border: 2px solid rgba(59, 130, 246, 0.55);
+        box-shadow: 
+          0 10px 24px rgba(0, 0, 0, 0.6),
+          0 0 24px rgba(59, 130, 246, 0.25),
+          inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      }
+
+      .tier-slab-3d.tier-vip .tier-front-face {
+        background: #0D162B;
+        border: 1px solid rgba(59, 130, 246, 0.5);
+        border-top: none;
+      }
+
+      .tier-slab-3d.tier-vip .tier-depth-neon-strip {
+        background: #60A5FA;
+        box-shadow: 0 0 10px #60A5FA;
+      }
+
+      .tier-slab-3d.tier-vip.active .tier-top-face {
+        border-color: #60A5FA;
+        background: linear-gradient(135deg, rgba(37, 99, 235, 0.6) 0%, rgba(14, 165, 233, 0.45) 100%);
+        box-shadow: 
+          0 16px 36px rgba(0, 0, 0, 0.7),
+          0 0 45px rgba(59, 130, 246, 0.65),
+          inset 0 1px 1px rgba(255, 255, 255, 0.4);
+      }
+
+      /* Orchestra Theme (Neon Purple / Ultraviolet) */
+      .tier-slab-3d.tier-orchestra .tier-top-face {
+        background: linear-gradient(135deg, rgba(88, 28, 135, 0.35) 0%, rgba(67, 56, 202, 0.3) 100%);
+        border: 2px solid rgba(168, 85, 247, 0.35);
+        box-shadow: 
+          0 10px 24px rgba(0, 0, 0, 0.6),
+          0 0 20px rgba(168, 85, 247, 0.18),
+          inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      }
+
+      .tier-slab-3d.tier-orchestra .tier-front-face {
+        background: #170F28;
+        border: 1px solid rgba(168, 85, 247, 0.35);
+        border-top: none;
+      }
+
+      .tier-slab-3d.tier-orchestra .tier-depth-neon-strip {
+        background: #C084FC;
+        box-shadow: 0 0 8px #C084FC;
+      }
+
+      .tier-slab-3d.tier-orchestra.active .tier-top-face {
+        border-color: #C084FC;
+        background: linear-gradient(135deg, rgba(147, 51, 234, 0.55) 0%, rgba(124, 58, 237, 0.45) 100%);
+        box-shadow: 
+          0 16px 36px rgba(0, 0, 0, 0.7),
+          0 0 45px rgba(168, 85, 247, 0.65),
+          inset 0 1px 1px rgba(255, 255, 255, 0.35);
+      }
+
+      /* Balcony Theme (Radiant Teal / Emerald) */
+      .tier-slab-3d.tier-balcony .tier-top-face {
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.5) 0%, rgba(13, 148, 136, 0.25) 100%);
+        border: 2px solid rgba(45, 212, 191, 0.3);
+        box-shadow: 
+          0 10px 24px rgba(0, 0, 0, 0.6),
+          0 0 20px rgba(20, 184, 166, 0.15),
+          inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      }
+
+      .tier-slab-3d.tier-balcony .tier-front-face {
+        background: #0B191B;
+        border: 1px solid rgba(45, 212, 191, 0.3);
+        border-top: none;
+      }
+
+      .tier-slab-3d.tier-balcony .tier-depth-neon-strip {
+        background: #2DD4BF;
+        box-shadow: 0 0 8px #2DD4BF;
+      }
+
+      .tier-slab-3d.tier-balcony.active .tier-top-face {
+        border-color: #2DD4BF;
+        background: linear-gradient(135deg, rgba(15, 118, 110, 0.5) 0%, rgba(16, 185, 129, 0.4) 100%);
+        box-shadow: 
+          0 16px 36px rgba(0, 0, 0, 0.7),
+          0 0 45px rgba(45, 212, 191, 0.6),
+          inset 0 1px 1px rgba(255, 255, 255, 0.35);
+      }
+
+      /* Seating Row Texture Details */
+      .tier-seating-grid-texture {
+        position: absolute;
+        inset: 0;
+        opacity: 0.12;
+        background-image: radial-gradient(#FFFFFF 1.5px, transparent 1.5px);
+        background-size: 14px 14px;
+        pointer-events: none;
+      }
+
+      .tier-info-header {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .tier-title-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .tier-badge-icon {
+        font-size: 13px;
+      }
+
+      .tier-title-name {
+        color: #FFFFFF;
+        font-size: 13px;
+        font-weight: 900;
+        letter-spacing: -0.2px;
+        flex: 1;
+        text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+      }
+
+      .tier-active-pill {
+        font-size: 9px;
+        font-weight: 900;
+        letter-spacing: 0.1em;
+        padding: 2px 7px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.1);
+        color: #CBD5E1;
         transition: all 0.2s;
       }
 
-      .hall-zone-pill:hover {
-        filter: brightness(1.2);
+      .tier-slab-3d.active .tier-active-pill {
+        background: #FFFFFF;
+        color: #0F172A;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+      }
+
+      .tier-pricing-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-top: 2px;
+      }
+
+      .tier-price-tag {
+        font-size: 13px;
+        font-weight: 900;
+        color: #FFFFFF;
+        text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+      }
+
+      .tier-seats-status {
+        font-size: 11px;
+        font-weight: 700;
+        color: #CBD5E1;
+        opacity: 0.9;
+      }
+
+
+
+      @media (max-width: 768px) {
+        .hall-container-card {
+          padding: 18px 14px;
+        }
+
+        .hall-arena-3d-viewport {
+          min-height: 400px;
+          padding: 30px 8px;
+        }
+
+        .stage-platform-core {
+          width: 220px;
+        }
+
+        .tier-slab-3d.tier-vip {
+          width: 90%;
+        }
+
+        .tier-slab-3d.tier-orchestra {
+          width: 95%;
+        }
+
+        .tier-slab-3d.tier-balcony {
+          width: 100%;
+        }
+
+        .selected-zone-right {
+          width: 100%;
+          align-items: stretch;
+        }
+
+        .zone-capacity-meter-box {
+          max-width: 100%;
+        }
       }
 
       /* ============================================================ */
